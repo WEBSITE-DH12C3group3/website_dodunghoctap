@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link rel="i" type="image/png" href="../images/Eden.png" >
+  <link rel="stylesheet" href="/mycss/form.css">
+
+  <link rel="stylesheet" href="/mycss/style.css">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOdLHNpLHn9+YRAy0RQgRNEirOrf0gR6Yq6yjHA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="/assets/owlcarousel/assets/owl.carousel.min.css">
+  <link rel="stylesheet" href="/assets/owlcarousel/assets/owl.theme.default.min.css">
+</head>
+<header>
+  <div class="container py-3">
+    <div class="row align-items-center">
+      <!-- Logo -->
+      <div class="col-md-3 col-4 text-center text-md-start mb-3 mb-md-0">
+        <a href="/">
+          <img
+            src="../public/images/logo1.png"
+            class="img-fluid"
+            width="200px"
+            height="auto"
+            alt="Logo" />
+        </a>
+      </div>
+      <!-- Search Bar -->
+      <div class="col-md-5 col-4 mb-3 mb-md-0">
+        <form method="get" action="" class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Tìm Kiếm"
+            aria-label="Tìm Kiếm"
+            aria-describedby="basic-addon2"
+            name="q"
+            maxlength="220" />
+          <button
+            class="btn btn-outline-secondary"
+            type="submit"
+            id="basic-addon2">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
+      <!-- Cart and Account Section -->
+      <div class="col-md-4 col-4">
+        <div class="d-flex justify-content-center justify-content-md-end align-items-center">
+          <!-- Cart -->
+          <div class="col-6">
+            <div class="me-4 position-relative text-center">
+              <a
+                href=""
+                class="position-relative text-dark">
+                <span class="fs-2" id="cart"><i class="fa-solid fa-bag-shopping"></i></span>
+                <span
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                </span>
+              </a>
+              <div class="text-muted">
+                <b>Giỏ Hàng</b>
+              </div>
+            </div>
+          </div>
+          <!-- Account -->
+          <div class="col-6">
+            <div class="fs-3"></div>
+              <!-- Nếu chưa đăng nhập -->
+              <div class="dropdown nav-item">
+                <a
+                  class="btn btn-secondary dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <i class="fa-regular fa-user"></i> Tài khoản
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="dangky.php">
+                      <i class="fa-regular fa-pen-to-square"></i> Đăng ký</a>
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="dangnhap.php">
+                      <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập</a>
+                  </li>
+                </ul>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- Other Header Content -->
+    </div>
+  </div>
+  
+</header>
+<!-- Navigation Bar -->
+<section class="mymainmenu" style="background-color: #aae9f7; border-radius: 5px;">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg">
+          <span class="navbar-brand" style="color: #093608;" href="#"><b>EDEN</b></span>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav d-flex justify-content-around w-100">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="index.php" style="color: #093608;"><b>Trang Chủ</b></a>
+              </li>
+              <?php if (isset($_SESSION['user_logged_in'])): ?>
+                <li class="nav-item">
+                  <a class="nav-link" href="liked.php" style="color: #093608;"><b>Yêu thích</b></a>
+                </li>
+              <?php endif; ?>
+              <!-- Other menu items -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #093608;">
+                  <b>Danh mục</b>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <?php foreach ($categories as $category): ?>
+                    <li><a class="dropdown-item" href="category.php?id=<?php echo $category['id']; ?>&category_name=<?php echo $category['category_name']; ?>"><?php echo htmlspecialchars($category['category_name']); ?></a></li>
+                  <?php endforeach; ?>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="supasale.php" style="color: #093608;"><b>Siêu sale</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="contact.php" style="color: #093608;"><b>Liên hệ</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="about.html" style="color: #093608;"><b>Về chúng tôi</b></a>
+              </li>
+              <li class="nav-item dropdown"></li> <!-- Empty dropdown item -->
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </section>
+  </header>
+
+  <!-- Optional: Add JavaScript if you want a click-based dropdown -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    let lastScrollTop = 0;
+    const header = document.getElementById("myHeader");
+
+    window.addEventListener("scroll", function() {
+      const currentScroll = window.pageYOffset;
+
+      if (currentScroll > lastScrollTop) {
+        // Cuộn xuống
+        header.classList.add("hidden");
+      } else {
+        // Cuộn lên
+        header.classList.remove("hidden");
+        header.classList.add("sticky");
+      }
+
+      lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // Đặt lại lastScrollTop để tránh giá trị âm
+    });
+  </script>

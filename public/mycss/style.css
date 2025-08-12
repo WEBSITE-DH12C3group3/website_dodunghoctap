@@ -1,0 +1,224 @@
+  /* body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  } */
+header {
+  background: #3b82f6;
+  /* padding: 10px; */
+}
+/* header a {
+  color: white;
+  margin-right: 15px;
+  text-decoration: none;
+} */
+footer {
+  text-align: center;
+  padding: 10px;
+  background: #f3f4f6;
+}
+
+    /* Style for the dropdown */
+    .dropdown:hover .dropdown-menu {
+      display: block;
+      /* Hiển thị menu khi hover vào phần tử dropdown */
+    }
+
+    .dropdown-menu {
+      display: none;
+      /* Ẩn menu mặc định */
+      position: absolute;
+      /* Đặt menu vào vị trí tuyệt đối */
+      z-index: 1000;
+      /* Đảm bảo menu hiển thị trên các phần tử khác */
+    }
+
+    .dropdown {
+      width: fit-content;
+      position: relative;
+    }
+
+    .dropdown-item {
+      color: #093608 !important;
+    }
+
+    .dropdown-item:hover {
+      background-color: #ddd;
+    }
+
+    /* Other styles... */
+    .sticky {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: top 0.3s;
+      /* Thêm hiệu ứng chuyển đổi */
+    }
+
+    .hidden {
+      top: -125px;
+      /* Chiều cao của menu để nó biến mất khi cuộn xuống */
+    }
+
+    #cart:hover {
+      color: orangered;
+    }
+
+a {
+  text-decoration: none;
+}
+.vertical-menu ul {
+  list-style-type: none; /* Bỏ dấu chấm đầu dòng */
+  padding: 0;
+}
+.vertical-menu a {
+  background-color: #62894cfc;
+  color: white;
+  display: block;
+  padding: 12px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.vertical-menu a:hover {
+  background-color: #308049;
+  color: white;
+}
+
+.vertical-menu a.active {
+  background-color: #b8f465;
+  color: white;
+}
+/*sanpham
+/*kẻ tiêu đề*/
+.title-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.title-divider::before,
+.title-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 3px solid #eee;
+}
+
+.title-divider:not(:empty)::before {
+  margin-right: 0.5em;
+}
+
+.title-divider:not(:empty)::after {
+  margin-left: 0.5em;
+}
+
+.title-text {
+  color: #666;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+/*nổi bóng*/
+.hover-effect {
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Tạo hiệu ứng chuyển đổi mượt mà */
+}
+
+.hover-effect:hover {
+  transform: translateY(-10px); /* Dịch phần tử lên trên */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Tạo hiệu ứng bóng đổ */
+}
+/*menu bar*/
+/* Ẩn menu con mặc định */
+.nav-item .dropdown-menu {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Hiển thị menu con khi rê chuột qua mục menu chính */
+.nav-item:hover .dropdown-menu {
+  display: block;
+  opacity: 1;
+  position: absolute;
+  background-color: #fcfbfb;
+}
+
+/* đổ bóng phần các sản phẩm chính */
+/* Bo tròn góc cho các sản phẩm */
+.card {
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  background-color: white;
+}
+
+/* Hiệu ứng nổi lên khi rê chuột */
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Chia ảnh và thông tin sản phẩm thành 2 ô */
+.product-image {
+  border-bottom: 1px solid #ddd;
+}
+
+.product-image img {
+  width: 100%;
+  height: auto;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.product-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.product-info h4 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+.product-info p {
+  font-size: 16px;
+  color: #888;
+}
+
+.product_title {
+  margin-bottom: 20px;
+}
+
+.title-text {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: #3f640b;
+}
+
+/* Chỉnh phần khoảng cách giữa các sản phẩm */
+/* .product-list {
+  margin-bottom: 50px;
+} */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.col-md-3,
+.col-sm-6 {
+  padding: 15px;
+}
+/* produc */

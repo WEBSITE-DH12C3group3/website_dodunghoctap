@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDEN | Đăng Ký</title>
+    <link rel="stylesheet" href="/public/mycss/form.css">
+    <style>
+        .log {
+            background-color: #28a228;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .log:hover {
+            background-color: #196f38;
+            color: #fff;
+        }
+
+        .alert {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+
+<body >   
+<%- include('../partials/header') %>
+    <section>
+        <div class="container mt-5 py-5">
+            <div class="row justify-content-center">
+                <div class="form-container">
+                    <h2 class="text-center mb-4">Đăng Ký Tài Khoản</h2>
+
+                  
+                    <form action="/BANHOA/database/reg.php" method="post" onsubmit="return validateForm()">
+                        <div class="form-group">
+                            <label for="fullname">Họ và Tên</label>
+                            <input type="text" class="form-control" name="fullname" id="fullname" placeholder="Nhập họ và tên">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="text" class="form-control" name="email" id="email" placeholder="Nhập email">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Mật khẩu</label>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Nhập mật khẩu">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword">Nhập lại mật khẩu</label>
+                            <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" placeholder="Nhập lại mật khẩu">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại</label>
+                            <input type="tel" class="form-control" name="phone" id="phone" placeholder="Nhập số điện thoại">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Địa chỉ</label>
+                            <input type="text" class="form-control" name="address" id="address" placeholder="Tỉnh thành/quận huyện/thị xã/số nhà">
+                        </div>
+
+                        <div class="d-flex py-3 form-group">
+                            <button type="submit" name="btn-reg" class="btn btn-block log">Đăng Ký</button>
+                        </div>
+
+                        <div>
+                            Đã có tài khoản? <a href="dangnhap.php">Đăng nhập ở đây.</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

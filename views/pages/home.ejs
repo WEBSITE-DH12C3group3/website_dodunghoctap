@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* produc CSS */
+        .product-image {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        .carousel-item {
+            transition: transform 1s ease;
+            /* 2 giây */
+        }
+    </style>
+    <style>
+        .swal2-popup {
+            font-size: 0.9rem !important;
+            font-family: Arial, sans-serif;
+        }
+
+        .swal2-toast {
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <body >
+
+    <section class="mymaincontent my-3">
+        <div class="container my-3">
+            <div class="slider">
+                <div id="carouselExampleRide" class="carousel slide" data-bs-ride="true">
+                    <div class="carousel-inner" style="border-radius: 5px;">
+                        <div class="carousel-item active">
+                            <img src="/public/images/logo1.png" class="d-block w-100" alt="anh">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/BANHOA/Front-end/public/copyslide.jpg" class="d-block w-100" alt="anhslide">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/BANHOA/Front-end/public/cpsile.jpg" class="d-block w-100" alt="anhslide">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/BANHOA/Front-end/public/ngay-phu-nu-viet-nam.jpg" class="d-block w-100" alt="anhslide">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/BANHOA/Front-end/public/tinh-thanh.jpg" class="d-block w-100" alt="anhslide">
+                        </div>
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+            <br>
+            <div class="cate-list mb-3">
+                <span>
+                    <h3 style="color: #3f640b;">Sản Phẩm Nổi Bật</h3>
+                </span>
+                <hr>
+                <div class="row py-4">
+                    <div class="large-12 columns">
+                        <div class="product-list owl-carousel owl-theme"> <!-- Đặt div này chứa toàn bộ sản phẩm -->
+                            
+                            <div class="item hover-effect" style="border-radius: 10px; padding: 5px;">
+                                <div class="category-icon text-center"> <!-- Thêm class 'text-center' để căn giữa -->
+                                    <a href="" class="product-link">
+                                        <img src="" alt="hoaxinh" class="img-fluid">
+                                        <h6 class="mt-2" style="color: black;"></h6> <!-- Thêm margin-top để tạo khoảng cách giữa ảnh và chữ -->
+                                    </a>
+                                </div>
+                            </div>
+                         
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="product-list mb-3">
+                        <div class="row text-center">
+                            <div class="container">
+                               
+                                            <!-- Tiêu đề danh mục với tên danh mục -->
+                                            <div class="row text-center">
+                                                <div class="title-divider">
+                                                    <span class="title-text" style="color: #3f640b;"><?php echo $category_name; ?></span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Sản phẩm trong danh mục -->
+                                            <div class="product_list-s">
+                                                <div class="row" style="background-color: #f7aaaa; border-radius: 5px;">
+                                                    <div class="container">
+                                                        <div class="row">
+                                                            
+                                                                    <div class="col-md-3 col-sm-6 mb-4">
+                                                                        <a class="card" href="">
+                                                                            <img src="" class="card-img-top product-image" alt=">">
+                                                                            <div class="card-body text-center">
+                                                                                <h5 class="card-title"></h5>
+                                                                                <!-- Hiển thị giá -->
+                                                                                <p class="text-muted">
+                                                                                 
+                                                                                </p>
+                                                                                <form action="" method="post">
+                                                                                    <button class="btn btn-success" name="addcart">Đặt hàng</button>
+                                                                                </form>
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                           
+                                                        </div>
+                                                        <!-- Nút xem thêm -->
+                                                        <div class="row text-center" style="width: 20%; margin: auto; margin-bottom: 10px;">
+                                                            <a href="" class="btn btn-secondary btn-sm">Xem thêm</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

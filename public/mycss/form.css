@@ -1,0 +1,32 @@
+body {
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* Đảm bảo body luôn đủ cao để căn giữa */
+  margin: 0;
+  /* Loại bỏ margin mặc định của body */
+}
+
+.form-container {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  /* Thiết lập chiều rộng cố định */
+  max-width: 500px;
+  min-width: 300px;
+}
+
+.form-group label {
+  margin: 10px 0 5px 0;
+  /* Điều chỉnh margin cho label */
+  display: block;
+  /* Đảm bảo label chiếm toàn bộ chiều rộng */
+}
+
+.form-group a {
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center;
+  margin-right: 10px;
+}
