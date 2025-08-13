@@ -1,0 +1,43 @@
+ecommerce-api/
+│
+├── server.js                # Điểm khởi động ứng dụng
+├── package.json
+│
+├── config/                   # Cấu hình (database, môi trường)
+│   ├── db.js
+│   └── env.js
+│
+├── controllers/              # Xử lý logic khi nhận request
+│   ├── product.controller.js
+│   ├── user.controller.js
+│   ├── order.controller.js
+│   └── auth.controller.js
+│
+├── models/                   # Định nghĩa dữ liệu
+│   ├── product.model.js
+│   ├── user.model.js
+│   ├── order.model.js
+│   └── category.model.js
+│
+├── routes/                   # Định nghĩa các endpoint API
+│   ├── product.routes.js
+│   ├── user.routes.js
+│   ├── order.routes.js
+│   └── auth.routes.js
+│
+├── middlewares/              # Middleware (auth, logger, validate)
+│   ├── auth.middleware.js
+│   └── error.middleware.js
+│
+├── services/                 # Xử lý nghiệp vụ phức tạp
+│   ├── product.service.js
+│   └── payment.service.js
+│
+├── utils/                    # Hàm tiện ích (format, email, JWT)
+│   ├── jwt.js
+│   ├── sendEmail.js
+│   └── helpers.js
+│
+└── tests/                    # Unit test / Integration test
+    ├── product.test.js
+    └── user.test.js

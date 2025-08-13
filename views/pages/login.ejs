@@ -20,33 +20,33 @@
 <body >
 <%- include('../partials/header') %>
     <section>
-        <div class="container mt-5 py-5">
-            <div class="row justify-content-center">
-                <div class="form-container">
+    <div class="container mt-5 py-5">
+        <div class="row justify-content-center">
+            <div class="form-container">
+                <h2 class="text-center mb-4">Đăng Nhập</h2>
 
-                    <h2 class="text-center mb-4">Đăng Nhập</h2>
-                   
+                <% if (typeof error !== 'undefined') { %>
+                    <p style="color:red"><%= error %></p>
+                <% } %>
 
-                    <form method="POST" action="">
-                        <!-- Email -->
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="text" class="form-control" id="email" name="email" placeholder="Nhập email">
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Mật khẩu</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu">
-                        </div>
-                        <div class="form-group" style="margin-top: 20px;">
-                            <a href="">Quên mật khẩu?</a>
-                            <a href="">Đăng ký</a>
-                            <button type="submit" name="btn-login" class="btn btn-block log" style="float: right;">Đăng nhập</button>
-                        </div>
-
-                    </form>
-                </div>
+                <form method="POST" action="/login">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" class="form-control" id="email" name="email" placeholder="Nhập email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu">
+                    </div>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <a href="">Quên mật khẩu?</a>
+                        <a href="">Đăng ký</a>
+                        <button type="submit" name="btn-login" class="btn btn-block log" style="float: right;">Đăng nhập</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 </body>
 </html>
