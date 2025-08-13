@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const db = require("./config/db");
 
 const app = express();
 const PORT = 3000;
@@ -25,24 +26,19 @@ app.get("/", (req, res) => {
 
 
 // Trang đăng ký
-app.get("/registers", (req, res) => {
-  res.render("pages/registers", { title: "Đăng ký" });
-});
-app.post("/registers", (req, res) => {
-  const { username, password } = req.body;
-  req.session.user = { username };
-  res.redirect("/");
-});
+// app.get("/registers", (req, res) => {
+//   res.render("pages/registers", { title: "Đăng ký" });
+// });
+// app.post("/registers", (req, res) => {
+//   const { username, password } = req.body;
+//   req.session.user = { username };
+//   res.redirect("/");
+// });
+app.use("/", require("./routes/auth.routes"));
 
 // Trang đăng nhập
-app.get("/login", (req, res) => {
-  res.render("pages/login", { title: "Đăng nhập" });
-});
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  req.session.user = { username };
-  res.redirect("/");
-});
+app.use("/", require("./routes/auth.routes"));
+
 
 // Đăng xuất
 app.get("/logout", (req, res) => {
