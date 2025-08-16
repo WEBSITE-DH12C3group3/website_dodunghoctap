@@ -64,3 +64,31 @@ exports.getFavorites = (req, res) => {
         res.status(200).json(results);
     });
 };
+// Render trang yêu thích
+exports.renderFavorites = (req, res) => {
+    const user = req.session.user; // user sau khi login lưu trong session
+
+    if (!user) {
+        return res.redirect("/login"); // chưa đăng nhập thì quay lại login
+    }
+
+    const sql = `
+        SELECT p.product_id, p.product_name, p.price, p.image_url, f.added_date
+        FROM favourite f
+        JOIN products p ON f.product_id = p.product_id
+        WHERE f.user_id = ?
+        ORDER BY f.added_date DESC
+    `;
+
+    db.query(sql, [user.user_id], (err, results) => {
+        if (err) {
+            return res.status(500).send("Lỗi khi lấy sản phẩm yêu thích: " + err.message);
+        }
+
+        res.render("pages/liked", {
+            title: "Trang yêu thích",
+            user: user,
+            favorites: results
+        });
+    });
+};

@@ -37,7 +37,7 @@ app.get("/logout", (req, res) => {
 });
 // Trang sản phẩm yêu thích
 
-app.use("/f", favoriteRoutes);
+app.use("/liked", favoriteRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server chạy tại http://localhost:${PORT}`);
