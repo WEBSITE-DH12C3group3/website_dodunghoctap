@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title><%= title %></title>
-  <link rel="i" type="image/png" href="../images/Eden.png" >
+  <link rel="icon" type="image/png" href="/images/Eden.png" >
   <link rel="stylesheet" href="/mycss/form.css">
 
   <link rel="stylesheet" href="/mycss/style.css">
@@ -21,7 +21,7 @@
       <div class="col-md-3 col-4 text-center text-md-start mb-3 mb-md-0">
         <a href="/">
           <img
-            src="../public/images/logo1.png"
+            src="/images/logo1.png"
             class="img-fluid"
             width="200px"
             height="auto"
@@ -115,11 +115,9 @@
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="/" style="color: #093608;"><b>Trang Chủ</b></a>
               </li>
-              <?php if (isset($_SESSION['user_logged_in'])): ?>
                 <li class="nav-item">
-                  <a class="nav-link" href="liked.php" style="color: #093608;"><b>Yêu thích</b></a>
+                  <a class="nav-link" href="/favorites" style="color: #093608;"><b>Yêu thích</b></a>
                 </li>
-              <?php endif; ?>
               <!-- Other menu items -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #093608;">

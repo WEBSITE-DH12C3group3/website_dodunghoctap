@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const favoriteRoutes = require("./routes/favorites.routes");
+
 const db = require("./config/db");
 
 const app = express();
@@ -24,18 +26,6 @@ app.get("/", (req, res) => {
   res.render("pages/home", { user: req.session.user || null, title: "Trang chủ" });
 });
 
-
-// Trang đăng ký
-// app.get("/registers", (req, res) => {
-//   res.render("pages/registers", { title: "Đăng ký" });
-// });
-// app.post("/registers", (req, res) => {
-//   const { username, password } = req.body;
-//   req.session.user = { username };
-//   res.redirect("/");
-// });
-app.use("/", require("./routes/auth.routes"));
-
 // Trang đăng nhập
 app.use("/", require("./routes/auth.routes"));
 
@@ -45,6 +35,9 @@ app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/login");
 });
+// Trang sản phẩm yêu thích
+
+app.use("/f", favoriteRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server chạy tại http://localhost:${PORT}`);

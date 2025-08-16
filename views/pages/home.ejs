@@ -39,19 +39,19 @@
                 <div id="carouselExampleRide" class="carousel slide" data-bs-ride="true">
                     <div class="carousel-inner" style="border-radius: 5px;">
                         <div class="carousel-item active">
-                            <img src="/public/images/logo1.png" class="d-block w-100" alt="anh">
+                            <img src="/images/copyside.jpg" class="d-block w-100" alt="anh">
                         </div>
                         <div class="carousel-item">
-                            <img src="" class="d-block w-100" alt="anhslide">
+                            <img src="/images/copyslide.jpg" class="d-block w-100" alt="anhslide">
                         </div>
                         <div class="carousel-item">
-                            <img src="" class="d-block w-100" alt="anhslide">
+                            <img src="/images/cpsile.jpg" class="d-block w-100" alt="anhslide">
                         </div>
                         <div class="carousel-item">
-                            <img src="" class="d-block w-100" alt="anhslide">
+                            <img src="/images/copyside.jpg" class="d-block w-100" alt="anhslide">
                         </div>
                         <div class="carousel-item">
-                            <img src="" class="d-block w-100" alt="anhslide">
+                            <img src="/images/copyslide.jpg" class="d-block w-100" alt="anhslide">
                         </div>
                     </div>
 
@@ -96,50 +96,51 @@
                         <div class="row text-center">
                             <div class="container">
                                
-                                            <!-- Tiêu đề danh mục với tên danh mục -->
-                                            <div class="row text-center">
-                                                <div class="title-divider">
-                                                    <span class="title-text" style="color: #3f640b;"><?php echo $category_name; ?></span>
-                                                </div>
-                                            </div>
+                                <!-- Tiêu đề danh mục với tên danh mục -->
+                                <div class="row text-center">
+                                    <div class="title-divider">
+                                        <span class="title-text" style="color: #3f640b;"><?php echo $category_name; ?></span>
+                                    </div>
+                                </div>
 
                                             <!-- Sản phẩm trong danh mục -->
-                                            <div class="product_list-s">
-                                                <div class="row" style="background-color: #f7aaaa; border-radius: 5px;">
-                                                    <div class="container">
-                                                        <div class="row">
-                                                            
-                                                                    <div class="col-md-3 col-sm-6 mb-4">
-                                                                        <a class="card" href="">
-                                                                            <img src="" class="card-img-top product-image" alt=">">
-                                                                            <div class="card-body text-center">
-                                                                                <h5 class="card-title"></h5>
-                                                                                <!-- Hiển thị giá -->
-                                                                                <p class="text-muted">
-                                                                                 
-                                                                                </p>
-                                                                                <form action="" method="post">
-                                                                                    <button class="btn btn-success" name="addcart">Đặt hàng</button>
-                                                                                </form>
-                                                                            </div>
-                                                                        </a>
-                                                                    </div>
-                                                           
+                                <div class="product_list-s">
+                                    <div class="row" style="background-color: #f7aaaa; border-radius: 5px;">
+                                        <div class="container">
+                                            <div class="row">
+                                                <!-- Lặp qua từng sản phẩm trong danh mục -->
+                                                <div class="col-md-3 col-sm-6 mb-4">
+                                                    <a class="card" href="">
+                                                        <img src="" class="card-img-top product-image" alt=">">
+                                                        <div class="card-body text-center">
+                                                            <h5 class="card-title"></h5>
+                                                            <!-- Hiển thị giá -->
+                                                            <p class="text-muted">
+                                                             
+                                                            </p>
+                                                            <form action="" method="post">
+                                                                <button class="btn btn-success" name="addcart">Đặt hàng</button>
+                                                            </form>
                                                         </div>
-                                                        <!-- Nút xem thêm -->
-                                                        <div class="row text-center" style="width: 20%; margin: auto; margin-bottom: 10px;">
-                                                            <a href="" class="btn btn-secondary btn-sm">Xem thêm</a>
-                                                        </div>
-                                                    </div>
+                                                    </a>
                                                 </div>
+                                        
                                             </div>
+                                            <!-- Nút xem thêm -->
+                                            <div class="row text-center" style="width: 20%; margin: auto; margin-bottom: 10px;">
+                                                <a href="" class="btn btn-secondary btn-sm">Xem thêm</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-  <%- include('../partials/footer') %>
+        </div>
+    </section>
+<%- include('../partials/footer') %>
 </body>
 </html>

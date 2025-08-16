@@ -5,11 +5,7 @@ const path = require("path");
 const session = require("express-session");
 const authController = require("../controllers/auth.controller");
 
-// GET hiển thị form đăng nhập
-// app.get("/", (req, res) => {
-//   res.render("pages/login");
-// });
-// POST xử lý đăng nhập
+//  xử lý đăng nhập
 router.get("/login", (req, res) => {
   res.render("pages/login", { title: "Đăng nhập" });
 });

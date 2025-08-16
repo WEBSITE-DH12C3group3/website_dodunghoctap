@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Sản phẩm yêu thích</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+
+<%- include('../partials/header') %>
+
+<body style="margin-top: 120px;">
+    <section class="py-5">
+        <div class="container mt-5">
+            <h2 class="mb-4 text-center">💖 Sản phẩm yêu thích</h2>
+
+            <table class="table table-bordered text-center align-middle shadow">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">STT</th>
+                        <th scope="col">Ảnh sản phẩm</th>
+                        <th scope="col">Tên sản phẩm</th>
+                        <th scope="col">Giá</th>
+                        <th scope="col">Ngày thêm</th>
+                        <th scope="col">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="favorites-body">
+                    <% if (favorites && favorites.length > 0) { %>
+                        <% favorites.forEach((item, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td>
+                                    <img src="<%= item.image_url %>" alt="Product Image" width="100px" class="rounded">
+                                </td>
+                                <td>
+                                    <a href="/products/<%= item.product_id %>" class="text-decoration-none fw-bold">
+                                        <%= item.product_name %>
+                                    </a>
+                                </td>
+                                <td><%= item.price.toLocaleString() %> VND</td>
+                                <td><%= new Date(item.added_date).toLocaleDateString('vi-VN') %></td>
+                                <td>
+                                    <form action="/favorites/remove/<%= item.product_id %>" method="POST" style="display:inline;">
+                                        <input type="hidden" name="userId" value="<%= userId %>">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6">
+                                <img src="/images/exhausted-wojak.gif" alt="empty" width="250" class="mb-3">
+                                <div class="fw-bold">Không có sản phẩm yêu thích</div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</body>
+
+<%- include('../partials/footer') %>
+
+</html>

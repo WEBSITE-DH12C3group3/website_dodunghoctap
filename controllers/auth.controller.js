@@ -1,12 +1,8 @@
-// Giả lập database
+// database
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 
 // Hiển thị form login
-// exports.showLoginForm = (req, res) => {
-//     res.render('pages/login');
-// };
-
 exports.login = (req, res) => {
     const { email, password } = req.body;
 
@@ -25,9 +21,6 @@ exports.login = (req, res) => {
     });
 };
 // Hiển thị form đăng ký
-// exports.showRegisterForm = (req, res) => {  
-//     res.render('pages/registers');
-// }
 exports.register = (req, res) => {
     const { fullname, email, password, confirmPassword, phone, address } = req.body;
 
