@@ -8,16 +8,22 @@ exports.login = (req, res) => {
 
     const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
     db.query(sql, [email, password], (err, results) => {
-        if (err) throw err;
-        if (results.length > 0) {
-        const fullname = results[0].full_name;
-        req.session.user = { full_name: fullname };
-        const role = results[0].role;
-        req.session.role = role; // Lưu vai trò vào session
+    if (err) throw err;
+
+    if (results.length > 0) {
+        const user = results[0];
+        req.session.user = {
+        user_id: user.user_id,
+        full_name: user.full_name,
+        email: user.email,
+        role: user.role
+        };
+
+        console.log("Đăng nhập thành công:", user.full_name, "Với ID:", user.user_id);
         res.redirect("/");
-        } else {
+    } else {
         res.send("Sai tài khoản hoặc mật khẩu!");
-        }
+    }
     });
 };
 // Hiển thị form đăng ký

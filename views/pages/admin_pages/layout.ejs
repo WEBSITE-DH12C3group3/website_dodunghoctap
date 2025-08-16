@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <%- include("../partials/sidebar") %>
+
+    <!-- Content -->
+    <main class="p-4 flex-fill">
+      <%- body %>
+    </main>
+  </div>
+</body>
+</html>

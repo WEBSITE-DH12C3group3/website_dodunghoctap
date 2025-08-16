@@ -1,0 +1,34 @@
+<!-- <% layout("admin/layout") %>
+
+<h2>📊 Bảng thống kê</h2>
+<p>Doanh thu hôm nay: <%= totalDay.toLocaleString() %> đ</p>
+<p>Doanh thu tuần này: <%= totalWeek.toLocaleString() %> đ</p>
+<p>Doanh thu tháng này: <%= totalMonth.toLocaleString() %> đ</p>
+
+<div style="width: 600px;">
+  <canvas id="hourlyChart"></canvas>
+</div>
+<script>
+  const ctx = document.getElementById("hourlyChart").getContext("2d");
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: <%= JSON.stringify(hours) %>,
+      // xuất ra [0,1,2,...,23]
+      datasets: [{
+        label: "Doanh thu theo giờ",
+        data: <%= JSON.stringify(revenues) %>, // xuất ra [0,1000,2000,...]
+        borderColor: "blue",
+        fill: false
+      }]
+    },
+    options: {
+      scales: {
+        x: { title: { display: true, text: "Giờ" } },
+        y: { title: { display: true, text: "Doanh thu (VNĐ)" } }
+      }
+    }
+  });
+</script>
+
+ -->
