@@ -16,4 +16,11 @@ router.get("/registers", (req, res) => {
   res.render("pages/registers", { title: "Đăng ký" });
 });
 router.post("/registers", authController.register);
+
+// Xử lý quên mật khẩu
+
+router.get("/forgotpassword", authController.renderForgotPassword);
+router.post("/forgotpassword", authController.sendResetCode);
+router.post("/verify-code", authController.verifyResetCode);
+
 module.exports = router;  

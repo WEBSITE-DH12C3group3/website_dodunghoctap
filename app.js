@@ -8,8 +8,6 @@ const userRoutes = require("./routes/user.routes");
 const cartRoutes = require("./routes/cart.routes");
 // Import middleware
 const setUser = require("./middlewares/setUser");
-const db = require("./config/db");
-
 
 app.set("view engine", "ejs");
 
@@ -33,6 +31,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  res.locals.email = "";
+  res.locals.error = "";
+  next();
+});
+
 // Trang chủ
 app.get("/", (req, res) => {
   res.render("pages/home", { 
@@ -40,7 +44,6 @@ app.get("/", (req, res) => {
     title: "Trang chủ"
   });
 });
-
 
 // Trang đăng nhập
 app.use("/", require("./routes/auth.routes"));
