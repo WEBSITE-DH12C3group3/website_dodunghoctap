@@ -61,7 +61,7 @@ exports.register = (req, res) => {
             if (err2) throw err2;
 
             req.session.user = { fullname, email };
-            res.redirect("/");
+            res.redirect("/login");
         });
     });
 };
