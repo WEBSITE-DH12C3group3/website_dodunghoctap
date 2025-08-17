@@ -8,11 +8,12 @@ const connection = mysql.createConnection({
   database: "sellschoolsupplies" // Tên database
 });
 
-// Dùng promise wrapper
-const db = connection.promise();
 
-db.connect()
-  .then(() => console.log("✅ Đã kết nối MySQL"))
-  .catch(err => console.error("❌ Lỗi kết nối MySQL:", err));
-
-module.exports = db;
+connection.connect((err) => {
+  if (err) {
+    console.error("Lỗi kết nối MySQL:", err);
+    return;
+  }
+  console.log("✅ Đã kết nối MySQL");
+});
+module.exports = connection;

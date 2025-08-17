@@ -6,6 +6,8 @@ const session = require("express-session");
 const favoriteRoutes = require("./routes/favorites.routes");
 const userRoutes = require("./routes/user.routes");
 const cartRoutes = require("./routes/cart.routes");
+const db = require("./config/db");
+
 // Import middleware
 const setUser = require("./middlewares/setUser");
 
