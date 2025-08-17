@@ -1,92 +1,110 @@
-// database
-const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const getConnection = require("../config/db");
 
-let resetCodes = {}; // lưu tạm trong bộ nhớ (nên lưu DB)
+let resetCodes = {}; // Lưu tạm trong bộ nhớ (nên lưu vào DB)
 
-exports.renderForgotPassword = (req, res) => {
+exports.renderForgotPassword = async (req, res) => {
   res.render("pages/forgotpassword", { error: "" });
 };
-// Hiển thị form login
-exports.login = (req, res) => {
-    const { email, password } = req.body;
 
-    const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-    db.query(sql, [email, password], (err, results) => {
-    if (err) throw err;
+// Hiển thị form login
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const connection = await getConnection();
+    const [results] = await connection.execute(
+      "SELECT * FROM users WHERE email = ? AND password = ?",
+      [email, password]
+    );
+    await connection.end();
 
     if (results.length > 0) {
-        const user = results[0];
-        req.session.user = {
+      const user = results[0];
+      req.session.user = {
         user_id: user.user_id,
         full_name: user.full_name,
         email: user.email,
-        role: user.role
-        };
+        role: user.role,
+      };
 
-        console.log("Đăng nhập thành công:", user.full_name, "Với ID:", user.user_id);
-        res.redirect("/");
+      console.log("Đăng nhập thành công:", user.full_name, "Với ID:", user.user_id);
+      res.redirect("/");
     } else {
-        res.send("Sai tài khoản hoặc mật khẩu!");
+      res.send("Sai tài khoản hoặc mật khẩu!");
     }
-    });
+  } catch (err) {
+    console.error("Lỗi đăng nhập:", err);
+    res.status(500).send("Lỗi server");
+  }
 };
-// Hiển thị form đăng ký
-exports.register = (req, res) => {
-    const { fullname, email, password, confirmPassword, phone, address } = req.body;
 
-    // 1. Kiểm tra mật khẩu nhập lại
-    if (password !== confirmPassword) {
-        return res.send("Mật khẩu không khớp!");
+// Hiển thị form đăng ký
+exports.register = async (req, res) => {
+  const { fullname, email, password, confirmPassword, phone, address } = req.body;
+
+  // 1. Kiểm tra mật khẩu nhập lại
+  if (password !== confirmPassword) {
+    return res.send("Mật khẩu không khớp!");
+  }
+
+  try {
+    const connection = await getConnection();
+    // 2. Kiểm tra email tồn tại chưa
+    const [emailResult] = await connection.execute(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
+    if (emailResult.length > 0) {
+      await connection.end();
+      return res.send("Email đã được sử dụng!");
     }
 
-    // 2. Kiểm tra email tồn tại chưa
-    const checkEmailSql = "SELECT * FROM users WHERE email = ?";
-    db.query(checkEmailSql, [email], (err, result) => {
-        if (err) throw err;
-        if (result.length > 0) {
-            return res.send("Email đã được sử dụng!");
-        }
+    // 3. Mã hóa mật khẩu
+    //const hashedPassword = await bcrypt.hash(password, 10);
 
-        // 3. Mã hóa mật khẩu
-        // const hashedPassword = bcrypt.hashSync(password, 10);
+    // 4. Lưu vào DB
+    const [result] = await connection.execute(
+      "INSERT INTO users (full_name, email, phone, address, password, role) VALUES (?, ?, ?, ?, ?, 'customer')",
+      [fullname, email, phone, address, hashedPassword]
+    );
+    await connection.end();
 
-        // 4. Lưu vào DB
-        const insertSql = `
-            INSERT INTO users (full_name, email, phone, address, password, role)
-            VALUES (?, ?, ?, ?, ?, 'customer')
-        `;
-        db.query(insertSql, [fullname, email, phone, address, password], (err2, result2) => {
-            if (err2) throw err2;
-
-            req.session.user = { fullname, email };
-            res.redirect("/login");
-        });
-    });
+    req.session.user = { full_name: fullname, email };
+    res.redirect("/login");
+  } catch (err) {
+    console.error("Lỗi đăng ký:", err);
+    res.status(500).send("Lỗi server");
+  }
 };
 
 // Gửi mã xác nhận
+
 exports.sendResetCode = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+    const connection = await getConnection();
+    const [rows] = await connection.execute(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
+    await connection.end();
 
     if (rows.length === 0) {
-      return res.render("forgotpassword", { error: "Email chưa được đăng ký." });
+      return res.render("pages/forgotpassword", { error: "Email chưa được đăng ký.", email });
     }
 
-    // Tạo mã xác nhận ngẫu nhiên
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    resetCodes[email] = code;
+    resetCodes[email] = { code, expiryTime: Date.now() + 10 * 60 * 1000 };
+    console.log(`Mã xác nhận cho ${email}: ${code}, Hết hạn: ${new Date(resetCodes[email].expiryTime)}`);
 
-    // Gửi mail
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: "mynameistrang19012004@gmail.com",
-        pass: "evzy ewzu ufci gpli", // nhớ dùng app password
+        pass: "evzy ewzu ufci gpli",
       },
     });
 
@@ -94,27 +112,25 @@ exports.sendResetCode = async (req, res) => {
       from: "mynameistrang19012004@gmail.com",
       to: email,
       subject: "Mã xác nhận đặt lại mật khẩu",
-      text: `Mã xác nhận của bạn là: ${code}`,
+      text: `Mã xác nhận của bạn là: ${code}. Mã có hiệu lực trong 10 phút.`,
     });
 
-    res.render("pages/forgotpassword", { error: "Mã xác nhận đã được gửi" });
+    res.render("pages/forgotpassword", { error: "Mã xác nhận đã được gửi", email });
   } catch (err) {
-    console.error(err);
-    res.render("pages/forgotpassword", { error: "Lỗi server" });
+    console.error("Lỗi gửi mã xác nhận:", err);
+    res.render("pages/forgotpassword", { error: "Lỗi server", email });
   }
 };
 
-// Kiểm tra mã xác nhận
-exports.verifyResetCode = (req, res) => {
+exports.verifyResetCode = async (req, res) => {
   const { email, code } = req.body;
+  const resetData = resetCodes[email];
+  console.log(`Mã nhập cho ${email}: ${code}, Mã lưu: ${resetData ? resetData.code : 'null'}`);
 
-  if (resetCodes[email] && resetCodes[email] === code) {
+  if (resetData && resetData.code === code && Date.now() < resetData.expiryTime) {
     delete resetCodes[email];
-    return res.send("✅ Xác nhận thành công! Bạn có thể đổi mật khẩu.");
+    return res.redirect('/reset-password'); // Chuyển đến trang đổi mật khẩu
   } else {
-    return res.render("pages/forgotpassword", { error: "Mã xác nhận không hợp lệ" });
+    return res.render("pages/forgotpassword", { error: "Mã xác nhận không hợp lệ hoặc đã hết hạn", email });
   }
 };
-
-
- 
