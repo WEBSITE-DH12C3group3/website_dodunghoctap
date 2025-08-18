@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EDEN | Sản phẩm</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      th {
+        background: #f8f8f8;
+      }
+      .img-thumb {
+        max-width: 100px;
+        max-height: 100px;
+      }
+      .maincontent {
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('layout.ejs') %>
+    <div class="wrapper">
+      <!-- Sidebar: có thể tái sử dụng riêng, hoặc đơn giản hóa cho NodeJS -->
+      <!-- Bỏ qua phần sidebar nếu bạn đã xử lý layout chung -->
+      <div class="maincontent" id="content">
+        <h2>Danh Sách Sản Phẩm</h2>
+        <div class="search-bar">
+          <input
+            type="text"
+            id="searchBox"
+            onkeyup="search()"
+            placeholder="Nhập Từ Khóa Cần Tìm..."
+          />
+          <button
+            type="button"
+            class="btn btn-success"
+            data-toggle="modal"
+            data-target="#add"
+          >
+            Thêm sản phẩm
+          </button>
+        </div>
+
+        <div class="info-bar">
+          <div class="total-posts">
+            <p>Tổng số sản phẩm: <%= products.length %></p>
+          </div>
+        </div>
+
+        <table class="table table-bordered" id="Table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Hình ảnh</th>
+              <th>Tên sản phẩm</th>
+              <th>Miêu tả</th>
+              <th>Giá</th>
+              <th>Kho</th>
+              <th>Danh mục</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (products.length === 0) { %>
+            <tr>
+              <td colspan="8">Không có kết quả!</td>
+            </tr>
+            <% } else { %> <% products.forEach(function(row) { %>
+            <tr>
+              <td><%= row.product_id %></td>
+              <td>
+                <% if (row.image_url) { %>
+                <img
+                  src="/uploads/<%= row.image_url %>"
+                  alt="product image"
+                  class="img-thumb"
+                />
+                <% } else { %> Chưa có ảnh <% } %>
+              </td>
+              <td><%= row.product_name %></td>
+              <td><%= row.description %></td>
+              <td><%= row.price.toLocaleString('vi-VN') %> ₫</td>
+              <td><%= row.stock_quantity %></td>
+              <td><%= row.category_name || "" %></td>
+              <td>
+                <a
+                  type="button"
+                  class="btn btn-info"
+                  href="/admin/edit/<%= row.product_id %>"
+                >
+                  <i class="fa fa-edit"></i>
+                </a>
+                <a
+                  onclick="return confirm('Bạn có muốn xóa?')"
+                  href="/admin/delete/<%= row.product_id %>"
+                  class="btn btn-danger"
+                >
+                  <i class="fa fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            <% }); %> <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Modal thêm/xóa/sửa có thể code thêm với EJS hoặc dùng route riêng -->
+  </body>
+</html>
