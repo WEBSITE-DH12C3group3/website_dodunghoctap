@@ -7,7 +7,7 @@ const favoriteRoutes = require("./routes/favorites.routes");
 const userRoutes = require("./routes/user.routes");
 const cartRoutes = require("./routes/cart.routes");
 const db = require("./config/db");
-
+const productRoutes = require('./routes/product.routes');
 // Import middleware
 const setUser = require("./middlewares/setUser");
 
@@ -64,7 +64,7 @@ app.use("/liked", favoriteRoutes);
 app.use("/cart", cartRoutes);
 
 // Admin routes
-app.use("/admin", require("./routes/admin.routes"));
+app.use("/admin", require("./routes/product.routes"));
 
 app.listen(PORT, () => {
   console.log(`Server chạy tại http://localhost:${PORT}`);
