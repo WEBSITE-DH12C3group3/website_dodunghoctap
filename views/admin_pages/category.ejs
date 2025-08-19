@@ -1,0 +1,189 @@
+<div class="wrapper">
+  <div class="maincontent" id="content">
+    <h2>Danh Sách Danh Mục</h2>
+    <div class="search-bar">
+      <input type="text" id="searchBox" placeholder="Nhập Từ Khóa Cần Tìm..." />
+      <button
+        type="button"
+        class="btn btn-success"
+        data-toggle="modal"
+        data-target="#add"
+      >
+        Thêm danh mục
+      </button>
+    </div>
+
+    <div class="info-bar">
+      <div class="total-posts">
+        <p>Tổng số danh mục: <%= categories.length %></p>
+      </div>
+    </div>
+
+    <table class="table table-bordered" id="Table">
+      <thead>
+        <tr>
+          <th scope="col" style="width: 140px">ID</th>
+          <th scope="col">Tên danh mục</th>
+          <th scope="col" style="width: 120px">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (categories.length > 0) { %> <% categories.forEach(category => {
+        %>
+        <tr>
+          <td><%= category.id %></td>
+          <td><%= category.category_name %></td>
+          <td>
+            <a
+              type="button"
+              class="btn btn-info"
+              data-toggle="modal"
+              data-target="#edit"
+              data-id="<%= category.id %>"
+              data-category_name="<%= category.category_name %>"
+              style="color: white"
+              ><i class="fa fa-edit"></i
+            ></a>
+
+            <a
+              onclick="return confirm('Bạn có muốn xóa?')"
+              href="/admin/category/delete/<%= category.id %>"
+              class="btn btn-danger"
+              ><i class="fa fa-trash"></i
+            ></a>
+          </td>
+        </tr>
+        <% }); %> <% } else { %>
+        <tr>
+          <td colspan="3">Không có danh mục nào.</td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="add"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addLabel">Thêm Danh mục</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addForm" method="POST" action="/admin/category/add">
+          <div class="form-group">
+            <label for="ID">Mã Danh mục</label>
+            <input
+              type="text"
+              class="form-control"
+              id="ID"
+              name="ID"
+              placeholder="Mã danh mục"
+            />
+          </div>
+          <div class="form-group">
+            <label for="Name">Tên Danh mục</label>
+            <input
+              type="text"
+              class="form-control"
+              id="Name"
+              name="Name"
+              placeholder="Tên danh mục"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Đóng
+        </button>
+        <button type="submit" form="addForm" class="btn btn-primary">
+          Lưu
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="edit"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editLabel">Sửa Danh mục</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" method="POST" action="/admin/category/edit">
+          <div class="form-group">
+            <label for="cateid">Mã Danh mục</label>
+            <input
+              type="text"
+              class="form-control"
+              id="cateid"
+              name="cateid"
+              readonly
+            />
+          </div>
+          <div class="form-group">
+            <label for="catename">Tên Danh mục</label>
+            <input
+              type="text"
+              class="form-control"
+              id="catename"
+              name="catename"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Đóng
+        </button>
+        <button type="submit" form="editForm" class="btn btn-primary">
+          Lưu
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $("#edit").on("show.bs.modal", function (event) {
+    var button = $(event.relatedTarget);
+    var id = button.data("id");
+    var category_name = button.data("category_name");
+
+    var modal = $(this);
+    modal.find("#cateid").val(id);
+    modal.find("#catename").val(category_name);
+  });
+</script>
