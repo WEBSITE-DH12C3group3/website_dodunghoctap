@@ -11,12 +11,10 @@ const authRoutes = require("./routes/auth.routes");
 const resetPasswordRoutes = require("./routes/resetpassword.routes");
 
 const db = require("./config/db");
-const resetPasswordRoutes = require("./routes/resetpassword.routes");
 const resetPasswordController = require("./controllers/resetpassword.controller");
-const productRoutes = require('./routes/product.routes');
 const authController = require("./controllers/auth.controller"); 
-const authRoutes = require("./routes/auth.routes");
 const forgotPasswordRoutes = require("./routes/forgotpassword.routes");
+const contactRoutes = require("./routes/contact.routes");
 
 const productRoutes = require("./routes/product.routes");
 
@@ -83,6 +81,16 @@ app.use("/resetpassword", resetPasswordRoutes);
 
 app.use("/", authRoutes);
 app.use("/change", forgotPasswordRoutes);
+// Trang liên hệ
+app.use("/partials/contact", contactRoutes);
+
+app.get("/about", (req, res) => {
+  res.render("partials/about", {
+    user: req.session.user || null,
+    title: "Giới thiệu",
+  });
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server chạy tại http://localhost:${PORT}`);
