@@ -1,97 +1,96 @@
-const express = require("express");
-const path = require("path");
+const express = require('express');
+const path = require('path');
+const session = require('express-session');
+
 const app = express();
-const PORT = 3000;
-const session = require("express-session");
-const favoriteRoutes = require("./routes/favorites.routes");
-const userRoutes = require("./routes/user.routes");
-const cartRoutes = require("./routes/cart.routes");
-const adminRoutes = require("./routes/product.routes");
-const authRoutes = require("./routes/auth.routes");
-const resetPasswordRoutes = require("./routes/resetpassword.routes");
+const PORT = process.env.PORT || 3000;
 
-const db = require("./config/db");
-const resetPasswordController = require("./controllers/resetpassword.controller");
-const authController = require("./controllers/auth.controller"); 
-const forgotPasswordRoutes = require("./routes/forgotpassword.routes");
-const contactRoutes = require("./routes/contact.routes");
+// Middleware khác
+const setUser = require('./middlewares/setUser');
 
-const productRoutes = require("./routes/product.routes");
+// View engine & Views
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// Import middleware
-const setUser = require("./middlewares/setUser");
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
-app.set("view engine", "ejs");
-
-app.set("views", path.join(__dirname, "views"));
-
-app.use(express.static(path.join(__dirname, "public")));
-
+// Body parsers
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
+// Session
 app.use(
   session({
-    secret: "secret-key",
+    secret: 'secret-key',
     resave: false,
     saveUninitialized: true,
   })
 );
+
+// Middleware setUser và locals
 app.use(setUser);
-//kiểm tra người dùng đã đăng nhập hay chưa
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
+  res.locals.email = '';
+  res.locals.error = '';
   next();
 });
 
-app.use((req, res, next) => {
-  res.locals.email = "";
-  res.locals.error = "";
-  next();
-});
+// Import các router khác
+const favoriteRoutes = require('./routes/favorites.routes');
+const userRoutes = require('./routes/user.routes');
+const cartRoutes = require('./routes/cart.routes');
+const authRoutes = require('./routes/auth.routes');
+const resetPasswordRoutes = require('./routes/resetpassword.routes');
+const forgotPasswordRoutes = require('./routes/forgotpassword.routes');
+const contactRoutes = require('./routes/contact.routes');
+
+// Router quản trị sản phẩm (duy nhất)
+const productAdminRouter = require('./routes/product.routes');
 
 // Trang chủ
-app.get("/", (req, res) => {
-  res.render("pages/home", {
+app.get('/', (req, res) => {
+  res.render('pages/home', {
     user: req.session.user || null,
-    title: "Trang chủ",
+    title: 'Trang chủ',
   });
 });
 
-// Trang đăng nhập
-app.use("/", authRoutes);
-// Trang thông tin tài khoản
-app.use("/", userRoutes);
+// Auth & User
+app.use('/', authRoutes);
+app.use('/', userRoutes);
 
 // Đăng xuất
-app.get("/logout", (req, res) => {
-  req.session.destroy();
-  res.redirect("/login");
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/login'));
 });
-// Trang sản phẩm yêu thích
 
-app.use("/liked", favoriteRoutes);
-// Trang giỏ hàng
-app.use("/cart", cartRoutes);
+// Yêu thích & Giỏ hàng
+app.use('/liked', favoriteRoutes);
+app.use('/cart', cartRoutes);
 
-// Admin routes
-app.use("/admin", adminRoutes);
+// Mount router sản phẩm admin tại /admin/products
+app.use('/admin/products', productAdminRouter);
 
-// Trang đặt lại mật khẩu
-app.use("/resetpassword", resetPasswordRoutes);
+// Redirect /admin → /admin/products (tuỳ chọn)
+app.get('/admin', (req, res) => res.redirect('/admin/products'));
 
-app.use("/", authRoutes);
-app.use("/change", forgotPasswordRoutes);
-// Trang liên hệ
-app.use("/partials/contact", contactRoutes);
+// Các router còn lại
+app.use('/resetpassword', resetPasswordRoutes);
+app.use('/change', forgotPasswordRoutes);
+app.use('/partials/contact', contactRoutes);
 
-app.get("/about", (req, res) => {
-  res.render("partials/about", {
+// About page
+app.get('/about', (req, res) => {
+  res.render('partials/about', {
     user: req.session.user || null,
-    title: "Giới thiệu",
+    title: 'Giới thiệu',
   });
 });
 
-
+// Lắng nghe
 app.listen(PORT, () => {
   console.log(`Server chạy tại http://localhost:${PORT}`);
 });

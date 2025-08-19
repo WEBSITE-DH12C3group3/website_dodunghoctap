@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EDEN | Xóa sản phẩm</title>
+    <style>
+      .maincontent { padding: 20px; max-width: 720px; margin: 0 auto; }
+      .warn { background:#fff3cd; border:1px solid #ffeeba; padding:12px; border-radius:4px; }
+      .actions { display:flex; gap:8px; margin-top:16px; }
+      .btn { display:inline-block; padding:6px 10px; border-radius:4px; text-decoration:none; color:#fff; }
+      .btn-secondary { background:#6c757d; }
+      .btn-danger { background:#dc3545; }
+    </style>
+  </head>
+  <body>
+    <div class="maincontent">
+      <h2>Xóa sản phẩm</h2>
+      <div class="warn">
+        <p>Bạn có chắc muốn xóa sản phẩm:</p>
+        <ul>
+          <li>ID: <strong><%= product.product_id %></strong></li>
+          <li>Tên: <strong><%= product.product_name %></strong></li>
+        </ul>
+        <p>Thao tác này không thể hoàn tác.</p>
+      </div>
+
+      <form action="/admin/products/delete/<%= product.product_id %>" method="post" class="actions">
+        <a class="btn btn-secondary" href="/admin/products">Hủy</a>
+        <button class="btn btn-danger" type="submit">Xóa</button>
+      </form>
+    </div>
+  </body>
+</html>

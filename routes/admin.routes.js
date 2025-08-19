@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const statsController = require("../controllers/statistical.controller");
+const { route } = require("./favorites.routes");
 
 // Khi vào /admin → mặc định hiển thị dashboard thống kê
 router.get("/", statsController.dashboard);

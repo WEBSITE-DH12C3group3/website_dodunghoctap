@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EDEN | Sản phẩm</title>
+    <style>
+      table { border-collapse: collapse; width: 100%; }
+      th, td { border: 1px solid #ddd; padding: 8px; }
+      th { background: #f8f8f8; }
+      .img-thumb { max-width: 100px; max-height: 100px; }
+      .maincontent { padding: 20px; }
+      .search-bar { display:flex; gap:8px; margin-bottom:12px; }
+      .btn { display:inline-block; padding:6px 10px; border-radius:4px; text-decoration:none; color:#fff; cursor:pointer; }
+      .btn-success { background:#28a745; }
+      .btn-info { background:#17a2b8; }
+      .btn-danger { background:#dc3545; }
+      .btn-sm { padding:4px 8px; font-size: 13px; }
+      .actions { display:flex; gap:8px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="maincontent" id="content">
+        <h2>Danh Sách Sản Phẩm</h2>
+
+        <div class="search-bar">
+          <input type="text" id="searchBox" onkeyup="search()" placeholder="Nhập Từ Khóa Cần Tìm..." />
+          <a class="btn btn-success" href="/admin/products/product_add">Thêm sản phẩm</a>
+        </div>
+
+        <div class="info-bar">
+          <div class="total-posts">
+            <p>Tổng số sản phẩm: <%= products.length %></p>
+          </div>
+        </div>
+
+        <table class="table table-bordered" id="Table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Hình ảnh</th>
+              <th>Tên sản phẩm</th>
+              <th>Miêu tả</th>
+              <th>Giá</th>
+              <th>Kho</th>
+              <th>Danh mục</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!products || products.length === 0) { %>
+              <tr><td colspan="8">Không có kết quả!</td></tr>
+            <% } else { %>
+              <% products.forEach(function(row) { %>
+                <tr>
+                  <td><%= row.product_id %></td>
+                  <td>
+                    <% if (row.image_url) { %>
+                      <img src="/uploads/<%= row.image_url %>" alt="product image" class="img-thumb" />
+                    <% } else { %> Chưa có ảnh <% } %>
+                  </td>
+                  <td><%= row.product_name %></td>
+                  <td><%= row.description %></td>
+                  <td><%= Number(row.price).toLocaleString('vi-VN') %> ₫</td>
+                  <td><%= row.stock_quantity %></td>
+                  <td><%= row.category_name || "" %></td>
+                  <td>
+                    <div class="actions">
+                      <a class="btn btn-info btn-sm" href="/admin/products/edit/<%= row.product_id %>">Sửa</a>
+                      <a class="btn btn-danger btn-sm" href="/admin/products/delete/<%= row.product_id %>">Xóa</a>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function search() {
+        const input = document.getElementById('searchBox');
+        const filter = (input.value || '').toLowerCase();
+        const trs = document.querySelectorAll('#Table tbody tr');
+        trs.forEach(tr => {
+          const cells = Array.from(tr.querySelectorAll('td')).slice(0, -1);
+          tr.style.display = cells.some(td => (td.textContent || '').toLowerCase().includes(filter)) ? '' : 'none';
+        });
+      }
+    </script>
+  </body>
+</html>

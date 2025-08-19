@@ -8,7 +8,7 @@ const getCategories = async (req, res) => {
       "SELECT * FROM categories ORDER BY id, category_name"
     );
     // Render trang EJS và truyền dữ liệu danh mục vào
-    res.render("admin_pages/category", {
+    res.render("admin_pages/category/category", {
       categories: rows,
       // Giả sử bạn có thông báo từ các hành động khác (thêm, sửa, xóa)
       status: req.query.status,
@@ -17,7 +17,7 @@ const getCategories = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.render("admin_pages/category", {
+    res.render("admin_pages/category/category", {
       categories: [],
       status: "error",
       title: "Lỗi!",

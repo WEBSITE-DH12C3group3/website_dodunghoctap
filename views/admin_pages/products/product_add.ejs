@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EDEN | Thêm sản phẩm</title>
+    <style>
+      .maincontent { padding: 20px; max-width: 960px; margin: 0 auto; }
+      .row2 { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+      .row1 { display:grid; grid-template-columns: 1fr; gap:16px; }
+      label { display:block; margin:8px 0 4px; font-weight:600; }
+      input, textarea, select { width:100%; padding:8px; }
+      .actions { display:flex; gap:8px; margin-top:16px; }
+      .btn { display:inline-block; padding:6px 10px; border-radius:4px; text-decoration:none; color:#fff; }
+      .btn-secondary { background:#6c757d; }
+      .btn-primary { background:#007bff; }
+    </style>
+  </head>
+  <body>
+    <div class="maincontent">
+      <h2>Thêm sản phẩm</h2>
+      <form action="/admin/products/add" method="post" enctype="multipart/form-data">
+        <div class="row2">
+          <div>
+            <label>Tên sản phẩm</label>
+            <input name="product_name" required />
+          </div>
+          <div>
+            <label>Giá (₫)</label>
+            <input name="price" type="number" min="0" step="1000" required />
+          </div>
+        </div>
+
+        <div class="row2">
+          <div>
+            <label>Số lượng kho</label>
+            <input name="stock_quantity" type="number" min="0" required />
+          </div>
+          <div>
+            <label>Danh mục</label>
+            <select name="category_id">
+              <option value="">-- Không chọn --</option>
+              <% categories.forEach(function(c){ %>
+                <option value="<%= c.category_id %>"><%= c.category_name %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+
+        <div class="row1">
+          <div>
+            <label>Miêu tả</label>
+            <textarea name="description" rows="4"></textarea>
+          </div>
+          <div>
+            <label>Hình ảnh</label>
+            <input type="file" name="image" accept="image/*" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-secondary" href="/admin/products">Hủy</a>
+          <button class="btn btn-primary" type="submit">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
