@@ -1,16 +1,15 @@
-// Giả sử bạn có một file kết nối database, ví dụ: /config/database.js
-const db = require("../config/db"); // Import kết nối database
+const getConnection = require("../config/db");
 
-// Hiển thị trang quản lý danh mục
+// Hiển thị danh mục
 const getCategories = async (req, res) => {
+  let connection;
   try {
-    const [rows] = await db.query(
-      "SELECT * FROM categories ORDER BY id, category_name"
+    connection = await getConnection();
+    const [rows] = await connection.query(
+      "SELECT * FROM categories ORDER BY category_id, category_name"
     );
-    // Render trang EJS và truyền dữ liệu danh mục vào
     res.render("admin_pages/category/category", {
       categories: rows,
-      // Giả sử bạn có thông báo từ các hành động khác (thêm, sửa, xóa)
       status: req.query.status,
       title: req.query.title,
       message: req.query.message,
@@ -23,14 +22,25 @@ const getCategories = async (req, res) => {
       title: "Lỗi!",
       message: "Không thể tải dữ liệu danh mục.",
     });
+  } finally {
+    if (connection) await connection.end();
   }
+};
+
+// Render form thêm danh mục
+const renderAddCategory = (req, res) => {
+  res.render("admin_pages/category/category_add", {
+    error: "",
+    category: { category_id: "", category_name: "" },
+  });
 };
 
 // Thêm danh mục mới
 const addCategory = async (req, res) => {
   const { ID, Name } = req.body;
+  let connection;
 
-  // --- VALIDATION ---
+  // Validation
   if (!ID) {
     return res.redirect(
       "/admin/category?status=error&title=Lỗi!&message=" +
@@ -71,9 +81,11 @@ const addCategory = async (req, res) => {
   }
 
   try {
+    connection = await getConnection();
+
     // Kiểm tra mã danh mục đã tồn tại
-    const [idExists] = await db.query(
-      "SELECT id FROM categories WHERE id = ?",
+    const [idExists] = await connection.query(
+      "SELECT category_id FROM categories WHERE category_id = ?",
       [ID]
     );
     if (idExists.length > 0) {
@@ -84,8 +96,8 @@ const addCategory = async (req, res) => {
     }
 
     // Kiểm tra tên danh mục đã tồn tại
-    const [nameExists] = await db.query(
-      "SELECT id FROM categories WHERE category_name = ?",
+    const [nameExists] = await connection.query(
+      "SELECT category_id FROM categories WHERE category_name = ?",
       [Name]
     );
     if (nameExists.length > 0) {
@@ -96,10 +108,10 @@ const addCategory = async (req, res) => {
     }
 
     // Thêm vào database
-    await db.query("INSERT INTO categories (id, category_name) VALUES (?, ?)", [
-      ID,
-      Name,
-    ]);
+    await connection.query(
+      "INSERT INTO categories (category_id, category_name) VALUES (?, ?)",
+      [ID, Name]
+    );
     res.redirect(
       "/admin/category?status=success&title=Thành công!&message=" +
         encodeURIComponent("Thêm danh mục thành công!")
@@ -110,14 +122,49 @@ const addCategory = async (req, res) => {
       "/admin/category?status=error&title=Lỗi!&message=" +
         encodeURIComponent("Lỗi khi thêm danh mục.")
     );
+  } finally {
+    if (connection) await connection.end();
+  }
+};
+
+// Render form sửa danh mục
+const renderEditCategory = async (req, res) => {
+  const id = req.params.id;
+  let connection;
+  try {
+    connection = await getConnection();
+
+    const [rows] = await connection.query(
+      "SELECT * FROM categories WHERE category_id = ?",
+      [id]
+    );
+    if (rows.length === 0) {
+      return res.redirect(
+        "/admin/category?status=error&title=Lỗi!&message=" +
+          encodeURIComponent("Danh mục không tồn tại!")
+      );
+    }
+    res.render("admin_pages/category/category_edit", {
+      error: "",
+      category: rows[0],
+    });
+  } catch (error) {
+    console.error(error);
+    res.redirect(
+      "/admin/category?status=error&title=Lỗi!&message=" +
+        encodeURIComponent("Lỗi khi tải dữ liệu danh mục.")
+    );
+  } finally {
+    if (connection) await connection.end();
   }
 };
 
 // Cập nhật danh mục
 const updateCategory = async (req, res) => {
   const { cateid, catename } = req.body;
+  let connection;
 
-  // --- VALIDATION ---
+  // Validation
   if (!catename) {
     return res.redirect(
       "/admin/category?status=error&title=Lỗi!&message=" +
@@ -130,7 +177,7 @@ const updateCategory = async (req, res) => {
         encodeURIComponent("Tên danh mục quá dài, tối đa 29 ký tự!")
     );
   }
-  const forbiddenCharsPattern = /[#\$%\^&\*\(\)=\+\[\]\{\};:\'\"<>,\?\/\\\\|]/;
+  const forbiddenCharsPattern = /[#\$%\^&\*\(\)=\+\[\]\{\};:'"<>,\?\\/\\|]/;
   if (forbiddenCharsPattern.test(catename)) {
     return res.redirect(
       "/admin/category?status=error&title=Lỗi!&message=" +
@@ -139,9 +186,11 @@ const updateCategory = async (req, res) => {
   }
 
   try {
+    connection = await getConnection();
+
     // Kiểm tra tên danh mục đã tồn tại (ngoại trừ chính nó)
-    const [nameExists] = await db.query(
-      "SELECT id FROM categories WHERE category_name = ? AND id != ?",
+    const [nameExists] = await connection.query(
+      "SELECT category_id FROM categories WHERE category_name = ? AND category_id != ?",
       [catename, cateid]
     );
     if (nameExists.length > 0) {
@@ -152,10 +201,10 @@ const updateCategory = async (req, res) => {
     }
 
     // Cập nhật database
-    await db.query("UPDATE categories SET category_name = ? WHERE id = ?", [
-      catename,
-      cateid,
-    ]);
+    await connection.query(
+      "UPDATE categories SET category_name = ? WHERE category_id = ?",
+      [catename, cateid]
+    );
     res.redirect(
       "/admin/category?status=success&title=Thành công!&message=" +
         encodeURIComponent("Cập nhật danh mục thành công!")
@@ -166,44 +215,49 @@ const updateCategory = async (req, res) => {
       "/admin/category?status=error&title=Lỗi!&message=" +
         encodeURIComponent("Lỗi khi cập nhật danh mục.")
     );
+  } finally {
+    if (connection) await connection.end();
   }
 };
 
 // Xóa danh mục
 const deleteCategory = async (req, res) => {
-  const { id } = req.params; // Lấy id từ URL
+  const { id } = req.params;
+  let connection;
 
   try {
-    // Bắt đầu transaction (nếu DB engine của bạn hỗ trợ)
-    await db.beginTransaction();
+    connection = await getConnection();
+    await connection.beginTransaction();
 
-    // Xóa các sản phẩm liên quan
-    await db.query("DELETE FROM products WHERE category_id = ?", [id]);
+    // Xóa các sản phẩm thuộc danh mục này
+    await connection.query("DELETE FROM products WHERE category_id = ?", [id]);
 
     // Xóa danh mục
-    await db.query("DELETE FROM categories WHERE id = ?", [id]);
+    await connection.query("DELETE FROM categories WHERE category_id = ?", [id]);
 
-    // Commit transaction
-    await db.commit();
+    await connection.commit();
 
     res.redirect(
       "/admin/category?status=success&title=Thành công!&message=" +
         encodeURIComponent("Xóa danh mục và các sản phẩm liên quan thành công!")
     );
   } catch (error) {
-    // Rollback nếu có lỗi
-    await db.rollback();
+    if (connection) await connection.rollback();
     console.error(error);
     res.redirect(
       "/admin/category?status=error&title=Lỗi!&message=" +
         encodeURIComponent("Lỗi khi xóa danh mục.")
     );
+  } finally {
+    if (connection) await connection.end();
   }
 };
 
 module.exports = {
   getCategories,
+  renderAddCategory,
   addCategory,
+  renderEditCategory,
   updateCategory,
   deleteCategory,
 };

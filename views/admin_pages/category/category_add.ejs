@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Thêm danh mục</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 15px;
+      background: #fafafa;
+      border-radius: 6px;
+      box-shadow: 0 0 6px #ccc;
+      color: #333;
+    }
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #007bff;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      margin-top: 12px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    a {
+      display: inline-block;
+      margin-top: 15px;
+      color: #6c757d;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .error {
+      margin-bottom: 18px;
+      color: red;
+      font-weight: 700;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>Thêm danh mục mới</h2>
+
+  <% if (error && error.length > 0) { %>
+    <div class="error"><%= error %></div>
+  <% } %>
+
+  <form action="/admin/category/add" method="POST" novalidate>
+    <label for="category_id">Mã danh mục</label>
+    <input id="category_id" name="ID" type="text" value="<%= category.category_id || '' %>" required maxlength="20" />
+
+    <label for="category_name">Tên danh mục</label>
+    <input id="category_name" name="Name" type="text" value="<%= category.category_name || '' %>" required maxlength="29" />
+
+    <button type="submit">Lưu danh mục</button>
+  </form>
+
+  <a href="/admin/category" title="Quay lại danh sách">« Quay lại danh sách</a>
+</body>
+</html>

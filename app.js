@@ -47,8 +47,8 @@ const resetPasswordRoutes = require('./routes/resetpassword.routes');
 const forgotPasswordRoutes = require('./routes/forgotpassword.routes');
 const contactRoutes = require('./routes/contact.routes');
 
-// Router quản trị sản phẩm (duy nhất)
-const productAdminRouter = require('./routes/product.routes');
+// Router quản trị tổng hợp (bao gồm dashboard, sản phẩm, danh mục)
+const adminRouter = require('./routes/admin.routes');
 
 // Trang chủ
 app.get('/', (req, res) => {
@@ -71,11 +71,8 @@ app.get('/logout', (req, res) => {
 app.use('/liked', favoriteRoutes);
 app.use('/cart', cartRoutes);
 
-// Mount router sản phẩm admin tại /admin/products
-app.use('/admin/products', productAdminRouter);
-
-// Redirect /admin → /admin/products (tuỳ chọn)
-app.get('/admin', (req, res) => res.redirect('/admin/products'));
+// Mount router admin tổng hợp tại /admin
+app.use('/admin', adminRouter);
 
 // Các router còn lại
 app.use('/resetpassword', resetPasswordRoutes);

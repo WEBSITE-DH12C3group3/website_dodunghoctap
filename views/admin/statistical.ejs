@@ -1,0 +1,35 @@
+<div>
+  <p><strong>Doanh thu hôm nay:</strong> <%= totalDay.toLocaleString() %> VNĐ</p>
+  <p><strong>Doanh thu tuần này:</strong> <%= totalWeek.toLocaleString() %> VNĐ</p>
+  <p><strong>Doanh thu tháng này:</strong> <%= totalMonth.toLocaleString() %> VNĐ</p>
+
+  <canvas id="revenueChart" width="600" height="300"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const hours = <%- JSON.stringify(hours) %>;
+  const revenues = <%- JSON.stringify(revenues) %>;
+
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: hours,
+      datasets: [{
+        label: 'Doanh thu theo giờ hôm nay',
+        data: revenues,
+        borderColor: 'rgba(54, 162, 235, 1)',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true },
+        x: { title: { display: true, text: 'Giờ trong ngày' } }
+      }
+    }
+  });
+</script>
