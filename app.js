@@ -6,8 +6,12 @@ const session = require("express-session");
 const favoriteRoutes = require("./routes/favorites.routes");
 const userRoutes = require("./routes/user.routes");
 const cartRoutes = require("./routes/cart.routes");
+const adminRoutes = require("./routes/product.routes");
+const authRoutes = require("./routes/auth.routes");
+const resetPasswordRoutes = require("./routes/resetpassword.routes");
+
 const db = require("./config/db");
-const productRoutes = require('./routes/product.routes');
+const productRoutes = require("./routes/product.routes");
 // Import middleware
 const setUser = require("./middlewares/setUser");
 
@@ -29,7 +33,7 @@ app.use(
 app.use(setUser);
 //kiểm tra người dùng đã đăng nhập hay chưa
 app.use((req, res, next) => {
-  res.locals.user = req.session.user || null; 
+  res.locals.user = req.session.user || null;
   next();
 });
 
@@ -41,14 +45,14 @@ app.use((req, res, next) => {
 
 // Trang chủ
 app.get("/", (req, res) => {
-  res.render("pages/home", { 
+  res.render("pages/home", {
     user: req.session.user || null,
-    title: "Trang chủ"
+    title: "Trang chủ",
   });
 });
 
 // Trang đăng nhập
-app.use("/", require("./routes/auth.routes"));
+app.use("/", authRoutes);
 // Trang thông tin tài khoản
 app.use("/", userRoutes);
 
@@ -64,10 +68,9 @@ app.use("/liked", favoriteRoutes);
 app.use("/cart", cartRoutes);
 
 // Admin routes
-app.use("/admin", require("./routes/product.routes"));
+app.use("/admin", adminRoutes);
 
 // Trang đặt lại mật khẩu
-const resetPasswordRoutes = require("./routes/resetpassword.routes");
 app.use("/resetpassword", resetPasswordRoutes);
 
 app.listen(PORT, () => {
