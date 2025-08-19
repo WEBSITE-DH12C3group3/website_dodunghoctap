@@ -1,8 +1,6 @@
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const getConnection = require("../config/db");
-const { setUserSession } = require("../utils/sessionHelper");
-
 
 let resetCodes = {}; // Lưu tạm trong bộ nhớ (nên lưu vào DB)
 
@@ -24,7 +22,13 @@ exports.login = async (req, res) => {
 
     if (results.length > 0) {
       const user = results[0];
-      setUserSession(req, user);
+      req.session.user = {
+        user_id: user.user_id,
+        full_name: user.full_name,
+        email: user.email,
+        role: user.role,
+      };
+
       console.log("Đăng nhập thành công:", user.full_name, "Với ID:", user.user_id);
       res.redirect("/");
     } else {
@@ -63,20 +67,12 @@ exports.register = async (req, res) => {
     // 4. Lưu vào DB
     const [result] = await connection.execute(
       "INSERT INTO users (full_name, email, phone, address, password, role) VALUES (?, ?, ?, ?, ?, 'customer')",
-      [fullname, email, phone, address, password]
+      [fullname, email, phone, address, hashedPassword]
     );
     await connection.end();
 
-     const newUser = {
-    user_id: result.insertId,
-    full_name: fullname,
-    email,
-    phone,
-    address,
-    role: "customer"
-  };
-  setUserSession(req, newUser);
-  res.redirect("/");
+    req.session.user = { full_name: fullname, email };
+    res.redirect("/login");
   } catch (err) {
     console.error("Lỗi đăng ký:", err);
     res.status(500).send("Lỗi server");
