@@ -19,8 +19,8 @@ const upload = multer({ storage });
 // Danh sách sản phẩm
 router.get('/', productController.getAllProducts);
 
-// Form thêm sản phẩm (dùng dấu gạch nối thay vì gạch dưới)
-router.get('/product-add', productController.renderAddProduct);
+// Form thêm sản phẩm (dùng dấu gạch dưới như bạn muốn)
+router.get('/product_add', productController.renderAddProduct);
 
 // Xử lý thêm sản phẩm có upload ảnh
 router.post('/add', upload.single('image'), productController.addProduct);
