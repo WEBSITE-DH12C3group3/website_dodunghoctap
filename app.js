@@ -66,6 +66,10 @@ app.use("/cart", cartRoutes);
 // Admin routes
 app.use("/admin", require("./routes/product.routes"));
 
+// Trang đặt lại mật khẩu
+const resetPasswordRoutes = require("./routes/resetpassword.routes");
+app.use("/resetpassword", resetPasswordRoutes);
+
 app.listen(PORT, () => {
   console.log(`Server chạy tại http://localhost:${PORT}`);
 });
