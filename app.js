@@ -7,7 +7,12 @@ const favoriteRoutes = require("./routes/favorites.routes");
 const userRoutes = require("./routes/user.routes");
 const cartRoutes = require("./routes/cart.routes");
 const db = require("./config/db");
+const resetPasswordRoutes = require("./routes/resetpassword.routes");
+const resetPasswordController = require("./controllers/resetpassword.controller");
 const productRoutes = require('./routes/product.routes');
+const authController = require("./controllers/auth.controller"); 
+const authRoutes = require("./routes/auth.routes");
+const forgotPasswordRoutes = require("./routes/forgotpassword.routes");
 // Import middleware
 const setUser = require("./middlewares/setUser");
 
@@ -67,8 +72,10 @@ app.use("/cart", cartRoutes);
 app.use("/admin", require("./routes/product.routes"));
 
 // Trang đặt lại mật khẩu
-const resetPasswordRoutes = require("./routes/resetpassword.routes");
 app.use("/resetpassword", resetPasswordRoutes);
+
+app.use("/", authRoutes);
+app.use("/change", forgotPasswordRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server chạy tại http://localhost:${PORT}`);
