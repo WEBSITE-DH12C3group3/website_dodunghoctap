@@ -1,4 +1,4 @@
-const getConnection = require('../config/db');
+const getConnection = require("../config/db");
 
 exports.getAllProducts = async (req, res, next) => {
   let connection;
@@ -10,8 +10,7 @@ exports.getAllProducts = async (req, res, next) => {
       LEFT JOIN categories c ON p.category_id = c.category_id
       ORDER BY p.product_id
     `);
-   res.render('pages/product', { products: rows });
-
+    res.render("admin_pages/product", { products: rows });
   } catch (error) {
     next(error);
   } finally {
@@ -23,14 +22,17 @@ exports.getProductById = async (req, res, next) => {
   let connection;
   try {
     connection = await getConnection();
-    const [rows] = await connection.query(`
+    const [rows] = await connection.query(
+      `
       SELECT p.*, c.category_name FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.id = ?
-    `, [req.params.id]);
+    `,
+      [req.params.id]
+    );
 
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
+      return res.status(404).json({ message: "Sản phẩm không tồn tại" });
     }
     res.json(rows[0]);
   } catch (error) {
@@ -43,13 +45,36 @@ exports.getProductById = async (req, res, next) => {
 exports.createProduct = async (req, res, next) => {
   let connection;
   try {
-    const { product_name, image, description, price, sale, stock, sold, remark, category_id } = req.body;
+    const {
+      product_name,
+      image,
+      description,
+      price,
+      sale,
+      stock,
+      sold,
+      remark,
+      category_id,
+    } = req.body;
     connection = await getConnection();
-    await connection.query(`
+    await connection.query(
+      `
       INSERT INTO products (product_name, image, description, price, sale, stock, sold, remark, category_id)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [product_name, image, description, price, sale, stock, sold || 0, remark, category_id]);
-    res.status(201).json({ message: 'Thêm sản phẩm thành công' });
+    `,
+      [
+        product_name,
+        image,
+        description,
+        price,
+        sale,
+        stock,
+        sold || 0,
+        remark,
+        category_id,
+      ]
+    );
+    res.status(201).json({ message: "Thêm sản phẩm thành công" });
   } catch (error) {
     next(error);
   } finally {
@@ -60,14 +85,38 @@ exports.createProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res, next) => {
   let connection;
   try {
-    const { product_name, image, description, price, sale, stock, sold, remark, category_id } = req.body;
+    const {
+      product_name,
+      image,
+      description,
+      price,
+      sale,
+      stock,
+      sold,
+      remark,
+      category_id,
+    } = req.body;
     const id = req.params.id;
     connection = await getConnection();
-    await connection.query(`
+    await connection.query(
+      `
       UPDATE products SET product_name=?, image=?, description=?, price=?, sale=?, stock=?, sold=?, remark=?, category_id=?
       WHERE id=?
-    `, [product_name, image, description, price, sale, stock, sold, remark, category_id, id]);
-    res.json({ message: 'Cập nhật sản phẩm thành công' });
+    `,
+      [
+        product_name,
+        image,
+        description,
+        price,
+        sale,
+        stock,
+        sold,
+        remark,
+        category_id,
+        id,
+      ]
+    );
+    res.json({ message: "Cập nhật sản phẩm thành công" });
   } catch (error) {
     next(error);
   } finally {
@@ -79,8 +128,10 @@ exports.deleteProduct = async (req, res, next) => {
   let connection;
   try {
     connection = await getConnection();
-    await connection.query(`DELETE FROM products WHERE id = ?`, [req.params.id]);
-    res.json({ message: 'Xóa sản phẩm thành công' });
+    await connection.query(`DELETE FROM products WHERE id = ?`, [
+      req.params.id,
+    ]);
+    res.json({ message: "Xóa sản phẩm thành công" });
   } catch (error) {
     next(error);
   } finally {
