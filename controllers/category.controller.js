@@ -8,12 +8,13 @@ const getCategories = async (req, res) => {
     const [rows] = await connection.query(
       "SELECT * FROM categories ORDER BY category_id, category_name"
     );
-    res.render("admin_pages/category/category", {
-      categories: rows,
-      status: req.query.status,
-      title: req.query.title,
-      message: req.query.message,
-    });
+    // res.render("admin_pages/category/category", {
+    //   categories: rows,
+    //   status: req.query.status,
+    //   title: req.query.title,
+    //   message: req.query.message,
+    // });
+    return rows;
   } catch (error) {
     console.error(error);
     res.render("admin_pages/category/category", {
@@ -233,7 +234,9 @@ const deleteCategory = async (req, res) => {
     await connection.query("DELETE FROM products WHERE category_id = ?", [id]);
 
     // Xóa danh mục
-    await connection.query("DELETE FROM categories WHERE category_id = ?", [id]);
+    await connection.query("DELETE FROM categories WHERE category_id = ?", [
+      id,
+    ]);
 
     await connection.commit();
 

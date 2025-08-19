@@ -1,136 +1,145 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8" />
-  <title>Quản lý danh mục</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 0 15px;
-      background-color: #fafafa;
-      color: #333;
-    }
-    h2 {
-      margin-bottom: 20px;
-      text-align: center;
-      color: #007bff;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      background: #fff;
-      border: 1px solid #ddd;
-      box-shadow: 0 0 5px #ccc;
-    }
-    th, td {
-      padding: 12px 15px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-      vertical-align: middle;
-    }
-    th {
-      background-color: #007bff;
-      color: white;
-      font-weight: 600;
-    }
-    tr:hover {
-      background-color: #f1f9ff;
-    }
-    .btn {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-      transition: background-color 0.2s ease;
-      color: white;
-      user-select: none;
-    }
-    .btn-primary {
-      background-color: #007bff;
-    }
-    .btn-primary:hover {
-      background-color: #0056b3;
-    }
-    .btn-warning {
-      background-color: #ffc107;
-      color: #212529;
-    }
-    .btn-warning:hover {
-      background-color: #d39e00;
-    }
-    .btn-danger {
-      background-color: #dc3545;
-    }
-    .btn-danger:hover {
-      background-color: #a71d2a;
-    }
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
-    .add-btn-container {
-      margin-bottom: 15px;
-      text-align: right;
-    }
-    p.no-data {
-      text-align: center;
-      font-style: italic;
-      color: #666;
-      margin-top: 40px;
-    }
-    .alert {
-      margin: 20px 0;
-      padding: 10px 15px;
-      border-radius: 4px;
-      background-color: #ffc107;
-      color: #856404;
-      text-align: center;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-  <h2>Quản lý danh mục</h2>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quản lý danh mục</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        /* max-width: 900px; */
+        /* margin: 40px auto; */
+        /* padding: 0 15px; */
+        background-color: #fafafa;
+        color: #333;
+      }
+      h2 {
+        margin-bottom: 20px;
+        text-align: center;
+        color: #007bff;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 5px #ccc;
+      }
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+      }
+      th {
+        background-color: #007bff;
+        color: white;
+        font-weight: 600;
+      }
+      tr:hover {
+        background-color: #f1f9ff;
+      }
+      .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
+        color: white;
+        user-select: none;
+      }
+      .btn-primary {
+        background-color: #007bff;
+      }
+      .btn-primary:hover {
+        background-color: #0056b3;
+      }
+      .btn-warning {
+        background-color: #ffc107;
+        color: #212529;
+      }
+      .btn-warning:hover {
+        background-color: #d39e00;
+      }
+      .btn-danger {
+        background-color: #dc3545;
+      }
+      .btn-danger:hover {
+        background-color: #a71d2a;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      .add-btn-container {
+        margin-bottom: 15px;
+        text-align: right;
+      }
+      p.no-data {
+        text-align: center;
+        font-style: italic;
+        color: #666;
+        margin-top: 40px;
+      }
+      .alert {
+        margin: 20px 0;
+        padding: 10px 15px;
+        border-radius: 4px;
+        background-color: #ffc107;
+        color: #856404;
+        text-align: center;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Quản lý danh mục</h2>
 
-  <div class="add-btn-container">
-    <a href="/admin/category/add" class="btn btn-primary">+ Thêm danh mục mới</a>
-  </div>
+    <div class="add-btn-container">
+      <a href="/admin/category/add" class="btn btn-primary"
+        >+ Thêm danh mục mới</a
+      >
+    </div>
 
-  <% if (!categories || categories.length === 0) { %>
+    <% if (!categories || categories.length === 0) { %>
     <p class="no-data">Chưa có danh mục nào.</p>
-  <% } else { %>
+    <% } else { %>
     <table>
       <thead>
         <tr>
           <th>Mã danh mục</th>
           <th>Tên danh mục</th>
-          <th style="width:160px;">Hành động</th>
+          <th style="width: 160px">Hành động</th>
         </tr>
       </thead>
       <tbody>
         <% categories.forEach(function(cat) { %>
-          <tr>
-            <td><%= cat.category_id %></td>
-            <td><%= cat.category_name %></td>
-            <td>
-              <div class="actions">
-                <a href="/admin/category/edit/<%= cat.category_id %>" class="btn btn-warning">Sửa</a>
-                <a href="/admin/category/delete/<%= cat.category_id %>" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">Xóa</a>
-              </div>
-            </td>
-          </tr>
+        <tr>
+          <td><%= cat.category_id %></td>
+          <td><%= cat.category_name %></td>
+          <td>
+            <div class="actions">
+              <a
+                href="/admin/category/edit/<%= cat.category_id %>"
+                class="btn btn-warning"
+                >Sửa</a
+              >
+              <a
+                href="/admin/category/delete/<%= cat.category_id %>"
+                class="btn btn-danger"
+                onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')"
+                >Xóa</a
+              >
+            </div>
+          </td>
+        </tr>
         <% }); %>
       </tbody>
     </table>
-  <% } %>
-
-  <% if (status && message) { %>
+    <% } %> <% if (status && message) { %>
     <div class="alert"><%= title %>: <%= message %></div>
-  <% } %>
-
-</body>
+    <% } %>
+  </body>
 </html>

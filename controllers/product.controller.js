@@ -1,19 +1,21 @@
 const getConnection = require("../config/db");
 
 // Lấy danh sách sản phẩm
-exports.getAllProducts = async (req, res, next) => {
+exports.getAllProducts = async () => {
   let connection;
   try {
     connection = await getConnection();
     const [rows] = await connection.query(`
-      SELECT p.product_id, p.product_name, p.image_url, p.description, p.price, p.stock_quantity, p.created_at, c.category_name
+      SELECT p.product_id, p.product_name, p.image_url, p.description, p.price, 
+             p.stock_quantity, p.created_at, c.category_name
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.category_id
       ORDER BY p.product_id
     `);
-    res.render("admin_pages/products/product", { products: rows });
+    //  res.render("admin_pages/products/product", { products: rows });
+    return rows; // ✅ trả về dữ liệu, KHÔNG res.render
   } catch (error) {
-    next(error);
+    throw error;
   } finally {
     if (connection) await connection.end();
   }
@@ -37,9 +39,9 @@ exports.renderAddProduct = async (req, res, next) => {
         description: "",
         price: "",
         stock_quantity: "",
-        category_id: ""
+        category_id: "",
       },
-      categories
+      categories,
     });
   } catch (error) {
     next(error);
@@ -77,7 +79,8 @@ exports.getProductById = async (req, res, next) => {
 exports.addProduct = async (req, res, next) => {
   let connection;
   try {
-    const { product_name, description, price, stock_quantity, category_id } = req.body || {};
+    const { product_name, description, price, stock_quantity, category_id } =
+      req.body || {};
     const image_url = req.file ? req.file.filename : null;
 
     if (!product_name || !price) {
@@ -89,14 +92,24 @@ exports.addProduct = async (req, res, next) => {
           FROM categories
           ORDER BY category_name
         `);
-      } catch (_) {}
-      finally {
-        if (connection) { await connection.end(); connection = null; }
+      } catch (_) {
+      } finally {
+        if (connection) {
+          await connection.end();
+          connection = null;
+        }
       }
       return res.status(400).render("admin_pages/products/product_add", {
         error: "Vui lòng nhập tên sản phẩm và giá.",
-        product: { product_name, description, price, stock_quantity, category_id, image_url },
-        categories
+        product: {
+          product_name,
+          description,
+          price,
+          stock_quantity,
+          category_id,
+          image_url,
+        },
+        categories,
       });
     }
 
@@ -106,7 +119,14 @@ exports.addProduct = async (req, res, next) => {
       INSERT INTO products (product_name, image_url, description, price, stock_quantity, category_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?, NOW())
       `,
-      [product_name, image_url, description, price, stock_quantity, category_id || null]
+      [
+        product_name,
+        image_url,
+        description,
+        price,
+        stock_quantity,
+        category_id || null,
+      ]
     );
 
     res.redirect("/admin/products");
@@ -162,13 +182,8 @@ exports.updateProduct = async (req, res, next) => {
   let connection;
   try {
     const id = req.params.id;
-    const {
-      product_name,
-      description,
-      price,
-      stock_quantity,
-      category_id
-    } = req.body || {};
+    const { product_name, description, price, stock_quantity, category_id } =
+      req.body || {};
     const newImage = req.file ? req.file.filename : null;
 
     connection = await getConnection();
@@ -192,7 +207,15 @@ exports.updateProduct = async (req, res, next) => {
       SET product_name = ?, image_url = ?, description = ?, price = ?, stock_quantity = ?, category_id = ?
       WHERE product_id = ?
       `,
-      [product_name, image_url, description, price, stock_quantity, category_id || null, id]
+      [
+        product_name,
+        image_url,
+        description,
+        price,
+        stock_quantity,
+        category_id || null,
+        id,
+      ]
     );
     if (result.affectedRows === 0) {
       return res.status(400).render("admin_pages/products/product_edit", {
@@ -203,7 +226,7 @@ exports.updateProduct = async (req, res, next) => {
           description,
           price,
           stock_quantity,
-          category_id
+          category_id,
         },
         categories: [],
         error: "Cập nhật không thành công.",
@@ -230,10 +253,10 @@ exports.renderDeleteProduct = async (req, res, next) => {
       [id]
     );
     if (!product) {
-      return res.status(404).redirect('/admin/products');
+      return res.status(404).redirect("/admin/products");
     }
 
-    res.render('admin_pages/products/product_delete', { product });
+    res.render("admin_pages/products/product_delete", { product });
   } catch (error) {
     next(error);
   } finally {
@@ -256,7 +279,7 @@ exports.deleteProduct = async (req, res, next) => {
       return res.status(404).send("Sản phẩm không tồn tại hoặc đã bị xóa.");
     }
 
-    res.redirect('/admin/products');
+    res.redirect("/admin/products");
   } catch (error) {
     next(error);
   } finally {

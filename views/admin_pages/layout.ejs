@@ -1,70 +1,86 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8" />
-  <title><%= title %> - Admin</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-      background: #f5f7fa;
-    }
-    .sidebar {
-      width: 220px;
-      background-color: #242528;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      padding: 25px 20px;
-      box-shadow: 2px 0 6px rgba(0,0,0,0.15);
-    }
-    .sidebar a {
-      color: #bbb;
-      text-decoration: none;
-      padding: 14px 18px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      user-select: none;
-      font-size: 16px;
-      box-shadow: 0 0 0 transparent;
-    }
-    .sidebar a:hover, .sidebar a.active {
-      background-color: #007bff;
-      color: white;
-      box-shadow: 0 3px 12px rgba(0,123,255,0.7);
-    }
-    .content {
-      flex-grow: 1;
-      padding: 30px 40px;
-      overflow-y: auto;
-      background: white;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
-    }
-    header {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 30px;
-      color: #333;
-      user-select: none;
-    }
-  </style>
-</head>
-<body>
-  <nav class="sidebar">
-    <a href="/admin" class="<%= activePage === 'dashboard' ? 'active' : '' %>">Dashboard</a>
-    <a href="/admin/products" class="<%= activePage === 'products' ? 'active' : '' %>">Quản lý Sản phẩm</a>
-    <a href="/admin/category" class="<%= activePage === 'category' ? 'active' : '' %>">Quản lý Danh mục</a>
-    <a href="/admin/static" class="<%= activePage === 'static' ? 'active' : '' %>">Thống kê</a>
-  </nav>
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= title %> - Admin</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        background: #f5f7fa;
+      }
+      .sidebar {
+        width: 220px;
+        background-color: #242528;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        padding: 25px 20px;
+        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.15);
+      }
+      .sidebar a {
+        color: #bbb;
+        text-decoration: none;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        user-select: none;
+        font-size: 16px;
+        box-shadow: 0 0 0 transparent;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        background-color: #007bff;
+        color: white;
+        box-shadow: 0 3px 12px rgba(0, 123, 255, 0.7);
+      }
+      .content {
+        flex-grow: 1;
+        padding: 30px 40px;
+        overflow-y: auto;
+        background: white;
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
+      }
+      header {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: #333;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sidebar">
+      <a href="/admin" class="<%= activePage === 'dashboard' ? 'active' : '' %>"
+        >Dashboard</a
+      >
+      <a
+        href="/admin/products"
+        class="<%= activePage === 'products' ? 'active' : '' %>"
+        >Quản lý Sản phẩm</a
+      >
+      <a
+        href="/admin/category"
+        class="<%= activePage === 'category' ? 'active' : '' %>"
+        >Quản lý Danh mục</a
+      >
+      <a
+        href="/admin/static"
+        class="<%= activePage === 'static' ? 'active' : '' %>"
+        >Thống kê</a
+      >
+      <a href="/logout">Đăng xuất</a>
+    </nav>
 
-  <main class="content">
-    <header><%= title %></header>
-    <%- body %>
-  </main>
-</body>
+    <main class="content">
+      <header><%= title %></header>
+      <%- body %>
+    </main>
+  </body>
 </html>
