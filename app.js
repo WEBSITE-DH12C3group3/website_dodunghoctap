@@ -1,20 +1,20 @@
-const express = require('express');
-const path = require('path');
-const session = require('express-session');
+const express = require("express");
+const path = require("path");
+const session = require("express-session");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware khác
-const setUser = require('./middlewares/setUser');
+const setUser = require("./middlewares/setUser");
 
 // View engine & Views
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
 
 // Body parsers
 app.use(express.urlencoded({ extended: true }));
@@ -23,7 +23,7 @@ app.use(express.json());
 // Session
 app.use(
   session({
-    secret: 'secret-key',
+    secret: "secret-key",
     resave: false,
     saveUninitialized: true,
   })
@@ -33,57 +33,58 @@ app.use(
 app.use(setUser);
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
-  res.locals.email = '';
-  res.locals.error = '';
+  res.locals.email = "";
+  res.locals.error = "";
   next();
 });
 
 // Import các router khác
-const favoriteRoutes = require('./routes/favorites.routes');
-const userRoutes = require('./routes/user.routes');
-const cartRoutes = require('./routes/cart.routes');
-const authRoutes = require('./routes/auth.routes');
-const resetPasswordRoutes = require('./routes/resetpassword.routes');
-const forgotPasswordRoutes = require('./routes/forgotpassword.routes');
-const contactRoutes = require('./routes/contact.routes');
+const favoriteRoutes = require("./routes/favorites.routes");
+const userRoutes = require("./routes/user.routes");
+const cartRoutes = require("./routes/cart.routes");
+const authRoutes = require("./routes/auth.routes");
+const resetPasswordRoutes = require("./routes/resetpassword.routes");
+const forgotPasswordRoutes = require("./routes/forgotpassword.routes");
+const contactRoutes = require("./routes/contact.routes");
 
 // Router quản trị tổng hợp (bao gồm dashboard, sản phẩm, danh mục)
-const adminRouter = require('./routes/admin.routes');
+const adminRouter = require("./routes/admin.routes");
+const authAdmin = require("./middlewares/authAdmin");
 
 // Trang chủ
-app.get('/', (req, res) => {
-  res.render('pages/home', {
+app.get("/", (req, res) => {
+  res.render("pages/home", {
     user: req.session.user || null,
-    title: 'Trang chủ',
+    title: "Trang chủ",
   });
 });
 
 // Auth & User
-app.use('/', authRoutes);
-app.use('/', userRoutes);
+app.use("/", authRoutes);
+app.use("/", userRoutes);
 
 // Đăng xuất
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/login'));
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => res.redirect("/login"));
 });
 
 // Yêu thích & Giỏ hàng
-app.use('/liked', favoriteRoutes);
-app.use('/cart', cartRoutes);
+app.use("/liked", favoriteRoutes);
+app.use("/cart", cartRoutes);
 
 // Mount router admin tổng hợp tại /admin
-app.use('/admin', adminRouter);
+app.use("/admin", authAdmin, adminRouter);
 
 // Các router còn lại
-app.use('/resetpassword', resetPasswordRoutes);
-app.use('/change', forgotPasswordRoutes);
-app.use('/partials/contact', contactRoutes);
+app.use("/resetpassword", resetPasswordRoutes);
+app.use("/change", forgotPasswordRoutes);
+app.use("/partials/contact", contactRoutes);
 
 // About page
-app.get('/about', (req, res) => {
-  res.render('partials/about', {
+app.get("/about", (req, res) => {
+  res.render("partials/about", {
     user: req.session.user || null,
-    title: 'Giới thiệu',
+    title: "Giới thiệu",
   });
 });
 
