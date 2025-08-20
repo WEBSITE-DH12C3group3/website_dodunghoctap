@@ -19,6 +19,11 @@ const contactRoutes = require("./routes/contact.routes");
 const adminRouter = require("./routes/admin.routes");
 const authAdmin = require("./middlewares/authAdmin");
 const productController = require("./controllers/product.controller");
+
+// Router quản trị tổng hợp (bao gồm dashboard, sản phẩm, danh mục)
+// const adminRouter = require("./routes/admin.routes");
+// const authAdmin = require("./middlewares/authAdmin");
+
 // View engine & Views
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -48,8 +53,6 @@ app.use((req, res, next) => {
   res.locals.error = "";
   next();
 });
-
-
 
 // Trang chủ
 
