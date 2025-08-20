@@ -39,6 +39,10 @@
         color: white;
         box-shadow: 0 3px 12px rgba(0, 123, 255, 0.7);
       }
+      a.logo:hover {
+        background-color: #242528;
+        box-shadow: none;
+      }
       .content {
         flex-grow: 1;
         padding: 30px 40px;
@@ -57,6 +61,18 @@
   </head>
   <body>
     <nav class="sidebar">
+      <div class="col-md-3 col-4 text-center text-md-start mb-3 mb-md-0">
+        <a href="/" class="logo">
+          <img
+            src="/images/logo1.png"
+            class="img-fluid"
+            width="200px"
+            height="auto"
+            alt="Logo"
+          />
+        </a>
+      </div>
+      <a class="logo" href="#"><%= user ? user.full_name : "Khách" %></a>
       <a href="/admin" class="<%= activePage === 'dashboard' ? 'active' : '' %>"
         >Dashboard</a
       >
