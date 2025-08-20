@@ -1,85 +1,140 @@
-<head>
-  <meta charset="utf-8" />
-  <title>Trang chủ - Sản phẩm</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-  <!-- Link Swiper's CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<head> 
+  <meta charset="utf-8" /> 
+  <title>Trang chủ - Sản phẩm</title> 
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" /> 
+  <!-- Link Swiper's CSS --> 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" /> 
+ 
+<!-- CSS --> 
+<style> 
+  .mySwiperA { 
+    width: 100%; 
+    height: 450px; 
+  } 
+ 
+  .mySwiperA .swiper-slide { 
+    text-align: center; 
+    font-size: 16px; 
+    background: #fff; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+  } 
+ 
+  .product-card { 
+    padding: 10px; 
+  } 
+ 
+  .product-card img { 
+    width: 100%; 
+    height: 200px; 
+    object-fit: cover; 
+    border-radius: 8px; 
+  } 
+ 
+  .product-card h3 { 
+    margin: 10px 0 5px; 
+    font-size: 18px; 
+  } 
+ 
+  .product-card p { 
+    color: #e63946; 
+    font-weight: bold; 
+  } 
 
-<!-- CSS -->
-<style>
-  .mySwiperA {
-    width: 100%;
-    height: 400px;
-  }
-
-  .mySwiperA .swiper-slide {
-    text-align: center;
-    font-size: 16px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  .product-actions {
+    margin-top: 10px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
   }
 
-  .product-card {
-    padding: 10px;
-  }
-
-  .product-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-
-  .product-card h3 {
-    margin: 10px 0 5px;
-    font-size: 18px;
-  }
-
-  .product-card p {
-    color: #e63946;
+  .btn {
+    flex: 1;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;   /* bỏ gạch chân */
     font-weight: bold;
+    transition: 0.2s;
+    display: inline-block;
   }
-</style>
-</head>
-<body>
-<!-- Swiper A -->
-<div class="swiper mySwiperA">
-  <div class="swiper-wrapper">
-    <% if (products && products.length > 0) { %>
-      <% products.forEach(product => { %>
-        <div class="swiper-slide">
-          <div class="product-card">
+
+  .btn-cart {
+    background: #3b82f6;
+    color: #fff;
+  }
+  .btn-cart:hover { background: #2563eb; }
+
+  .btn-buy {
+    background: #22c55e;
+    color: #fff;
+  }
+  .btn-buy:hover { background: #16a34a; }
+
+  .btn-fav {
+    background: #f43f5e;
+    color: #fff;
+  }
+  .btn-fav:hover { background: #e11d48; }
+</style> 
+</head> 
+<body> 
+<!-- Swiper A --> 
+<div class="swiper mySwiperA"> 
+  <div class="swiper-wrapper"> 
+    <% if (products && products.length > 0) { %> 
+      <% products.forEach(product => { %> 
+      <div class="swiper-slide"> 
+        <div class="product-card"> 
+          <!-- Ảnh sản phẩm có link -->
+          <a href="/product/<%= product.id %>">
             <img src="/uploads/<%= product.image_url %>" alt="<%= product.product_name %>" />
-            <h3><%= product.product_name %></h3>
-            <p><%= product.price %> VNĐ</p>
+          </a>
+
+          <!-- Tên sản phẩm có link -->
+          <h3>
+            <a href="/product/<%= product.id %>" style="color: inherit; text-decoration: none;">
+              <%= product.product_name %>
+            </a>
+          </h3>
+
+          <p><%= product.price %> VNĐ</p> 
+
+          <!-- Nút thao tác -->
+          <div class="product-actions">
+            <a href="/cart/add/<%= product.id %>" class="btn btn-cart">🛒 Thêm</a>
+            <a href="/checkout/<%= product.id %>" class="btn btn-buy">⚡ Mua ngay</a>
+            <a href="/favorite/add/<%= product.id %>" class="btn btn-fav">❤️ Yêu thích</a>
           </div>
-        </div>
-      <% }) %>
-    <% } else { %>
-      <div class="swiper-slide">Không có sản phẩm nào</div>
-    <% } %>
-  </div>
-  <!-- Pagination riêng -->
-  <div class="swiper-pagination swiper-pagination-a"></div>
-</div>
-
-  <!-- Swiper JS -->
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-  <!-- Initialize Swiper A -->
-  <script>
-    var swiperA = new Swiper(".mySwiperA", {
-      slidesPerView: 3,
-      spaceBetween: 30,
-      freeMode: true,
-      pagination: {
-        el: ".mySwiperA .swiper-pagination-a",
-        clickable: true,
-      },
-    });
-  </script>
+        </div> 
+      </div>
+      <% }) %> 
+    <% } else { %> 
+      <div class="swiper-slide">Không có sản phẩm nào</div> 
+    <% } %> 
+  </div> 
+  <!-- Pagination riêng --> 
+  <div class="swiper-pagination swiper-pagination-a"></div> 
+</div> 
+ 
+  <!-- Swiper JS --> 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script> 
+ 
+  <!-- Initialize Swiper A --> 
+  <script> 
+    var swiperA = new Swiper(".mySwiperA", { 
+      slidesPerView: 3, 
+      spaceBetween: 30, 
+      freeMode: true, 
+      pagination: { 
+        el: ".mySwiperA .swiper-pagination-a", 
+        clickable: true, 
+      }, 
+    }); 
+  </script> 
 </body>
