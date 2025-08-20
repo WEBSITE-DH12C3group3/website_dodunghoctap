@@ -43,7 +43,7 @@ footer {
     }
 
     .dropdown-item:hover {
-      background-color: #ddd;
+      background-color: #969494;
     }
 
     /* Other styles... */
@@ -145,7 +145,7 @@ a {
   display: block;
   opacity: 1;
   position: absolute;
-  background-color: #fcfbfb;
+  background-color: #59aae7;
 }
 
 /* đổ bóng phần các sản phẩm chính */

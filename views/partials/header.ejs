@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <link rel="icon" type="/png" href="/images/Eden.png" >
   <link rel="stylesheet" href="/mycss/form.css">
-
+  <link rel="stylesheet" href="/mycss/styleheader.css">
   <link rel="stylesheet" href="/mycss/style.css">
   <link rel="stylesheet" href="/css/bootstrap.min.css">
   <link rel="stylesheet" href="/css/font-awesome.min.css">
@@ -12,9 +12,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOdLHNpLHn9+YRAy0RQgRNEirOrf0gR6Yq6yjHA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="/assets/owlcarousel/assets/owl.carousel.min.css">
   <link rel="stylesheet" href="/assets/owlcarousel/assets/owl.theme.default.min.css">
+
 </head>
-<header>
-  <div class="container py-3">
+<header class="myheader sticky" id="myHeader">
+  <div class="container py-3 ">
     <div class="row align-items-center">
       <!-- Logo -->
       <div class="col-md-3 col-4 text-center text-md-start mb-3 mb-md-0">
@@ -96,37 +97,37 @@
               </div>
             <% } else { %>
               <!-- Nếu đã đăng nhập -->
-<div class="dropdown nav-item">
-  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-    <i class="fa-regular fa-user"></i>
-    <% if (user && user.full_name) { %>
-      <%= user.full_name.length > 10 
-            ? user.full_name.substring(0, 10) + "..." 
-            : user.full_name %>
-    <% } else { %>
-      Tài khoản
-    <% } %>
-  </a>
-  <ul class="dropdown-menu">
-    <li>
-      <a class="dropdown-item" href="/personal">
-        <i class="fa-regular fa-address-card"></i> Trang cá nhân
-      </a>
-    </li>
-    <% if (user && user.role === 'admin') { %>
-      <li>
-        <a class="dropdown-item" href="/admin">
-          <i class="fa-solid fa-gauge"></i> Quản lý
-        </a>
-      </li>
-    <% } %>
-    <li>
-      <a class="dropdown-item" href="/logout">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất
-      </a>
-    </li>
-  </ul>
-</div>
+              <div class="dropdown nav-item">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                  <i class="fa-regular fa-user"></i>
+                  <% if (user && user.full_name) { %>
+                    <%= user.full_name.length > 10 
+                          ? user.full_name.substring(0, 10) + "..." 
+                          : user.full_name %>
+                  <% } else { %>
+                    Tài khoản
+                  <% } %>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="/personal">
+                      <i class="fa-regular fa-address-card"></i> Trang cá nhân
+                    </a>
+                  </li>
+                  <% if (user && user.role === 'admin') { %>
+                    <li>
+                      <a class="dropdown-item" href="/admin">
+                        <i class="fa-solid fa-gauge"></i> Quản lý
+                      </a>
+                    </li>
+                  <% } %>
+                  <li>
+                    <a class="dropdown-item" href="/logout">
+                      <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất
+                    </a>
+                  </li>
+                </ul>
+              </div>
             <% } %>
           </div>
         </div>
@@ -137,24 +138,24 @@
   
 </header>
 <!-- Navigation Bar -->
-<section class="mymainmenu" style="background-color: #aae9f7; border-radius: 5px;">
+<section class="mymainmenu" style="background-color: #3b82f6; border-radius: 5px;">
       <div class="container">
         <nav class="navbar navbar-expand-lg">
-          <span class="navbar-brand" style="color: #093608;" href="#"><b>EDEN</b></span>
+          <span class="navbar-brand" style="color: #ffffff;" href="#"><b>EDEN</b></span>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav d-flex justify-content-around w-100">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/" style="color: #093608;"><b>Trang Chủ</b></a>
+                <a class="nav-link active" aria-current="page" href="/" style="color: #ffffff;"><b>Trang Chủ</b></a>
               </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="/liked" style="color: #093608;"><b>Yêu thích</b></a>
+                  <a class="nav-link" href="/liked" style="color: #ffffff;"><b>Yêu thích</b></a>
                 </li>
               <!-- Other menu items -->
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #093608;">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #ffffff;">
                   <b>Danh mục</b>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -164,13 +165,13 @@
                 </ul>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="supasale.php" style="color: #093608;"><b>Siêu sale</b></a>
+                <a class="nav-link" href="supasale.php" style="color: #ffffff;"><b>Siêu sale</b></a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/partials/contact" style="color: #093608;"><b>Liên hệ</b></a>
+                <a class="nav-link" href="/partials/contact" style="color: #ffffff;"><b>Liên hệ</b></a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/about" style="color: #093608;"><b>Về chúng tôi</b></a>
+                <a class="nav-link" href="/about" style="color: #ffffff;"><b>Về chúng tôi</b></a>
               </li>
               <li class="nav-item dropdown"></li> <!-- Empty dropdown item -->
             </ul>
@@ -202,3 +203,6 @@
       lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // Đặt lại lastScrollTop để tránh giá trị âm
     });
   </script>
+
+
+  

@@ -1,6 +1,6 @@
 const getConnection = require("../config/db");
 
-// Lấy danh sách sản phẩm
+// Lấy tất cả sản phẩm
 exports.getAllProducts = async () => {
   let connection;
   try {
@@ -12,14 +12,45 @@ exports.getAllProducts = async () => {
       LEFT JOIN categories c ON p.category_id = c.category_id
       ORDER BY p.product_id
     `);
-    //  res.render("admin_pages/products/product", { products: rows });
-    return rows; // ✅ trả về dữ liệu, KHÔNG res.render
-  } catch (error) {
-    throw error;
+    return rows;
   } finally {
     if (connection) await connection.end();
   }
 };
+
+// Hiển thị swiper
+// exports.showProductsSwiper = async (req, res, next) => {
+//   try {
+//     const products = await exports.getAllProducts();
+//     res.render("pages/view_products", { products });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// Trang home
+exports.showHome = async (req, res, next) => {
+  try {
+    const connection = await getConnection();
+    const [rows] = await connection.query("SELECT * FROM products");
+    await connection.end();
+
+    console.log("✅ Dữ liệu lấy từ DB:", rows);
+
+    res.render("pages/home", { 
+      products: rows,
+      user: req.session.user || null,
+      title: "Trang chủ"
+    });
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy sản phẩm:", error);
+    res.render("pages/home", { 
+      products: [],
+      user: req.session.user || null,
+      title: "Trang chủ"
+    });
+  }
+}
 
 // Render form thêm sản phẩm
 exports.renderAddProduct = async (req, res, next) => {
