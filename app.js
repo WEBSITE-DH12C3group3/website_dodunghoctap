@@ -1,12 +1,14 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+
 const app = express();
 const PORT = process.env.PORT || 4000;
-// Middleware khác
+
+// Middleware setUser
 const setUser = require("./middlewares/setUser");
 
-// Import các router khác
+// Import các router
 const favoriteRoutes = require("./routes/favorites.routes");
 const userRoutes = require("./routes/user.routes");
 const cartRoutes = require("./routes/cart.routes");
@@ -15,17 +17,14 @@ const resetPasswordRoutes = require("./routes/resetpassword.routes");
 const forgotPasswordRoutes = require("./routes/forgotpassword.routes");
 const contactRoutes = require("./routes/contact.routes");
 
-// Router quản trị tổng hợp (bao gồm dashboard, sản phẩm, danh mục)
+// Router admin và middleware phân quyền
 const adminRouter = require("./routes/admin.routes");
 const authAdmin = require("./middlewares/authAdmin");
-const productController = require("./controllers/product.controller");
-const view_products = require("./controllers/viewproducts.controller")
 
-// Router quản trị tổng hợp (bao gồm dashboard, sản phẩm, danh mục)
-// const adminRouter = require("./routes/admin.routes");
-// const authAdmin = require("./middlewares/authAdmin");
+// Controller view sản phẩm và trang chủ
+const view_products = require("./controllers/viewproducts.controller");
 
-// View engine & Views
+// Cấu hình template engine và đường dẫn views
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -42,11 +41,16 @@ app.use(
   session({
     secret: "secret-key",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Không tạo session rỗng
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, // 1 ngày
+      httpOnly: true,
+      secure: false,
+    },
   })
 );
 
-// Middleware setUser và locals
+// Middleware gán user cho req và biến dùng chung trong view
 app.use(setUser);
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
@@ -56,23 +60,36 @@ app.use((req, res, next) => {
 });
 
 // Trang chủ
-
 app.get("/", view_products.showHome);
 
-// Auth & User
+// Trang cá nhân
+app.get("/personal", (req, res) => {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+  const account = req.session.user;
+  res.render("pages/personal", {
+    title: "Thông tin tài khoản",
+    account,
+  });
+});
+
+// Router auth và user
 app.use("/", authRoutes);
 app.use("/", userRoutes);
 
 // Đăng xuất
 app.get("/logout", (req, res) => {
-  req.session.destroy(() => res.redirect("/login"));
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
 });
 
-// Yêu thích & Giỏ hàng
+// Yêu thích và giỏ hàng
 app.use("/liked", favoriteRoutes);
 app.use("/cart", cartRoutes);
 
-// Mount router admin tổng hợp tại /admin
+// Router admin bảo vệ bằng middleware authAdmin
 app.use("/admin", authAdmin, adminRouter);
 
 // Các router còn lại
@@ -80,7 +97,7 @@ app.use("/resetpassword", resetPasswordRoutes);
 app.use("/change", forgotPasswordRoutes);
 app.use("/partials/contact", contactRoutes);
 
-// About page
+// Trang giới thiệu
 app.get("/about", (req, res) => {
   res.render("partials/about", {
     user: req.session.user || null,
@@ -88,8 +105,12 @@ app.get("/about", (req, res) => {
   });
 });
 
+// Xử lý lỗi 404: Phải để ở cuối cùng
+app.use((req, res) => {
+  res.status(404).send("404 - Trang không tồn tại");
+});
 
-// Lắng nghe
+// Khởi động server
 app.listen(PORT, () => {
-  console.log(`Server chạy tại http://localhost:${PORT}`);
+  console.log(`Server đang chạy tại http://localhost:${PORT}`);
 });

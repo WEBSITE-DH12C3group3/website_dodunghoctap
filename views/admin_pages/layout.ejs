@@ -73,27 +73,33 @@
         </a>
       </div>
       <a class="logo" href="#"><%= user ? user.full_name : "Khách" %></a>
-      <a href="/admin" class="<%= activePage === 'dashboard' ? 'active' : '' %>"
-        >Dashboard</a
-      >
-      <a
-        href="/admin/products"
-        class="<%= activePage === 'products' ? 'active' : '' %>"
-        >Quản lý Sản phẩm</a
-      >
-      <a
-        href="/admin/category"
-        class="<%= activePage === 'category' ? 'active' : '' %>"
-        >Quản lý Danh mục</a
-      >
-      <a
-        href="/admin/static"
-        class="<%= activePage === 'static' ? 'active' : '' %>"
-        >Thống kê</a
-      >
+
+      <% if (user && Array.isArray(user.permissions) && user.permissions.includes("dashboard_access")) { %>
+        <a href="/admin" class="<%= activePage === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+      <% } %>
+
+      <% if (user && Array.isArray(user.permissions) && user.permissions.includes("product_management")) { %>
+        <a href="/admin/products" class="<%= activePage === 'products' ? 'active' : '' %>">Quản lý Sản phẩm</a>
+      <% } %>
+
+      <% if (user && Array.isArray(user.permissions) && user.permissions.includes("category_management")) { %>
+        <a href="/admin/category" class="<%= activePage === 'category' ? 'active' : '' %>">Quản lý Danh mục</a>
+      <% } %>
+
+      <% if (user && Array.isArray(user.permissions) && user.permissions.includes("statistics_access")) { %>
+        <a href="/admin/static" class="<%= activePage === 'static' ? 'active' : '' %>">Thống kê</a>
+      <% } %>
+
+      <% if (user && Array.isArray(user.permissions) && user.permissions.includes("user_management")) { %>
+        <a href="/admin/users" class="<%= activePage === 'users' ? 'active' : '' %>">Quản lý Người dùng</a>
+      <% } %>
+
+      <% if (user && Array.isArray(user.permissions) && user.permissions.includes("role_management")) { %>
+        <a href="/admin/roles" class="<%= activePage === 'roles' ? 'active' : '' %>">Quản lý Nhóm Người dùng</a>
+      <% } %>
+
       <a href="/logout">Đăng xuất</a>
     </nav>
-
     <main class="content">
       <header><%= title %></header>
       <%- body %>
