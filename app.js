@@ -19,6 +19,7 @@ const contactRoutes = require("./routes/contact.routes");
 const adminRouter = require("./routes/admin.routes");
 const authAdmin = require("./middlewares/authAdmin");
 const productController = require("./controllers/product.controller");
+const view_products = require("./controllers/viewproducts.controller")
 
 // Router quản trị tổng hợp (bao gồm dashboard, sản phẩm, danh mục)
 // const adminRouter = require("./routes/admin.routes");
@@ -56,7 +57,7 @@ app.use((req, res, next) => {
 
 // Trang chủ
 
-app.get("/", productController.showHome)
+app.get("/", view_products.showHome);
 
 // Auth & User
 app.use("/", authRoutes);

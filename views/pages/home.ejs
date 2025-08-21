@@ -114,8 +114,15 @@
                             <div class="row text-center">
                               <div class="row text-center">
                                 <div class="container">
-                                  <%- include("view_products", { products: products }) %>
+                                <% for (let catId in catProducts) { %>
+                                    <div class="category-block" style="margin-bottom: 60px;"> 
+                                    <h2 style="margin-bottom: 20px;"><%= catProducts[catId].category_name %></h2>
+                                    <%- include("view_products", { products: catProducts[catId].products }) %>
+                                    </div>
+                                <% } %>
                                 </div>
+
+
                               </div>
                             </div>
                         </div>
