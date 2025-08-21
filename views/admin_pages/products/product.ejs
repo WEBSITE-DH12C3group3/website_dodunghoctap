@@ -53,23 +53,87 @@
         display: flex;
         gap: 8px;
       }
+      .header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding: 12px 16px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .header-bar h2 {
+        margin: 0;
+        font-size: 25px;
+        color: #333;
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .search-input {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 20px;
+        outline: none;
+        transition: 0.2s;
+      }
+
+      .search-input:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .btn-success {
+        background: #28a745;
+      }
+
+      .btn-success:hover {
+        background: #218838;
+      }
+
+      .btn i {
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
     <div class="wrapper">
       <div class="maincontent" id="content">
-        <h2>Danh Sách Sản Phẩm</h2>
-
-        <div class="search-bar">
-          <input
-            type="text"
-            id="searchBox"
-            onkeyup="search()"
-            placeholder="Nhập Từ Khóa Cần Tìm..."
-          />
-          <a class="btn btn-success" href="/admin/products/product_add"
-            >Thêm sản phẩm</a
-          >
+        <div class="header-bar">
+          <h2 style="justify-content: center">Danh Sách Sản Phẩm</h2>
+          <div class="search-bar">
+            <input
+              type="text"
+              id="searchBox"
+              class="search-input"
+              onkeyup="search()"
+              placeholder="🔍 Nhập từ khóa..."
+            />
+            <a class="btn btn-success" href="/admin/products/product_add">
+              <i class="fa fa-plus" aria-hidden="true"></i>Thêm sản phẩm
+            </a>
+          </div>
         </div>
 
         <div class="info-bar">
@@ -125,29 +189,106 @@
                     href="/admin/products/delete/<%= row.product_id %>"
                     >Xóa</a
                   >
+                  <a
+                    class="btn btn-warning btn-sm"
+                    href="/admin/products/view/<%= row.product_id %>"
+                    >Xem</a
+                  >
                 </div>
               </td>
             </tr>
             <% }); %> <% } %>
           </tbody>
         </table>
+        <div id="pagination" style="margin-top: 16px; text-align: center"></div>
       </div>
     </div>
-
     <script>
+      const rowsPerPage = 5; // số sản phẩm trên 1 trang
+      let currentPage = 1;
+
+      function renderTable() {
+        const trs = document.querySelectorAll("#Table tbody tr");
+        const totalRows = trs.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        trs.forEach((tr, index) => {
+          tr.style.display =
+            index >= (currentPage - 1) * rowsPerPage &&
+            index < currentPage * rowsPerPage
+              ? ""
+              : "none";
+        });
+
+        renderPagination(totalPages);
+      }
+
+      function renderPagination(totalPages) {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        for (let i = 1; i <= totalPages; i++) {
+          const btn = document.createElement("button");
+          btn.innerText = i;
+          btn.className = "page-btn" + (i === currentPage ? " active" : "");
+          btn.style.margin = "0 4px";
+          btn.style.padding = "6px 10px";
+          btn.style.border = "1px solid #ccc";
+          btn.style.borderRadius = "4px";
+          btn.style.cursor = "pointer";
+          btn.onclick = function () {
+            currentPage = i;
+            renderTable();
+          };
+          pagination.appendChild(btn);
+        }
+      }
+
+      // Kết hợp tìm kiếm với phân trang
       function search() {
         const input = document.getElementById("searchBox");
         const filter = (input.value || "").toLowerCase();
         const trs = document.querySelectorAll("#Table tbody tr");
+        let visibleRows = [];
+
         trs.forEach((tr) => {
           const cells = Array.from(tr.querySelectorAll("td")).slice(0, -1);
-          tr.style.display = cells.some((td) =>
-            (td.textContent || "").toLowerCase().includes(filter)
-          )
-            ? ""
-            : "none";
+          if (
+            cells.some((td) =>
+              (td.textContent || "").toLowerCase().includes(filter)
+            )
+          ) {
+            tr.style.display = "";
+            visibleRows.push(tr);
+          } else {
+            tr.style.display = "none";
+          }
         });
+
+        // Cập nhật phân trang theo kết quả tìm kiếm
+        const totalRows = visibleRows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        // Nếu không có kết quả thì clear phân trang
+        if (totalRows === 0) {
+          document.getElementById("pagination").innerHTML = "";
+          return;
+        }
+
+        // Reset lại page = 1 khi tìm kiếm
+        currentPage = 1;
+        visibleRows.forEach((tr, index) => {
+          tr.style.display =
+            index >= (currentPage - 1) * rowsPerPage &&
+            index < currentPage * rowsPerPage
+              ? ""
+              : "none";
+        });
+        renderPagination(totalPages);
       }
+
+      // Gọi lần đầu
+      renderTable();
     </script>
   </body>
 </html>
