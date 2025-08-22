@@ -12,6 +12,8 @@ exports.getProfile = async (req, res) => {
       "SELECT full_name, email, phone, address FROM users WHERE user_id = ?",
       [user.user_id]
     );
+    await connection.end();
+
 
     if (result.length === 0) {
       return res.send("Không tìm thấy thông tin người dùng.");
@@ -19,6 +21,7 @@ exports.getProfile = async (req, res) => {
 
     res.render("pages/personal", {
       title: "Thông tin tài khoản",
+      user: req.session.user,
       user: user,
       account: result[0],
     });
@@ -43,6 +46,8 @@ exports.updateProfile = async (req, res) => {
       "UPDATE users SET full_name = ?, email = ?, phone = ?, address = ? WHERE user_id = ?",
       [full_name, email, phone, address, user.user_id]
     );
+    await connection.end();
+
 
     res.redirect("/personal?status=success");
   } catch (err) {

@@ -63,16 +63,16 @@ app.use((req, res, next) => {
 app.get("/", view_products.showHome);
 
 // Trang cá nhân
-app.get("/personal", (req, res) => {
-  if (!req.session.user) {
-    return res.redirect("/login");
-  }
-  const account = req.session.user;
-  res.render("pages/personal", {
-    title: "Thông tin tài khoản",
-    account,
-  });
-});
+// app.get("/personal", (req, res) => {
+//   if (!req.session.user) {
+//     return res.redirect("/login");
+//   }
+//   const account = req.session.user;
+//   res.render("pages/personal", {
+//     title: "Thông tin tài khoản",
+//     account,
+//   });
+// });
 
 // Router auth và user
 app.use("/", authRoutes);

@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const getConnection = require("../config/db");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt"); 
+const userController = require("../controllers/user.controller");
+
+router.get("/personal", userController.getProfile);
+
+router.post("/personal/update", userController.updateProfile);
 
 // Hiển thị danh sách người dùng
 router.get("/", async (req, res) => {
