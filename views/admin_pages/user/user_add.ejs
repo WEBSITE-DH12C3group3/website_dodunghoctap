@@ -45,11 +45,11 @@
         <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu" required>
       </div>
       <div class="mb-3">
-        <label for="role" class="form-label">Nhóm người dùng</label>
-        <select class="form-select" id="role" name="role" required>
+        <label for="role_id" class="form-label">Nhóm người dùng</label>
+        <select class="form-select" id="role_id" name="role_id" required>
           <option value="" disabled selected>Chọn nhóm người dùng</option>
           <% roles.forEach(role => { %>
-            <option value="<%= role.role_name %>"><%= role.role_name %></option>
+            <option value="<%= role.role_id %>"><%= role.role_name %></option>
           <% }) %>
         </select>
       </div>

@@ -3,7 +3,7 @@ function setUserSession(req, user) {
     user_id: user.user_id,
     full_name: user.full_name,
     email: user.email,
-    role: user.role,
+    role: user.role_id,
     phone: user.phone,
     address: user.address
   };

@@ -4,11 +4,11 @@ const getConnection = require("../config/db");
 const bcrypt = require("bcrypt"); 
 const userController = require("../controllers/user.controller");
 
+// ---- Profile cá nhân ----
 router.get("/personal", userController.getProfile);
-
 router.post("/personal/update", userController.updateProfile);
 
-// Hiển thị danh sách người dùng
+// ---- Danh sách user ----
 router.get("/", async (req, res) => {
   let connection;
   try {
@@ -27,7 +27,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Hiển thị form thêm người dùng kèm danh sách nhóm người dùng (roles)
+// ---- Form thêm người dùng ----
 router.get("/add", async (req, res) => {
   let connection;
   try {
@@ -38,7 +38,7 @@ router.get("/add", async (req, res) => {
     res.render("admin_pages/user/user_add", {
       title: "Thêm Người dùng",
       activePage: "users",
-      roles, // truyền danh sách nhóm người dùng sang view
+      roles, // truyền sang view để tạo select nhóm
     });
   } catch (err) {
     if (connection) await connection.end();
@@ -47,16 +47,16 @@ router.get("/add", async (req, res) => {
   }
 });
 
-// Xử lý thêm người dùng
+// ---- Xử lý thêm user ----
 router.post("/add", async (req, res) => {
-  const { full_name, email, phone, address, password, role } = req.body;
+  const { full_name, email, phone, address, password, role_id } = req.body;
   let connection;
   try {
     connection = await getConnection();
     const hashedPassword = await bcrypt.hash(password, 10);
     await connection.execute(
-      "INSERT INTO users (full_name, email, phone, address, password, role) VALUES (?, ?, ?, ?, ?, ?)",
-      [full_name, email, phone, address, hashedPassword, role]
+      "INSERT INTO users (full_name, email, phone, address, password, role_id, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+      [full_name, email, phone, address, hashedPassword, role_id]
     );
     await connection.end();
     res.redirect("/admin/users");
@@ -67,7 +67,7 @@ router.post("/add", async (req, res) => {
   }
 });
 
-// Hiển thị form sửa người dùng kèm danh sách nhóm người dùng (roles)
+// ---- Form sửa user ----
 router.get("/edit/:id", async (req, res) => {
   const userId = req.params.id;
   let connection;
@@ -84,7 +84,7 @@ router.get("/edit/:id", async (req, res) => {
       user: result[0],
       title: "Sửa Người dùng",
       activePage: "users",
-      roles, // truyền danh sách nhóm người dùng sang view
+      roles,
     });
   } catch (err) {
     if (connection) await connection.end();
@@ -93,23 +93,23 @@ router.get("/edit/:id", async (req, res) => {
   }
 });
 
-// Xử lý cập nhật người dùng
+// ---- Xử lý update user ----
 router.post("/edit/:id", async (req, res) => {
   const userId = req.params.id;
-  const { full_name, email, phone, address, role, password } = req.body;
+  const { full_name, email, phone, address, role_id, password } = req.body;
   let connection;
   try {
     connection = await getConnection();
     if (password && password.trim() !== "") {
       const hashedPassword = await bcrypt.hash(password, 10);
       await connection.execute(
-        "UPDATE users SET full_name = ?, email = ?, phone = ?, address = ?, role = ?, password = ? WHERE user_id = ?",
-        [full_name, email, phone, address, role, hashedPassword, userId]
+        "UPDATE users SET full_name = ?, email = ?, phone = ?, address = ?, role_id = ?, password = ? WHERE user_id = ?",
+        [full_name, email, phone, address, role_id, hashedPassword, userId]
       );
     } else {
       await connection.execute(
-        "UPDATE users SET full_name = ?, email = ?, phone = ?, address = ?, role = ? WHERE user_id = ?",
-        [full_name, email, phone, address, role, userId]
+        "UPDATE users SET full_name = ?, email = ?, phone = ?, address = ?, role_id = ? WHERE user_id = ?",
+        [full_name, email, phone, address, role_id, userId]
       );
     }
     await connection.end();
@@ -121,7 +121,7 @@ router.post("/edit/:id", async (req, res) => {
   }
 });
 
-// Xóa người dùng
+// ---- Xử lý xóa user ----
 router.post("/delete/:id", async (req, res) => {
   const userId = req.params.id;
   let connection;
