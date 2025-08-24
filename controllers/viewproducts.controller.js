@@ -24,11 +24,20 @@ exports.showHome = async (req, res) => {
       };
     }
 
-    res.render("pages/home", { catProducts });
+    await connection.end();
+
+    res.render("pages/home", {
+      title: "Trang chủ",
+      catProducts,
+      // Không cần truyền user, cart, favorites vì res.locals đã gán
+    });
   } catch (error) {
-    console.error(error);
-    res.render("pages/home", { catProducts: {} });
-  } finally {
+    console.error("Lỗi hiển thị trang chủ:", error);
     if (connection) await connection.end();
+    res.render("pages/home", {
+      title: "Trang chủ",
+      catProducts: {},
+      error: "Lỗi khi tải trang chủ"
+    });
   }
 };

@@ -5,9 +5,10 @@ const favoritesController = require("../controllers/favorites.controller");
 // Trang yêu thích
 router.get("/", favoritesController.renderFavorites);
 
-// API thêm/xóa JSON giữ nguyên
+// API thêm/xóa yêu thích
 router.post("/add", favoritesController.addFavorite);
-router.delete("/remove/:productId", favoritesController.removeFavorite);
+router.post("/remove/:productId", favoritesController.removeFavorite);
 router.get("/:userId", favoritesController.getFavorites);
+router.post("/sync", favoritesController.syncFavoritesOnLogin);
 
 module.exports = router;

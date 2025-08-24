@@ -106,9 +106,9 @@ app.get("/about", (req, res) => {
 });
 
 // Xử lý lỗi 404: Phải để ở cuối cùng
-app.use((req, res) => {
-  res.status(404).send("404 - Trang không tồn tại");
-});
+// app.use((req, res) => {
+//   res.status(404).send("404 - Trang không tồn tại");
+// });
 
 // Khởi động server
 app.listen(PORT, () => {

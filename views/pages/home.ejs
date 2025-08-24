@@ -1,164 +1,164 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        /* produc CSS */
-        .product-image {
-            width: 100%;
-            height: auto;
-            max-height: 300px;
-            object-fit: cover;
-        }
-
-        .carousel-item {
-            transition: transform 1s ease;
-            /* 2 giây */
-        }
-    </style>
-    <style>
-        .swal2-popup { 
-            font-size: 0.9rem !important;
-            font-family: Arial, sans-serif;
-        }
-
-        .swal2-toast {
-            background: #fff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-      <style>
-        .swiper {
-            width: 100%;
-            height: 400px;
-        }
-        .swiper-wrapper {
-            height: 400px;
-        }
-        .swiper-slide {
-            background-color: aquamarine;
-            display: flex;                /* phải có dòng này */
-            justify-content: center;      /* căn ngang */
-            align-items: center;          /* căn dọc */
-            background-image: url("https://wallpapers.com/images/hd/blueto-yellow-gradient-abstract-wt4x802da8mmp3br.jpg");
-            background-size: cover;       
-            background-position: center;  
-        }
-        .swiper-slide img {
-            max-width: 80%;
-            max-height: 80%;
-            object-fit: contain;          /* giữ nguyên tỉ lệ, không bị cắt */
-            display: block;               /* tránh bị inline làm lệch */
-            margin: auto;                 /* fallback nếu flex lỗi */
-        }
-
-      </style>
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+  <link rel="icon" type="image/png" href="/images/Eden.png" />
+  <link rel="stylesheet" href="/mycss/form.css">
+  <link rel="stylesheet" href="/mycss/styleheader.css">
+  <link rel="stylesheet" href="/mycss/style.css">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="/assets/owlcarousel/assets/owl.carousel.min.css">
+  <link rel="stylesheet" href="/assets/owlcarousel/assets/owl.theme.default.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <!-- Link SweetAlert2 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"/>
+  <!-- CSS tùy chỉnh -->
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin-top: 120px;
+    }
+    h2, h3, h6 {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+    }
+    p, button, a.btn-add-cart, a[href^="/favorite/add"], button[type="submit"] {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+    }
+    #cart-count, .cart-badge {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+    }
+    .swal2-popup {
+      font-family: 'Roboto', sans-serif !important;
+      font-size: 0.9rem !important;
+    }
+    .swal2-toast {
+      background: #fff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .swiper {
+      width: 100%;
+      height: 400px;
+    }
+    .swiper-wrapper {
+      height: 400px;
+    }
+    .swiper-slide {
+      font-family: 'Roboto', sans-serif;
+      background: #fff !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .swiper-slide img {
+      max-width: 80%;
+      max-height: 80%;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+    }
+    .product-image {
+      width: 100%;
+      height: auto;
+      max-height: 300px;
+      object-fit: cover;
+    }
+    .carousel-item {
+      transition: transform 1s ease;
+    }
+  </style>
 </head>
-<body>
+<body style="margin-top: 120px;">
   <%- include('../partials/header') %>
 
-  <body style="margin-top: 120px;">
+  <!-- Thanh giỏ hàng nhỏ -->
+  <div style="position:fixed; top:20px; right:30px; font-size:18px; font-weight:bold;">
+    🛒 Giỏ hàng: <span id="cart-count"><%= cart && cart.length > 0 ? cart.reduce((sum, i) => sum + i.quantity, 0) : 0 %></span>
+  </div>
 
-    <section class="mymaincontent my-3">
-        <div class="container my-3">
-            <!-- Banner -->
-            <div class="swiper mySwiper">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide"><img src="https://thresholdresources.wordpress.com/wp-content/uploads/2018/12/office-supplies.jpg" alt="Banner 3"></div>
-                <div class="swiper-slide"><img src="https://tse2.mm.bing.net/th/id/OIP.eSOggCcEKqFGGE22iGTiEwHaFj?w=626&h=470&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Banner 3"></div>
-                <div class="swiper-slide"><img src="https://thresholdresources.wordpress.com/wp-content/uploads/2018/12/office-supplies.jpg" alt="Banner 3"></div>
-                <div class="swiper-slide"><img src="https://thresholdresources.wordpress.com/wp-content/uploads/2018/12/office-supplies.jpg" alt="Banner 3"></div>
-            </div>
-
-            <!-- Thêm nút điều khiển nếu muốn -->
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-pagination"></div>
-            </div>
-            <br>
-            <div class="cate-list mb-3">
-                <span>
-                    <h3 style="color: #3f640b;">Sản Phẩm Nổi Bật</h3>
-                </span>
-                <hr>
-                <div class="row py-4">
-                    <div class="large-12 columns">
-                        <div class="product-list owl-carousel owl-theme"> <!-- Đặt div này chứa toàn bộ sản phẩm -->
-                            
-                            <div class="item hover-effect" style="border-radius: 10px; padding: 5px;">
-                                <div class="category-icon text-center"> <!-- Thêm class 'text-center' để căn giữa -->
-                                    <a href="" class="product-link">
-                                        <img src="" alt="hoaxinh" class="img-fluid">
-                                        <h6 class="mt-2" style="color: black;"></h6> <!-- Thêm margin-top để tạo khoảng cách giữa ảnh và chữ -->
-                                    </a>
-                                </div>
-                            </div>
-                         
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <section class="mymaincontent my-3">
+    <div class="container my-3">
+      <!-- Banner -->
+      <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide"><img src="https://thresholdresources.wordpress.com/wp-content/uploads/2018/12/office-supplies.jpg" alt="Banner 1"></div>
+          <div class="swiper-slide"><img src="https://tse2.mm.bing.net/th/id/OIP.eSOggCcEKqFGGE22iGTiEwHaFj?w=626&h=470&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Banner 2"></div>
+          <div class="swiper-slide"><img src="https://thresholdresources.wordpress.com/wp-content/uploads/2018/12/office-supplies.jpg" alt="Banner 3"></div>
+          <div class="swiper-slide"><img src="https://thresholdresources.wordpress.com/wp-content/uploads/2018/12/office-supplies.jpg" alt="Banner 4"></div>
         </div>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <div class="product-list mb-3">
-                        <div class="row text-center">
-                            <div class="row text-center">
-                              <div class="row text-center">
-                                <div class="container">
-                                <% for (let catId in catProducts) { %>
-                                    <div class="category-block" style="margin-bottom: 60px;"> 
-                                    <h2 style="margin-bottom: 20px;"><%= catProducts[catId].category_name %></h2>
-                                    <%- include("view_products", { products: catProducts[catId].products }) %>
-                                    </div>
-                                <% } %>
-                                </div>
-
-
-                              </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+      </div>
+      <br>
+      <div class="cate-list mb-3">
+        <span>
+          <h3 style="color: #3f640b;">Sản Phẩm Nổi Bật</h3>
+        </span>
+        <hr>
+        <div class="row py-4">
+          <div class="large-12 columns">
+            <div class="product-list owl-carousel owl-theme">
+              <!-- Owl Carousel content (có thể thêm sản phẩm nổi bật từ controller) -->
+              <div class="item hover-effect" style="border-radius: 10px; padding: 5px;">
+                <div class="category-icon text-center">
+                  <a href="" class="product-link">
+                    <img src="" alt="hoaxinh" class="img-fluid">
+                    <h6 class="mt-2" style="color: black;"></h6>
+                  </a>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-    </section>
-<%- include('../partials/footer') %>
-</body>
-</html>   
- <script>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <div class="product-list mb-3">
+            <div class="row text-center">
+              <div class="container">
+                <% for (let catId in catProducts) { %>
+                  <% if (catProducts[catId].products && catProducts[catId].products.length > 0) { %>
+                    <div class="category-block" style="margin-bottom: 60px;"> 
+                      <h2 style="margin-bottom: 20px; text-align: center;"><%= catProducts[catId].category_name %></h2>
+                      <%- include('../pages/view_products', { 
+                            catId, 
+                            products: catProducts[catId].products 
+                          }) %>
+                    </div>
+                  <% } %>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-     var swiper = new Swiper(".mySwiper", {
-         loop: true, // lặp lại vô hạn
-         autoplay: {
-         delay: 2000, // 3 giây đổi ảnh
-         disableOnInteraction: false,
-         },
-         pagination: {
-         el: ".swiper-pagination",
-         clickable: true,
-         },
-         navigation: {
-         nextEl: ".swiper-button-next",
-         prevEl: ".swiper-button-prev",
-         },
-         effect: "coverflow", // có thể đổi thành "fade", "cube", "coverflow", "flip"
-         speed: 700 // tốc độ chuyển slide (ms)
-     });
-</script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <%- include('../partials/footer') %>
+
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Swiper init cho banner -->
   <script>
-    var swiper = new Swiper(".mySwiperProducts", {
-      slidesPerView: 4,
-      spaceBetween: 20,
+    var swiper = new Swiper(".mySwiper", {
+      loop: true,
+      autoplay: {
+        delay: 2000,
+        disableOnInteraction: false,
+      },
       pagination: {
         el: ".swiper-pagination",
         clickable: true,
@@ -167,13 +167,11 @@
         nextEl: ".swiper-button-next",
         prevEl: ".swiper-button-prev",
       },
+      effect: "coverflow",
+      speed: 700
     });
-  </script> -->
+  </script>
 
-<!-- <script>
-  fetch("/products/swiper")   // route này gọi controller showProductsSwiper
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById("products-container").innerHTML = html;
-    });
-</script> -->
+</body>
+</html>
+```

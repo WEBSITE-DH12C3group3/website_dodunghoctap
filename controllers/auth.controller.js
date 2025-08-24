@@ -62,7 +62,7 @@ exports.register = async (req, res) => {
 
     // 4. Lưu vào DB
     const [result] = await connection.execute(
-      "INSERT INTO users (full_name, email, phone, address, password, role) VALUES (?, ?, ?, ?, ?, 'customer')",
+      "INSERT INTO users (full_name, email, phone, address, password, role_id) VALUES (?, ?, ?, ?, ?, '3')",
       [fullname, email, phone, address, password]
     );
     await connection.end();
@@ -73,12 +73,14 @@ exports.register = async (req, res) => {
     email,
     phone,
     address,
-    role: "customer"
+    role: "3"
   };
   setUserSession(req, newUser);
   res.redirect("/");
   } catch (err) {
     console.error("Lỗi đăng ký:", err);
+      console.error("Chi tiết:", err);
+
     res.status(500).send("Lỗi server");
   }
 };

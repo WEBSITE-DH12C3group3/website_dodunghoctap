@@ -1,102 +1,163 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <title>EDEN | Giỏ Hàng</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"/>
   <style>
     body {
       background: #f8f9fa;
       margin-top: 100px;
+      font-family: 'Arial', sans-serif;
     }
     .cart-card {
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       background: #fff;
-      padding: 20px;
-      margin-bottom: 20px;
+      padding: 15px;
+      margin-bottom: 15px;
+      transition: transform 0.2s;
+    }
+    .cart-card:hover {
+      transform: translateY(-3px);
     }
     .cart-img {
-      max-width: 120px;
-      border-radius: 10px;
+      max-width: 100px;
+      border-radius: 8px;
+      object-fit: cover;
     }
     .cart-total-box {
       background: #fff;
       padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 20px;
     }
     .btn-qty {
       border: 1px solid #ccc;
       border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      text-align: center;
-      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+    .btn-qty:hover {
+      background-color: #e9ecef;
+    }
+    .btn-remove, .btn-clear-cart {
+      border-radius: 8px;
+      transition: background-color 0.2s;
+    }
+    .btn-remove:hover, .btn-clear-cart:hover {
+      opacity: 0.9;
     }
     .empty-cart {
       text-align: center;
-      padding: 50px;
+      padding: 60px 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .table th {
+      font-weight: 600;
+      color: #333;
+    }
+    .table td {
+      vertical-align: middle;
+    }
+    @media (max-width: 768px) {
+      .cart-img {
+        max-width: 80px;
+      }
+      .cart-card {
+        padding: 10px;
+      }
+      .cart-total-box {
+        margin-top: 20px;
+      }
     }
   </style>
 </head>
-<body>
+<body style="margin-top: 120px;">
+    <%- include('../partials/header') %>
   <div class="container">
-    <h2 class="text-center mb-4">🛒 Giỏ Hàng</h2>
 
     <% if (cart.length > 0) { %>
       <div class="row">
         <!-- Danh sách sản phẩm -->
         <div class="col-lg-8">
-          <% cart.forEach((item, i) => { %>
-            <div class="cart-card d-flex align-items-center justify-content-between">
-              <div class="d-flex align-items-center">
-                <img src="/uploads/<%= item.image %>" class="cart-img me-3">
-                <div>
-                  <h5><%= item.name %></h5>
-                  <p class="text-muted mb-1">Giá: <b><%= item.price_sale.toLocaleString() %> VND</b></p>
-                  <p class="mb-0">Thành tiền: 
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Sản phẩm</th>
+                <th scope="col" class="text-center">Giá</th>
+                <th scope="col" class="text-center">Số lượng</th>
+                <th scope="col" class="text-center">Thành tiền</th>
+                <th scope="col" class="text-center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% cart.forEach((item, i) => { %>
+                <tr class="cart-card">
+                  <td class="d-flex align-items-center">
+                    <img src="/Uploads/<%= item.image_url %>" class="cart-img me-3" alt="<%= item.product_name %>">
+                    <div>
+                      <h6 class="mb-0"><%= item.product_name %></h6>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="fw-bold"><%= item.price.toLocaleString() %> VND</span>
+                  </td>
+                  <td class="text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <a href="/cart/minus/<%= item.product_id %>" class="btn btn-light btn-qty me-2 btn-minus" data-id="<%= item.product_id %>">
+                        <i class="fa fa-minus"></i>
+                      </a>
+                      <span class="fw-bold mx-2"><%= item.quantity %></span>
+                      <a href="/cart/plus/<%= item.product_id %>" class="btn btn-light btn-qty btn-plus" data-id="<%= item.product_id %>">
+                        <i class="fa fa-plus"></i>
+                      </a>
+                    </div>
+                  </td>
+                  <td class="text-center">
                     <span class="text-danger fw-bold">
-                      <%= item.thanhtien.toLocaleString() %> VND
+                      <%= (item.price * item.quantity).toLocaleString() %> VND
                     </span>
-                  </p>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <a href="/cart/minus/<%= item.id %>" class="btn btn-light btn-qty me-2">
-                  <i class="fa fa-minus"></i>
-                </a>
-                <span class="fw-bold"><%= item.quantity %></span>
-                <a href="/cart/plus/<%= item.id %>" class="btn btn-light btn-qty ms-2">
-                  <i class="fa fa-plus"></i>
-                </a>
-              </div>
-
-              <a href="/cart/remove/<%= item.id %>" class="btn btn-outline-danger ms-3">
-                <i class="fa fa-trash"></i>
-              </a>
-            </div>
-          <% }) %>
+                  </td>
+                  <td class="text-center">
+                    <a href="/cart/remove/<%= item.product_id %>" class="btn btn-outline-danger btn-remove" data-id="<%= item.product_id %>">
+                      <i class="fa fa-trash"></i>
+                    </a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
         </div>
 
         <!-- Tổng tiền -->
         <div class="col-lg-4">
           <div class="cart-total-box">
-            <h4>Tổng cộng</h4>
-            <h3 class="text-danger"><%= total.toLocaleString() %> VND</h3>
+            <h4 class="mb-3">Tổng cộng</h4>
+            <h3 class="text-danger mb-4"><%= total.toLocaleString() %> VND</h3>
             <hr>
             <div class="d-grid gap-2">
-              <a href="/cart/clear" class="btn btn-outline-danger">
-                <i class="fa fa-trash"></i> Xóa tất cả
+              <a href="#" class="btn btn-outline-danger btn-clear-cart">
+                <i class="fa fa-trash me-2"></i>Xóa tất cả
               </a>
               <% if (user) { %>
                 <a href="/delivery" class="btn btn-success">
-                  <i class="fa fa-truck"></i> Tiến hành thanh toán
+                  <i class="fa fa-truck me-2"></i>Tiến hành thanh toán
                 </a>
               <% } else { %>
                 <a href="/registers" class="btn btn-warning">
-                  <i class="fa fa-user"></i> Đăng ký để tiếp tục
+                  <i class="fa fa-user me-2"></i>Đăng ký để tiếp tục
                 </a>
               <% } %>
             </div>
@@ -105,11 +166,206 @@
       </div>
     <% } else { %>
       <div class="empty-cart">
-        <img src="/images/empty.png" width="300" class="mb-3">
+        <img src="/images/empty.png" width="250" class="mb-4">
         <h4>Giỏ hàng của bạn đang trống!</h4>
-        <a href="/" class="btn btn-success mt-3">Mua Ngay</a>
+        <a href="/" class="btn btn-success mt-3">
+          <i class="fa fa-shopping-bag me-2"></i>Mua Ngay
+        </a>
       </div>
     <% } %>
   </div>
+
+  <!-- Script SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Script AJAX cho các hành động giỏ hàng -->
+  <script>
+    // Hàm hiển thị thông báo SweetAlert2
+    const showToast = (icon, title) => {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        icon,
+        title,
+        customClass: {
+          popup: 'swal2-custom-toast'
+        }
+      });
+    };
+
+    // Hàm cập nhật giao diện giỏ hàng
+    function updateCartUI(cart, total) {
+      const cartContainer = document.querySelector(".table tbody");
+      const totalEl = document.querySelector(".cart-total-box h3");
+      const cartCountEl = document.getElementById("cart-count");
+      const cartBadge = document.querySelector(".badge.rounded-pill.bg-danger");
+
+      // Cập nhật tổng tiền
+      if (totalEl) {
+        totalEl.textContent = total.toLocaleString() + " VND";
+      }
+
+      // Cập nhật số lượng giỏ hàng
+      const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      if (cartCountEl) {
+        cartCountEl.textContent = cartCount;
+      }
+      if (cartBadge) {
+        cartBadge.textContent = cartCount;
+      }
+
+      // Nếu giỏ hàng rỗng, hiển thị thông báo
+      if (cart.length === 0) {
+        window.location.reload(); // Tải lại trang để hiển thị giao diện giỏ rỗng
+        return;
+      }
+
+      // Cập nhật danh sách sản phẩm
+      if (cartContainer) {
+        cartContainer.innerHTML = "";
+        cart.forEach(item => {
+          const itemEl = document.createElement("tr");
+          itemEl.className = "cart-card table-light";
+          itemEl.innerHTML = `
+            <td class="d-flex align-items-center">
+              <img src="/Uploads/${item.image_url}" class="cart-img me-3" alt="${item.product_name}">
+              <div>
+                <h6 class="mb-0">${item.product_name}</h6>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="fw-bold">${item.price.toLocaleString()} VND</span>
+            </td>
+            <td class="text-center">
+              <div class="d-flex align-items-center justify-content-center">
+                <a href="/cart/minus/${item.product_id}" class="btn btn-light btn-qty me-2 btn-minus" data-id="${item.product_id}">
+                  <i class="fa fa-minus"></i>
+                </a>
+                <span class="fw-bold mx-2">${item.quantity}</span>
+                <span class="btn btn-light btn-qty btn-plus" data-id="${item.product_id}">
+                  <i class="fa fa-plus"></i>
+                </span>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="text-danger fw-bold">${(item.price * item.quantity).toLocaleString()} VND</span>
+            </td>
+            <td class="text-center">
+              <a href="/cart/remove/${item.product_id}" class="btn btn-outline-danger btn-remove" data-id="${item.product_id}">
+                <i class="fa fa-trash"></i>
+              </a>
+            </td>
+          `;
+          cartContainer.appendChild(itemEl);
+        });
+
+        // Gắn lại sự kiện cho các nút mới
+        attachCartEvents();
+      }
+    }
+
+    // Hàm gắn sự kiện cho các nút trong giỏ hàng
+    function attachCartEvents() {
+      // Tăng số lượng
+      document.querySelectorAll(".btn-plus").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const productId = btn.dataset.id;
+          try {
+            const res = await fetch(`/cart/plus/${productId}`, { 
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+            });
+            const data = await res.json();
+            if (data.success) {
+              updateCartUI(data.cart, data.total);
+              showToast("success", "Đã tăng số lượng sản phẩm!");
+            } else {
+              showToast("error", `Lỗi: ${data.message}`);
+            }
+          } catch (err) {
+            showToast("error", "Lỗi kết nối server!");
+            console.error(err);
+          }
+        });
+      });
+
+      // Giảm số lượng
+      document.querySelectorAll(".btn-minus").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const productId = btn.dataset.id;
+          try {
+            const res = await fetch(`/cart/minus/${productId}`, { 
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+            });
+            const data = await res.json();
+            if (data.success) {
+              updateCartUI(data.cart, data.total);
+              showToast("success", "Đã giảm số lượng sản phẩm!");
+            } else {
+              showToast("error", `Lỗi: ${data.message}`);
+            }
+          } catch (err) {
+            showToast("error", "Lỗi kết nối server!");
+            console.error(err);
+          }
+        });
+      });
+
+      // Xóa sản phẩm
+      document.querySelectorAll(".btn-remove").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const productId = btn.dataset.id;
+          try {
+            const res = await fetch(`/cart/remove/${productId}`, { 
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+            });
+            const data = await res.json();
+            if (data.success) {
+              updateCartUI(data.cart, data.total);
+              showToast("success", "Đã xóa sản phẩm khỏi giỏ hàng!");
+            } else {
+              showToast("error", `Lỗi: ${data.message}`);
+            }
+          } catch (err) {
+            showToast("error", "Lỗi kết nối server!");
+            console.error(err);
+          }
+        });
+      });
+
+      // Xóa tất cả
+      document.querySelectorAll(".btn-clear-cart").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try {
+            const res = await fetch(`/cart/clear`, { 
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+            });
+            const data = await res.json();
+            if (data.success) {
+              updateCartUI(data.cart, data.total);
+              showToast("success", "Đã xóa toàn bộ giỏ hàng!");
+            } else {
+              showToast("error", `Lỗi: ${data.message}`);
+            }
+          } catch (err) {
+            showToast("error", "Lỗi kết nối server!");
+            console.error(err);
+          }
+        });
+      });
+    }
+
+    // Gắn sự kiện khi tải trang
+    document.addEventListener("DOMContentLoaded", attachCartEvents);
+  </script>
 </body>
 </html>
