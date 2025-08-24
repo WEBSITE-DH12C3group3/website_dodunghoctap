@@ -196,37 +196,6 @@ document.querySelectorAll('.btn-favorite').forEach(button => {
   });
 });
 
-  // Gắn sự kiện cho nút thêm vào giỏ hàng
-  document.querySelectorAll('.btn-add-cart').forEach(button => {
-    button.addEventListener('click', async function(e) {
-      e.preventDefault();
-      const productId = this.dataset.id;
-      this.disabled = true;
-
-      try {
-        const response = await fetch(`/cart/add/${productId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        if (data.success) {
-          // Cập nhật trạng thái yêu thích dựa trên danh sách favorites từ phản hồi
-          document.querySelectorAll('.btn-favorite').forEach(btn => {
-            const isFavorited = data.favorites.some(item => item.product_id == btn.dataset.id);
-            updateFavoriteStatus(btn.dataset.id, isFavorited);
-          });
-          showToast("success", "Đã thêm sản phẩm vào giỏ hàng");
-        } else {
-          showToast("error", data.message || "Lỗi khi thêm vào giỏ hàng");
-        }
-      } catch (error) {
-        console.error('Lỗi:', error);
-        showToast("error", "Lỗi kết nối server!");
-      } finally {
-        this.disabled = false;
-      }
-    });
-  });
 </script>
 
   <!-- CSS tùy chỉnh cho SweetAlert2 toast -->

@@ -2,38 +2,66 @@ const getConnection = require("../config/db");
 
 // Hàm đồng bộ danh sách yêu thích từ session vào bảng favourite
 const syncSessionFavoritesToDB = async (userId, sessionFavorites, conn) => {
-  if (!sessionFavorites || sessionFavorites.length === 0) return;
+  if (!sessionFavorites || !Array.isArray(sessionFavorites) || sessionFavorites.length === 0) {
+    console.log('Không có sản phẩm yêu thích trong session để đồng bộ');
+    return;
+  }
 
-  for (const productId of sessionFavorites) {
-    // Kiểm tra xem sản phẩm đã có trong bảng favourite chưa
-    const [existingItem] = await conn.query(
-      "SELECT * FROM favourite WHERE user_id = ? AND product_id = ?",
-      [userId, productId]
-    );
+  const favorites = sessionFavorites.map(id => Number(id)).filter(id => !isNaN(id));
+  if (favorites.length === 0) {
+    console.log('Danh sách yêu thích trong session không hợp lệ');
+    return;
+  }
 
-    if (existingItem.length === 0) {
-      // Thêm sản phẩm mới vào bảng favourite
-      await conn.query(
-        "INSERT INTO favourite (user_id, product_id) VALUES (?, ?)",
+  try {
+    for (const productId of favorites) {
+      // Kiểm tra xem sản phẩm có tồn tại trong bảng products không
+      const [product] = await conn.execute(
+        'SELECT product_id FROM products WHERE product_id = ?',
+        [productId]
+      );
+      if (product.length === 0) {
+        console.log(`Sản phẩm ${productId} không tồn tại, bỏ qua`);
+        continue;
+      }
+
+      // Kiểm tra xem sản phẩm đã có trong bảng favourite chưa
+      const [existingItem] = await conn.execute(
+        'SELECT * FROM favourite WHERE user_id = ? AND product_id = ?',
         [userId, productId]
       );
+
+      if (existingItem.length === 0) {
+        // Thêm sản phẩm mới vào bảng favourite
+        await conn.execute(
+          'INSERT INTO favourite (user_id, product_id) VALUES (?, ?)',
+          [userId, productId]
+        );
+        console.log(`Đã thêm sản phẩm ${productId} vào favourite cho user ${userId}`);
+      } else {
+        console.log(`Sản phẩm ${productId} đã có trong favourite của user ${userId}, bỏ qua`);
+      }
     }
+  } catch (err) {
+    console.error('Lỗi đồng bộ sản phẩm yêu thích:', err);
+    throw err;
   }
 };
 
 // Thêm sản phẩm vào danh sách yêu thích
 exports.addFavorite = async (req, res) => {
   const { userId, productId } = req.body;
+  const productIdNum = Number(productId);
 
-  if (!productId) {
-    return res.status(400).json({ success: false, error: "Thiếu productId" });
+  if (!productId || isNaN(productIdNum)) {
+    return res.status(400).json({ success: false, error: "Thiếu hoặc productId không hợp lệ" });
   }
 
   try {
     const connection = await getConnection();
     const [product] = await connection.execute(
       "SELECT product_id, product_name, price, image_url FROM products WHERE product_id = ?",
-      [productId]
+      [productIdNum]
     );
 
     if (product.length === 0) {
@@ -42,10 +70,9 @@ exports.addFavorite = async (req, res) => {
     }
 
     if (req.session.user && userId && userId == req.session.user.user_id) {
-      // Khách đã đăng nhập: Thêm vào bảng favourite
       const [existingItem] = await connection.execute(
         "SELECT * FROM favourite WHERE user_id = ? AND product_id = ?",
-        [userId, productId]
+        [userId, productIdNum]
       );
 
       if (existingItem.length > 0) {
@@ -55,7 +82,7 @@ exports.addFavorite = async (req, res) => {
 
       await connection.execute(
         "INSERT INTO favourite (user_id, product_id) VALUES (?, ?)",
-        [userId, productId]
+        [userId, productIdNum]
       );
 
       const [results] = await connection.execute(
@@ -72,30 +99,35 @@ exports.addFavorite = async (req, res) => {
 
       return res.status(201).json({ success: true, message: "Đã thêm sản phẩm vào yêu thích", favorites: results });
     } else {
-      // Khách vãng lai: Thêm vào session
-      if (!req.session.favorites) req.session.favorites = [];
-      if (req.session.favorites.includes(productId)) {
+      let favorites = req.session.favorites ? JSON.parse(req.session.favorites).map(id => Number(id)) : [];
+      if (favorites.includes(productIdNum)) {
         await connection.end();
         return res.status(400).json({ success: false, error: "Sản phẩm đã có trong yêu thích" });
       }
 
-      req.session.favorites.push(productId);
-      const [results] = await connection.execute(
-        `
-          SELECT product_id, product_name, price, image_url
-          FROM products
-          WHERE product_id IN (?)
-        `,
-        [req.session.favorites]
-      );
+      favorites.push(productIdNum);
+      req.session.favorites = JSON.stringify(favorites);
+
+      let results = [];
+      if (favorites.length > 0) {
+        const placeholders = favorites.map(() => '?').join(', ');
+        [results] = await connection.execute(
+          `
+            SELECT product_id, product_name, price, image_url
+            FROM products
+            WHERE product_id IN (${placeholders})
+          `,
+          favorites
+        );
+      }
       await connection.end();
 
-      const favorites = results.map(item => ({
+      const favoritesWithDate = results.map(item => ({
         ...item,
         added_date: new Date()
       }));
 
-      return res.status(201).json({ success: true, message: "Đã thêm sản phẩm vào yêu thích", favorites });
+      return res.status(201).json({ success: true, message: "Đã thêm sản phẩm vào yêu thích", favorites: favoritesWithDate });
     }
   } catch (err) {
     console.error("Lỗi thêm sản phẩm yêu thích:", err);
@@ -106,19 +138,18 @@ exports.addFavorite = async (req, res) => {
 // Xóa sản phẩm khỏi danh sách yêu thích
 exports.removeFavorite = async (req, res) => {
   const { userId } = req.body;
-  const { productId } = req.params;
+  const productIdNum = Number(req.params.productId);
 
-  if (!productId) {
-    return res.status(400).json({ success: false, error: "Thiếu productId" });
+  if (!productIdNum || isNaN(productIdNum)) {
+    return res.status(400).json({ success: false, error: "Thiếu hoặc productId không hợp lệ" });
   }
 
   try {
     if (req.session.user && userId && userId == req.session.user.user_id) {
-      // Khách đã đăng nhập: Xóa từ bảng favourite
       const connection = await getConnection();
       const [result] = await connection.execute(
         "DELETE FROM favourite WHERE user_id = ? AND product_id = ?",
-        [userId, productId]
+        [userId, productIdNum]
       );
 
       const [results] = await connection.execute(
@@ -139,29 +170,35 @@ exports.removeFavorite = async (req, res) => {
 
       return res.status(200).json({ success: true, message: "Đã xóa sản phẩm khỏi yêu thích", favorites: results });
     } else {
-      // Khách vãng lai: Xóa từ session
-      if (!req.session.favorites || !req.session.favorites.includes(productId)) {
+      let favorites = req.session.favorites ? JSON.parse(req.session.favorites).map(id => Number(id)) : [];
+      if (!favorites.includes(productIdNum)) {
         return res.status(404).json({ success: false, message: "Không tìm thấy sản phẩm trong yêu thích" });
       }
 
-      req.session.favorites = req.session.favorites.filter(id => id != productId);
+      favorites = favorites.filter(id => id !== productIdNum);
+      req.session.favorites = JSON.stringify(favorites);
+
       const connection = await getConnection();
-      const [results] = await connection.execute(
-        `
-          SELECT product_id, product_name, price, image_url
-          FROM products
-          WHERE product_id IN (?)
-        `,
-        [req.session.favorites.length > 0 ? req.session.favorites : [0]]
-      );
+      let results = [];
+      if (favorites.length > 0) {
+        const placeholders = favorites.map(() => '?').join(', ');
+        [results] = await connection.execute(
+          `
+            SELECT product_id, product_name, price, image_url
+            FROM products
+            WHERE product_id IN (${placeholders})
+          `,
+          favorites
+        );
+      }
       await connection.end();
 
-      const favorites = results.map(item => ({
+      const favoritesWithDate = results.map(item => ({
         ...item,
         added_date: new Date()
       }));
 
-      return res.status(200).json({ success: true, message: "Đã xóa sản phẩm khỏi yêu thích", favorites });
+      return res.status(200).json({ success: true, message: "Đã xóa sản phẩm khỏi yêu thích", favorites: favoritesWithDate });
     }
   } catch (err) {
     console.error("Lỗi xóa sản phẩm yêu thích:", err);
@@ -200,46 +237,62 @@ exports.getFavorites = async (req, res) => {
 
 // Render trang yêu thích
 exports.renderFavorites = async (req, res) => {
-  const userId = req.user ? req.user.user_id : null;
+  const userId = req.session.user ? req.session.user.user_id : null;
 
   try {
     let favorites = [];
+    let products = [];
+    const connection = await getConnection();
+
     if (userId) {
       // Lấy từ database cho user đã đăng nhập
-      const [rows] = await req.db.execute(
-        'SELECT product_id FROM favorites WHERE user_id = ?',
+      const [rows] = await connection.execute(
+        `
+          SELECT p.product_id, p.product_name, p.price, p.image_url, f.added_date
+          FROM favourite f
+          JOIN products p ON f.product_id = p.product_id
+          WHERE f.user_id = ?
+          ORDER BY f.added_date DESC
+        `,
         [userId]
       );
-      favorites = rows.map(row => Number(row.product_id)); // Convert sang number
+      products = rows.map(row => ({
+        product_id: Number(row.product_id),
+        product_name: row.product_name,
+        price: row.price,
+        image_url: row.image_url,
+        added_date: row.added_date
+      }));
     } else {
       // Lấy từ session cho khách vãng lai
-      const sessionFavorites = req.session.favorites || '[]';
-      favorites = JSON.parse(sessionFavorites).map(id => Number(id)); // Parse và convert sang number
+      favorites = req.session.favorites ? JSON.parse(req.session.favorites || '[]').map(id => Number(id)) : [];
+      if (favorites.length > 0) {
+        const placeholders = favorites.map(() => '?').join(', ');
+        const query = `
+          SELECT product_id, product_name, price, image_url
+          FROM products
+          WHERE product_id IN (${placeholders})
+        `;
+        const [rows] = await connection.execute(query, favorites);
+        products = rows.map(row => ({
+          product_id: Number(row.product_id),
+          product_name: row.product_name,
+          price: row.price,
+          image_url: row.image_url,
+          added_date: null // Không có added_date cho khách vãng lai
+        }));
+      }
     }
 
-    // Nếu mảng rỗng, trả về danh sách sản phẩm rỗng mà không chạy query
-    if (favorites.length === 0) {
-      return res.render('favorites', { products: [], user: req.user });
-    }
+    await connection.end();
 
-    // Tạo placeholder động
-    const placeholders = favorites.map(() => '?').join(', ');
-    const query = `
-      SELECT product_id, product_name, price, image_url
-      FROM products
-      WHERE product_id IN (${placeholders})
-    `;
-
-    // Debug để kiểm tra (bạn có thể xóa sau khi test)
+    // Debug
+    console.log('Session user:', req.session.user);
     console.log('Favorites:', favorites);
-    console.log('Query:', query);
-    console.log('Parameters:', favorites);
-
-    // Thực thi query
-    const [products] = await req.db.execute(query, favorites);
+    console.log('Products:', products);
 
     // Render trang
-    res.render('favorites', { products, user: req.user });
+    res.render('pages/liked', { products, user: req.session.user });
   } catch (error) {
     console.error('Lỗi render trang yêu thích:', error);
     res.status(500).send('Lỗi server');
@@ -250,28 +303,50 @@ exports.renderFavorites = async (req, res) => {
 exports.syncFavoritesOnLogin = async (req, res) => {
   try {
     if (!req.session.user || !req.session.user.user_id) {
-      return res.status(401).json({ success: false, error: "Chưa đăng nhập" });
+      return res.status(401).json({ success: false, error: 'Chưa đăng nhập' });
     }
 
+    const userId = req.session.user.user_id;
+    const sessionFavorites = req.session.favorites ? JSON.parse(req.session.favorites || '[]').map(id => Number(id)) : [];
+
     const connection = await getConnection();
-    await syncSessionFavoritesToDB(req.session.user.user_id, req.session.favorites, connection);
-    req.session.favorites = []; // Xóa danh sách yêu thích trong session sau khi đồng bộ
+    await connection.beginTransaction(); // Bắt đầu transaction
 
-    const [results] = await connection.execute(
-      `
-        SELECT p.product_id, p.product_name, p.price, p.image_url, f.added_date
-        FROM favourite f
-        JOIN products p ON f.product_id = p.product_id
-        WHERE f.user_id = ?
-        ORDER BY f.added_date DESC
-      `,
-      [req.session.user.user_id]
-    );
-    await connection.end();
+    try {
+      // Đồng bộ session favorites vào bảng favourite
+      await syncSessionFavoritesToDB(userId, sessionFavorites, connection);
+      req.session.favorites = JSON.stringify([]); // Xóa session favorites sau khi đồng bộ
 
-    return res.status(200).json({ success: true, favorites: results });
+      // Lấy danh sách yêu thích từ database
+      const [results] = await connection.execute(
+        `
+          SELECT p.product_id, p.product_name, p.price, p.image_url, f.added_date
+          FROM favourite f
+          JOIN products p ON f.product_id = p.product_id
+          WHERE f.user_id = ?
+          ORDER BY f.added_date DESC
+        `,
+        [userId]
+      );
+
+      const favorites = results.map(row => ({
+        product_id: Number(row.product_id),
+        product_name: row.product_name,
+        price: row.price,
+        image_url: row.image_url,
+        added_date: row.added_date
+      }));
+
+      await connection.commit();
+      await connection.end();
+
+      return res.status(200).json({ success: true, message: 'Đã đồng bộ danh sách yêu thích', favorites });
+    } catch (err) {
+      await connection.rollback();
+      throw err;
+    }
   } catch (err) {
-    console.error("Lỗi đồng bộ danh sách yêu thích:", err);
+    console.error('Lỗi đồng bộ danh sách yêu thích:', err);
     return res.status(500).json({ success: false, error: err.message });
   }
 };
