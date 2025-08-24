@@ -57,6 +57,7 @@
       <div class="swiper-pagination-<%= catId %>"></div>
     </div>
   </div>
+  
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <!-- SweetAlert2 JS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -78,24 +79,6 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  
-  new Swiper(".mySwiperA-<%= catId %>", {
-    slidesPerView: 5,
-    spaceBetween: 70,
-    freeMode: true,
-    pagination: {
-      el: ".swiper-pagination-<%= catId %>",
-      clickable: true,
-    },
-    breakpoints: {
-      320: { slidesPerView: 1, spaceBetween: 20 },
-      640: { slidesPerView: 2, spaceBetween: 30 },
-      768: { slidesPerView: 3, spaceBetween: 40 },
-      1024: { slidesPerView: 4, spaceBetween: 50 },
-      1280: { slidesPerView: 5, spaceBetween: 70 }
-    }
-  });
-
   // Hàm hiển thị thông báo SweetAlert2
   const showToast = (icon, title) => {
     Swal.fire({
@@ -106,9 +89,7 @@
       timerProgressBar: true,
       icon,
       title,
-      customClass: {
-        popup: 'swal2-custom-toast'
-      }
+      customClass: { popup: 'swal2-custom-toast' }
     });
   };
 
@@ -118,9 +99,9 @@
     if (button) {
       button.dataset.favorited = isFavorited;
       button.style.background = isFavorited ? "#d1d5db" : "#f43f5e";
-      button.innerHTML = isFavorited ? 
-        `<i class="fa fa-heart me-2"></i> Đã yêu thích` : 
-        `<i class="fa fa-heart me-2"></i> Yêu thích`;
+      button.innerHTML = isFavorited
+        ? `<i class="fa fa-heart me-2"></i> Đã yêu thích`
+        : `<i class="fa fa-heart me-2"></i> Yêu thích`;
     }
   }
 
@@ -129,74 +110,83 @@
     const productId = button.dataset.id;
     const userId = "<%= user ? user.user_id : '' %>";
     const sessionFavorites = JSON.parse(sessionStorage.getItem('favorites')) || [];
+
     if (userId) {
-      // Khách đã đăng nhập: Kiểm tra qua API
+      // Khách đã đăng nhập → kiểm tra qua API
       try {
-        const response = await fetch(`/liked/${userId}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
+        const response = await fetch(`/liked/${userId}`);
         const data = await response.json();
         if (data.success && data.favorites.some(item => item.product_id == productId)) {
           updateFavoriteStatus(productId, true);
         }
       } catch (error) {
-        console.error('Lỗi kiểm tra trạng thái yêu thích:', error);
+        console.error("Lỗi khi check trạng thái:", error);
       }
     } else {
-      // Khách vãng lai: Kiểm tra session
+      // Khách vãng lai → kiểm tra session
       if (sessionFavorites.includes(Number(productId))) {
         updateFavoriteStatus(productId, true);
       }
     }
   }
 
-  // Gắn sự kiện cho nút yêu thích
-document.querySelectorAll('.btn-favorite').forEach(button => {
-  checkFavoriteStatus(button);
+  // Quét tất cả nút yêu thích có trên trang
+  function initFavorites() {
+    document.querySelectorAll('.btn-favorite').forEach(button => {
+      checkFavoriteStatus(button);
+    });
+  }
 
-  button.addEventListener('click', async function(e) {
+  // Gọi init khi load trang
+  document.addEventListener("DOMContentLoaded", initFavorites);
+
+  // Event delegation cho tất cả nút yêu thích
+  document.addEventListener("click", async function (e) {
+    if (!e.target.closest(".btn-favorite")) return;
+
+    const button = e.target.closest(".btn-favorite");
     e.preventDefault();
-    const productId = Number(this.dataset.id); // Convert sang number
+
+    const productId = Number(button.dataset.id);
     const userId = "<%= user ? user.user_id : '' %>";
-    const isFavorited = this.dataset.favorited === "true";
-    this.disabled = true;
+    const isFavorited = button.dataset.favorited === "true";
+    button.disabled = true;
 
     try {
-      const endpoint = isFavorited ? `/liked/remove/${productId}` : '/liked/add';
+      const endpoint = isFavorited ? `/liked/remove/${productId}` : `/liked/add`;
       const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, productId })
       });
       const data = await response.json();
+
       if (data.success) {
         updateFavoriteStatus(productId, !isFavorited);
         showToast("success", isFavorited ? "Đã xóa khỏi yêu thích" : data.message);
 
         // Đồng bộ sessionStorage cho khách vãng lai
         if (!userId) {
-          let localFavorites = JSON.parse(sessionStorage.getItem('favorites') || '[]').map(id => Number(id));
+          let localFavorites = JSON.parse(sessionStorage.getItem("favorites") || "[]").map(id => Number(id));
           if (!isFavorited) {
             if (!localFavorites.includes(productId)) localFavorites.push(productId);
           } else {
             localFavorites = localFavorites.filter(id => id !== productId);
           }
-          sessionStorage.setItem('favorites', JSON.stringify(localFavorites));
+          sessionStorage.setItem("favorites", JSON.stringify(localFavorites));
         }
       } else {
         showToast("error", data.error || "Lỗi khi xử lý yêu thích");
       }
     } catch (error) {
-      console.error('Lỗi:', error);
+      console.error("Lỗi:", error);
       showToast("error", "Lỗi kết nối server!");
     } finally {
-      this.disabled = false;
+      button.disabled = false;
     }
   });
-});
-
 </script>
+
 
   <!-- CSS tùy chỉnh cho SweetAlert2 toast -->
   <style>

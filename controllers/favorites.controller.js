@@ -137,10 +137,12 @@ exports.addFavorite = async (req, res) => {
 
 // Xóa sản phẩm khỏi danh sách yêu thích
 exports.removeFavorite = async (req, res) => {
+  console.log('Request received for removeFavorite:', req.body, req.params);
   const { userId } = req.body;
   const productIdNum = Number(req.params.productId);
 
   if (!productIdNum || isNaN(productIdNum)) {
+    console.log('Invalid productId:', req.params.productId);
     return res.status(400).json({ success: false, error: "Thiếu hoặc productId không hợp lệ" });
   }
 

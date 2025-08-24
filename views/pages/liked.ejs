@@ -196,7 +196,7 @@
           const productId = Number(btn.dataset.id);
           const userId = "<%= user ? user.user_id : '' %>";
           try {
-            const res = await fetch(`/favorites/remove/${productId}`, {
+            const res = await fetch(`/liked/remove/${productId}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ userId })
@@ -226,7 +226,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       attachFavoriteEvents();
       // Đồng bộ sessionStorage với favorites từ server
-      const initialFavorites = <%- JSON.stringify(favorites.map(item => item.product_id)) %>;
+      const initialFavorites = JSON.stringify(favorites.map(item => item.product_id)) ;
       sessionStorage.setItem('favorites', JSON.stringify(initialFavorites));
     });
   </script>
