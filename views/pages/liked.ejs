@@ -61,7 +61,13 @@
     <div class="container mt-5">
       <h2 class="mb-5 text-center"><i class="fa fa-heart me-2"></i>Sản phẩm yêu thích</h2>
 
-      <% if (products && products.length > 0) { %>
+      <% if (error) { %>
+        <div class="alert alert-danger text-center">
+          <%= error %>
+        </div>
+      <% } %>
+
+      <% if (favorites && favorites.length > 0) { %>
         <table class="table table-hover">
           <thead>
             <tr>
@@ -74,7 +80,7 @@
             </tr>
           </thead>
           <tbody id="favorites-body">
-            <% products.forEach((item, index) => { %>
+            <% favorites.forEach((item, index) => { %>
               <tr>
                 <td><%= index + 1 %></td>
                 <td>
@@ -100,6 +106,9 @@
             <% }) %>
           </tbody>
         </table>
+        <div class="text-end">
+          <h4>Tổng giá trị: <span class="fw-bold"><%= total.toLocaleString() %> VND</span></h4>
+        </div>
       <% } else { %>
         <div class="empty-favorites">
           <img src="/images/empty.png" alt="empty" width="250" class="mb-4">
@@ -133,8 +142,9 @@
     };
 
     // Hàm cập nhật giao diện danh sách yêu thích
-    function updateFavoritesUI(favorites) {
+    function updateFavoritesUI(favorites, total) {
       const favoritesBody = document.querySelector("#favorites-body");
+      const totalElement = document.querySelector(".text-end h4 span");
       if (!favoritesBody) return;
 
       if (favorites.length === 0) {
@@ -170,6 +180,10 @@
         favoritesBody.appendChild(row);
       });
 
+      if (totalElement) {
+        totalElement.textContent = total.toLocaleString() + ' VND';
+      }
+
       // Gắn lại sự kiện cho các nút xóa
       attachFavoriteEvents();
     }
@@ -182,7 +196,7 @@
           const productId = Number(btn.dataset.id);
           const userId = "<%= user ? user.user_id : '' %>";
           try {
-            const res = await fetch(`/liked/remove/${productId}`, {
+            const res = await fetch(`/favorites/remove/${productId}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ userId })
@@ -195,7 +209,7 @@
                 localFavorites = localFavorites.filter(id => id !== productId);
                 sessionStorage.setItem('favorites', JSON.stringify(localFavorites));
               }
-              updateFavoritesUI(data.favorites);
+              updateFavoritesUI(data.favorites, data.favorites.reduce((sum, item) => sum + Number(item.price), 0));
               showToast("success", data.message);
             } else {
               showToast("error", `Lỗi: ${data.error || "Không thể xóa sản phẩm"}`);
@@ -208,8 +222,13 @@
       });
     }
 
-    // Gắn sự kiện khi tải trang
-    document.addEventListener("DOMContentLoaded", attachFavoriteEvents);
+    // Đồng bộ sessionStorage với dữ liệu từ server
+    document.addEventListener("DOMContentLoaded", () => {
+      attachFavoriteEvents();
+      // Đồng bộ sessionStorage với favorites từ server
+      const initialFavorites = <%- JSON.stringify(favorites.map(item => item.product_id)) %>;
+      sessionStorage.setItem('favorites', JSON.stringify(initialFavorites));
+    });
   </script>
 </body>
 </html>

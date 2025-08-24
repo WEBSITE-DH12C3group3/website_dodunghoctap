@@ -48,5 +48,27 @@
         </div>
     </div>
 </section>
+<script>
+    // Trong login.js hoặc <script> trong login.ejs
+async function login(email, password) {
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await response.json();
+    if (data.success) {
+      sessionStorage.setItem('favorites', JSON.stringify([])); // Xóa sessionStorage
+      window.location.href = '/favorites'; // Chuyển hướng đến trang yêu thích
+    } else {
+      alert('Đăng nhập thất bại: ' + data.error);
+    }
+  } catch (err) {
+    console.error('Lỗi đăng nhập:', err);
+    alert('Lỗi kết nối server');
+  }
+}
+</script>
 </body>
 </html>

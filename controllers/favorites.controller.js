@@ -206,7 +206,7 @@ exports.removeFavorite = async (req, res) => {
   }
 };
 
-// Lấy danh sách sản phẩm yêu thích của 1 user
+// Lấy danh sách sản phẩm yêu thích của 1 user (cho route /:userId)
 exports.getFavorites = async (req, res) => {
   const { userId } = req.params;
 
@@ -228,59 +228,95 @@ exports.getFavorites = async (req, res) => {
     );
     await connection.end();
 
-    return res.status(200).json({ success: true, favorites: results });
+    const favorites = results.map(item => ({
+      product_id: Number(item.product_id),
+      product_name: item.product_name,
+      price: Number(item.price),
+      image_url: item.image_url,
+      added_date: item.added_date,
+      thanhtien: Number(item.price)
+    }));
+
+    const total = favorites.reduce((sum, item) => sum + item.thanhtien, 0);
+
+    return res.status(200).json({ success: true, favorites, total });
   } catch (err) {
     console.error("Lỗi lấy danh sách yêu thích:", err);
     return res.status(500).json({ success: false, error: err.message });
   }
 };
 
-// Render trang yêu thích
-exports.renderFavorites = async (req, res) => {
+// Hàm lấy hoặc đồng bộ danh sách yêu thích (cho route /)
+exports.getOrSyncFavorites = async (req, res) => {
   const userId = req.session.user ? req.session.user.user_id : null;
+  let favorites = [];
+  let total = 0;
 
   try {
-    let favorites = [];
-    let products = [];
     const connection = await getConnection();
 
     if (userId) {
-      // Lấy từ database cho user đã đăng nhập
-      const [rows] = await connection.execute(
-        `
-          SELECT p.product_id, p.product_name, p.price, p.image_url, f.added_date
-          FROM favourite f
-          JOIN products p ON f.product_id = p.product_id
-          WHERE f.user_id = ?
-          ORDER BY f.added_date DESC
-        `,
-        [userId]
-      );
-      products = rows.map(row => ({
-        product_id: Number(row.product_id),
-        product_name: row.product_name,
-        price: row.price,
-        image_url: row.image_url,
-        added_date: row.added_date
-      }));
-    } else {
-      // Lấy từ session cho khách vãng lai
-      favorites = req.session.favorites ? JSON.parse(req.session.favorites || '[]').map(id => Number(id)) : [];
-      if (favorites.length > 0) {
-        const placeholders = favorites.map(() => '?').join(', ');
-        const query = `
-          SELECT product_id, product_name, price, image_url
-          FROM products
-          WHERE product_id IN (${placeholders})
-        `;
-        const [rows] = await connection.execute(query, favorites);
-        products = rows.map(row => ({
-          product_id: Number(row.product_id),
-          product_name: row.product_name,
-          price: row.price,
-          image_url: row.image_url,
-          added_date: null // Không có added_date cho khách vãng lai
+      // Người dùng đã đăng nhập: Đồng bộ session vào database và lấy từ bảng favourite
+      const sessionFavorites = req.session.favorites ? JSON.parse(req.session.favorites || '[]').map(id => Number(id)) : [];
+
+      await connection.beginTransaction();
+      try {
+        // Đồng bộ session favorites vào bảng favourite
+        await syncSessionFavoritesToDB(userId, sessionFavorites, connection);
+        req.session.favorites = JSON.stringify([]); // Xóa session favorites sau khi đồng bộ
+
+        // Lấy danh sách yêu thích từ database
+        const [favoriteItems] = await connection.execute(
+          `
+            SELECT p.product_id, p.product_name, p.price, p.image_url, f.added_date
+            FROM favourite f
+            JOIN products p ON f.product_id = p.product_id
+            WHERE f.user_id = ?
+            ORDER BY f.added_date DESC
+          `,
+          [userId]
+        );
+
+        favorites = favoriteItems.map(item => ({
+          product_id: Number(item.product_id),
+          product_name: item.product_name,
+          image_url: item.image_url,
+          price: Number(item.price),
+          added_date: item.added_date,
+          thanhtien: Number(item.price) // Tính giá mỗi sản phẩm (tương tự cart)
         }));
+
+        total = favorites.reduce((sum, item) => sum + item.thanhtien, 0);
+
+        await connection.commit();
+      } catch (err) {
+        await connection.rollback();
+        throw err;
+      }
+    } else {
+      // Khách vãng lai: Lấy từ session
+      const sessionFavorites = req.session.favorites ? JSON.parse(req.session.favorites || '[]').map(id => Number(id)) : [];
+      if (sessionFavorites.length > 0) {
+        const placeholders = sessionFavorites.map(() => '?').join(', ');
+        const [favoriteItems] = await connection.execute(
+          `
+            SELECT product_id, product_name, price, image_url
+            FROM products
+            WHERE product_id IN (${placeholders})
+          `,
+          sessionFavorites
+        );
+
+        favorites = favoriteItems.map(item => ({
+          product_id: Number(item.product_id),
+          product_name: item.product_name,
+          image_url: item.image_url,
+          price: Number(item.price),
+          added_date: null, // Không có added_date cho khách vãng lai
+          thanhtien: Number(item.price) // Tính giá mỗi sản phẩm
+        }));
+
+        total = favorites.reduce((sum, item) => sum + item.thanhtien, 0);
       }
     }
 
@@ -288,65 +324,24 @@ exports.renderFavorites = async (req, res) => {
 
     // Debug
     console.log('Session user:', req.session.user);
+    console.log('Session favorites:', req.session.favorites);
     console.log('Favorites:', favorites);
-    console.log('Products:', products);
+    console.log('Total:', total);
 
-    // Render trang
-    res.render('pages/liked', { products, user: req.session.user });
-  } catch (error) {
-    console.error('Lỗi render trang yêu thích:', error);
-    res.status(500).send('Lỗi server');
-  }
-};
-
-// Đồng bộ danh sách yêu thích khi đăng nhập
-exports.syncFavoritesOnLogin = async (req, res) => {
-  try {
-    if (!req.session.user || !req.session.user.user_id) {
-      return res.status(401).json({ success: false, error: 'Chưa đăng nhập' });
-    }
-
-    const userId = req.session.user.user_id;
-    const sessionFavorites = req.session.favorites ? JSON.parse(req.session.favorites || '[]').map(id => Number(id)) : [];
-
-    const connection = await getConnection();
-    await connection.beginTransaction(); // Bắt đầu transaction
-
-    try {
-      // Đồng bộ session favorites vào bảng favourite
-      await syncSessionFavoritesToDB(userId, sessionFavorites, connection);
-      req.session.favorites = JSON.stringify([]); // Xóa session favorites sau khi đồng bộ
-
-      // Lấy danh sách yêu thích từ database
-      const [results] = await connection.execute(
-        `
-          SELECT p.product_id, p.product_name, p.price, p.image_url, f.added_date
-          FROM favourite f
-          JOIN products p ON f.product_id = p.product_id
-          WHERE f.user_id = ?
-          ORDER BY f.added_date DESC
-        `,
-        [userId]
-      );
-
-      const favorites = results.map(row => ({
-        product_id: Number(row.product_id),
-        product_name: row.product_name,
-        price: row.price,
-        image_url: row.image_url,
-        added_date: row.added_date
-      }));
-
-      await connection.commit();
-      await connection.end();
-
-      return res.status(200).json({ success: true, message: 'Đã đồng bộ danh sách yêu thích', favorites });
-    } catch (err) {
-      await connection.rollback();
-      throw err;
-    }
+    res.render('pages/liked', {
+      title: 'Danh sách yêu thích',
+      favorites,
+      total,
+      user: req.session.user || null
+    });
   } catch (err) {
-    console.error('Lỗi đồng bộ danh sách yêu thích:', err);
-    return res.status(500).json({ success: false, error: err.message });
+    console.error('Lỗi lấy hoặc đồng bộ danh sách yêu thích:', err);
+    res.status(500).render('pages/liked', {
+      title: 'Danh sách yêu thích',
+      favorites: [],
+      total: 0,
+      user: req.session.user || null,
+      error: 'Lỗi khi tải danh sách yêu thích'
+    });
   }
 };
