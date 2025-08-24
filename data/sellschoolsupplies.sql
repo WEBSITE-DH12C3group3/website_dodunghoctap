@@ -247,7 +247,25 @@ INSERT INTO `products` (`product_id`, `product_name`, `category_id`, `brand_id`,
 
 -- --------------------------------------------------------
 
---
+-- bang thuoc tinh
+
+CREATE TABLE attributes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bảng product_attributes: Lưu giá trị thuộc tính cụ thể cho từng sản phẩm
+CREATE TABLE product_attributes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    attribute_id INT NOT NULL,
+    value VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+    FOREIGN KEY (attribute_id) REFERENCES attributes(id) ON DELETE CASCADE
+);
 -- Table structure for table `purchase_orders`
 --
 
