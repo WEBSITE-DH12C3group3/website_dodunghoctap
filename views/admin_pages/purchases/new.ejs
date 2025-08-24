@@ -1,0 +1,17 @@
+<h3>Tạo phiếu nhập</h3>
+<form method="POST" action="/admin/purchases">
+  <label>Nhà cung cấp</label>
+  <select name="supplier_id" required>
+    <% (suppliers || []).forEach(s => { %>
+      <option value="<%= s.supplier_id %>"><%= s.supplier_name %></option>
+    <% }) %>
+  </select>
+
+  <label>Ngày</label>
+  <input type="date" name="order_date" required>
+
+  <label>Ghi chú</label>
+  <textarea name="note"></textarea>
+
+  <button type="submit">Tạo phiếu (Draft)</button>
+</form>

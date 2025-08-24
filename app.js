@@ -16,6 +16,7 @@ const authRoutes = require("./routes/auth.routes");
 const resetPasswordRoutes = require("./routes/resetpassword.routes");
 const forgotPasswordRoutes = require("./routes/forgotpassword.routes");
 const contactRoutes = require("./routes/contact.routes");
+const adminPurchaseRoutes = require('./routes/adminPurchase.routes');
 
 // Router admin và middleware phân quyền
 const adminRouter = require("./routes/admin.routes");
@@ -109,7 +110,9 @@ app.get("/about", (req, res) => {
 // app.use((req, res) => {
 //   res.status(404).send("404 - Trang không tồn tại");
 // });
-
+app.use('/admin', authAdmin);            // 1) áp quyền
+app.use('/admin', adminPurchaseRoutes);  // 2) NHẬP KHO (purchases)
+app.use('/admin', adminRouter);   
 // Khởi động server
 app.listen(PORT, () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);

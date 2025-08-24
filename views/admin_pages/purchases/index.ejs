@@ -1,0 +1,21 @@
+<h2>Phiếu nhập</h2>
+<a href="/admin/purchases/new">+ Tạo phiếu nhập</a>
+<table border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>#</th><th>Nhà cung cấp</th><th>Ngày</th><th>Tổng tiền</th><th>Trạng thái</th><th>Chi tiết</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% orders.forEach(o => { %>
+      <tr>
+        <td><%= o.purchase_order_id %></td>
+        <td><%= o.supplier_name %></td>
+        <td><%= o.order_date %></td>
+        <td><%= o.total_amount %></td>
+        <td><%= o.status %></td>
+        <td><a href="/admin_pages/purchases/<%= o.purchase_order_id %>">Xem</a></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

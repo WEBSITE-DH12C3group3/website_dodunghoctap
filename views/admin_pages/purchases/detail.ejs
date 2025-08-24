@@ -1,0 +1,41 @@
+<h3>Phiếu nhập #<%= po.purchase_order_id %> - <%= po.status %></h3>
+<p>Nhà cung cấp: <b><%= po.supplier_name %></b> | Ngày: <%= po.order_date %> | Tổng tiền: <%= po.total_amount %></p>
+
+<% if (po.status !== 'received' && po.status !== 'cancelled') { %>
+<form method="POST" action="/admin_pages/purchases/<%= po.purchase_order_id %>/items">
+  <select name="product_id" required>
+    <% products.forEach(p => { %>
+      <option value="<%= p.product_id %>"><%= p.name %> (stock: <%= p.stock %>)</option>
+    <% }) %>
+  </select>
+  <input type="number" name="quantity" min="1" placeholder="Số lượng" required>
+  <input type="number" step="0.01" name="price" min="0" placeholder="Giá nhập" required>
+  <button>Thêm dòng</button>
+</form>
+
+<form method="POST" action="/admin_pages/purchases/<%= po.purchase_order_id %>/submit" style="display:inline">
+  <button>Gửi duyệt</button>
+</form>
+<form method="POST" action="/admin_pages/purchases/<%= po.purchase_order_id %>/receive" style="display:inline">
+  <button>Nhập kho (Received)</button>
+</form>
+<form method="POST" action="/admin_pages/purchases/<%= po.purchase_order_id %>/cancel" style="display:inline">
+  <button>Hủy</button>
+</form>
+<% } %>
+
+<table border="1" cellpadding="6">
+  <thead>
+    <tr><th>Sản phẩm</th><th>Số lượng</th><th>Giá</th><th>Thành tiền</th></tr>
+  </thead>
+  <tbody>
+    <% items.forEach(i => { %>
+      <tr>
+        <td><%= i.product_name %></td>
+        <td><%= i.quantity %></td>
+        <td><%= i.price %></td>
+        <td><%= (Number(i.quantity) * Number(i.price)).toFixed(2) %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
