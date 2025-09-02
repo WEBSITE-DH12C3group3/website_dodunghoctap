@@ -68,7 +68,212 @@
             <input type="file" name="image" accept="image/*" />
           </div>
         </div>
+        <div class="row1" style="margin-top:16px">
+          <div>
+            <h3>Thuộc tính đã gán cho sản phẩm</h3>
 
+            <div id="attr-list" style="display:flex;flex-direction:column;gap:8px">
+              <% if (productAttrs && productAttrs.length) { %>
+                <% productAttrs.forEach(function(pa){ %>
+                  <div class="attr-row" data-attr-id="<%= pa.attribute_id %>" style="display:grid;grid-template-columns: 1fr 2fr auto;gap:8px;align-items:center;border:1px dashed #ddd;padding:8px;border-radius:8px">
+                    <div class="attr-name"><%= pa.name %></div>
+                    <input
+                      name="attributes[<%= pa.attribute_id %>]"
+                      value="<%= pa.value %>"
+                      placeholder="Giá trị (VD: Đỏ, 10mm)"
+                    />
+                    <button type="button" class="btn-remove-attr" title="Xóa thuộc tính này">X</button>
+                  </div>
+                <% }) %>
+              <% } else { %>
+                <em>Sản phẩm hiện chưa có thuộc tính nào.</em>
+              <% } %>
+            </div>
+
+            <p class="note" style="margin-top:8px;color:#666">
+              • Sửa trực tiếp ô <b>Giá trị</b> để cập nhật.<br/>
+              • Nhấn <b>X</b> để <b>xóa</b> thuộc tính khỏi sản phẩm (dòng bị xóa sẽ không được gửi lên server).<br/>
+            </p>
+
+            <!-- Thêm thuộc tính có sẵn (không phải tạo mới tên) -->
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eee">
+              <label style="display:block;margin-bottom:6px">Thêm thuộc tính có sẵn</label>
+              <div style="display:grid;grid-template-columns: 1fr 2fr auto;gap:8px;align-items:center">
+                <select id="attr-select"></select>
+                <input id="attr-select-value" placeholder="Giá trị (VD: Đỏ, 10mm)" />
+                <button type="button" id="btn-add-existing">+ Thêm</button>
+              </div>
+              <small style="color:#666">Nếu chưa có tên thuộc tính mong muốn, dùng khối <i>“Thuộc tính mới”</i> bên dưới.</small>
+            </div>
+                    <div class="row1" style="margin-top: 16px">
+          <div>
+            <h3>Thuộc tính mới</h3>
+            <p class="note">
+              Nhập <b>Tên thuộc tính</b> (VD: Màu, Kích thước…) +
+              <b>Giá trị</b> (VD: Đỏ, 10mm…). Nếu tên trùng thuộc tính đã có, hệ
+              thống sẽ tự dùng lại thuộc tính sẵn có.
+            </p>
+
+            <div
+              id="new-attrs"
+              style="display: flex; flex-direction: column; gap: 8px"
+            ></div>
+
+            <button
+              type="button"
+              id="btn-add-new-attr"
+              class="btn btn-secondary"
+              style="margin-top: 8px"
+            >
+              + Thêm dòng
+            </button>
+          </div>
+  <script>
+          (function () {
+            const wrap = document.getElementById("new-attrs");
+            const btn = document.getElementById("btn-add-new-attr");
+
+            function row() {
+              const div = document.createElement("div");
+              div.className = "na-row";
+              div.style.display = "grid";
+              div.style.gridTemplateColumns = "1fr 1fr 1fr auto";
+              div.style.gap = "8px";
+              div.innerHTML = `
+      <input name="new_attr_names" placeholder="Tên thuộc tính *" />
+      <input name="new_attr_values" placeholder="Giá trị (VD: Đỏ, 10mm)" />
+      <input name="new_attr_descs" placeholder="Mô tả (tuỳ chọn)" />
+      <button type="button" class="remove-na">X</button>
+    `;
+              return div;
+            }
+
+            btn.addEventListener("click", () => wrap.appendChild(row()));
+
+            wrap.addEventListener("click", (e) => {
+              if (e.target.classList.contains("remove-na")) {
+                e.target.closest(".na-row").remove();
+              }
+            });
+
+            // Tạo sẵn 1 dòng trống
+            btn.click();
+          })();
+        </script>
+
+          </div>
+        </div>
+<!-- ========== /THUỘC TÍNH ĐANG CÓ ========== -->
+
+        <script>
+        (function(){
+          // Dữ liệu từ server
+          const ALL_ATTRS = <%- JSON.stringify(attributes || []) %>;
+          const EXISTING  = new Set(<%- JSON.stringify((productAttrs || []).map(x => x.attribute_id)) %>);
+
+          const listEl = document.getElementById('attr-list');
+          const selEl  = document.getElementById('attr-select');
+          const valEl  = document.getElementById('attr-select-value');
+          const addBtn = document.getElementById('btn-add-existing');
+
+          // ----- Helpers -----
+          function renderSelectOptions() {
+            selEl.innerHTML = '';
+            const remaining = ALL_ATTRS.filter(a => !EXISTING.has(a.id));
+            if (remaining.length === 0) {
+              const opt = document.createElement('option');
+              opt.value = '';
+              opt.textContent = '— Không còn thuộc tính nào để thêm —';
+              selEl.appendChild(opt);
+              selEl.disabled = true;
+              valEl.disabled = true;
+              addBtn.disabled = true;
+              return;
+            }
+            selEl.disabled = false; valEl.disabled = false; addBtn.disabled = false;
+            const opt0 = document.createElement('option');
+            opt0.value = '';
+            opt0.textContent = '— Chọn thuộc tính —';
+            selEl.appendChild(opt0);
+            remaining.forEach(a => {
+              const opt = document.createElement('option');
+              opt.value = a.id;
+              opt.textContent = a.name;
+              selEl.appendChild(opt);
+            });
+          }
+
+          function makeRow(attrId, name, value) {
+            const row = document.createElement('div');
+            row.className = 'attr-row';
+            row.dataset.attrId = String(attrId);
+            row.style.cssText = 'display:grid;grid-template-columns:1fr 2fr auto;gap:8px;align-items:center;border:1px dashed #ddd;padding:8px;border-radius:8px';
+
+            // Name (hiển thị)
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'attr-name';
+            nameDiv.textContent = name;
+
+            // Input value (để submit về server)
+            const input = document.createElement('input');
+            input.name = `attributes[${attrId}]`;
+            input.placeholder = 'Giá trị (VD: Đỏ, 10mm)';
+            if (value) input.value = value;
+
+            // Remove button
+            const rm = document.createElement('button');
+            rm.type = 'button';
+            rm.className = 'btn-remove-attr';
+            rm.title = 'Xóa thuộc tính này';
+            rm.textContent = 'X';
+
+            row.appendChild(nameDiv);
+            row.appendChild(input);
+            row.appendChild(rm);
+            return row;
+          }
+
+          // ----- Remove an existing attribute row -----
+          listEl.addEventListener('click', function(e){
+            if (e.target && e.target.classList.contains('btn-remove-attr')) {
+              const row = e.target.closest('.attr-row');
+              if (!row) return;
+              const aid = Number(row.dataset.attrId);
+              // Bỏ khỏi DOM => sẽ không submit input => server không chèn lại => coi như xóa
+              row.remove();
+              // Cho phép chọn lại attribute này trong dropdown
+              if (EXISTING.has(aid)) {
+                EXISTING.delete(aid);
+                renderSelectOptions();
+              }
+            }
+          });
+
+          // ----- Add an existing attribute from select -----
+          addBtn.addEventListener('click', function(){
+            const aid = Number(selEl.value || 0);
+            const value = (valEl.value || '').trim();
+            if (!aid) return; // chưa chọn
+            if (EXISTING.has(aid)) return; // đã có rồi
+
+            const a = ALL_ATTRS.find(x => x.id === aid);
+            if (!a) return;
+
+            // Append row
+            const row = makeRow(aid, a.name, value);
+            listEl.appendChild(row);
+
+            // Đánh dấu đã dùng, reset ô nhập
+            EXISTING.add(aid);
+            valEl.value = '';
+            selEl.value = '';
+            renderSelectOptions();
+          });
+
+          // Init
+          renderSelectOptions();
+        })();
+        </script>
         <div class="actions">
           <a class="btn btn-secondary" href="/admin/products">Quay lại</a>
           <button class="btn btn-primary" type="submit">Cập nhật</button>

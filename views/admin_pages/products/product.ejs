@@ -88,6 +88,7 @@
               <th>Giá</th>
               <th>Kho</th>
               <th>Danh mục</th>
+              <th>Thuộc tính</th>
               <th>Thao tác</th>
             </tr>
           </thead>
@@ -113,6 +114,7 @@
               <td><%= Number(row.price).toLocaleString('vi-VN') %> ₫</td>
               <td><%= row.stock_quantity %></td>
               <td><%= row.category_name || "" %></td>
+              <td><%= row.attributes_text || '' %></td>
               <td>
                 <div class="actions">
                   <a

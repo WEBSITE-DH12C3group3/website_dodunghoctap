@@ -4,23 +4,61 @@
     <meta charset="UTF-8" />
     <title>EDEN | Thêm sản phẩm</title>
     <style>
-      .maincontent { padding: 20px; max-width: 960px; margin: 0 auto; }
-      .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-      .row1 { display: grid; grid-template-columns: 1fr; gap: 16px; }
-      label { display: block; margin: 8px 0 4px; font-weight: 600; }
-      input, textarea, select { width: 100%; padding: 8px; }
-      .actions { display: flex; gap: 8px; margin-top: 16px; }
-      .btn { display: inline-block; padding: 6px 10px; border-radius: 4px; text-decoration: none; color: #fff; }
-      .btn-secondary { background: #6c757d; }
-      .btn-primary { background: #007bff; }
+      .maincontent {
+        padding: 20px;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .row1 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      label {
+        display: block;
+        margin: 8px 0 4px;
+        font-weight: 600;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 8px;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #fff;
+      }
+      .btn-secondary {
+        background: #6c757d;
+      }
+      .btn-primary {
+        background: #007bff;
+      }
     </style>
   </head>
   <body>
     <div class="maincontent">
       <h2>Thêm sản phẩm</h2>
 
-      <form action="/admin/products/add" method="post" enctype="multipart/form-data">
-
+      <form
+        action="/admin/products/add"
+        method="post"
+        enctype="multipart/form-data"
+      >
         <div class="row2">
           <div>
             <label for="product_name">Tên sản phẩm</label>
@@ -28,21 +66,36 @@
           </div>
           <div>
             <label for="price">Giá (₫)</label>
-            <input id="price" name="price" type="number" min="0" step="1000" required />
+            <input
+              id="price"
+              name="price"
+              type="number"
+              min="0"
+              step="1000"
+              required
+            />
           </div>
         </div>
 
         <div class="row2">
           <div>
             <label for="stock_quantity">Số lượng kho</label>
-            <input id="stock_quantity" name="stock_quantity" type="number" min="0" required />
+            <input
+              id="stock_quantity"
+              name="stock_quantity"
+              type="number"
+              min="0"
+              required
+            />
           </div>
           <div>
             <label for="category_id">Danh mục</label>
             <select id="category_id" name="category_id">
               <option value="">-- Không chọn --</option>
               <% categories.forEach(function(c) { %>
-                <option value="<%= c.category_id %>"><%= c.category_name %></option>
+              <option value="<%= c.category_id %>">
+                <%= c.category_name %>
+              </option>
               <% }); %>
             </select>
           </div>
@@ -58,12 +111,68 @@
             <input id="image" type="file" name="image" accept="image/*" />
           </div>
         </div>
+        <div class="row1" style="margin-top: 16px">
+          <div>
+            <h3>Thuộc tính mới</h3>
+            <p class="note">
+              Nhập <b>Tên thuộc tính</b> (VD: Màu, Kích thước…) +
+              <b>Giá trị</b> (VD: Đỏ, 10mm…). Nếu tên trùng thuộc tính đã có, hệ
+              thống sẽ tự dùng lại thuộc tính sẵn có.
+            </p>
+
+            <div
+              id="new-attrs"
+              style="display: flex; flex-direction: column; gap: 8px"
+            ></div>
+
+            <button
+              type="button"
+              id="btn-add-new-attr"
+              class="btn btn-secondary"
+              style="margin-top: 8px"
+            >
+              + Thêm dòng
+            </button>
+          </div>
+        </div>
+
+        <script>
+          (function () {
+            const wrap = document.getElementById("new-attrs");
+            const btn = document.getElementById("btn-add-new-attr");
+
+            function row() {
+              const div = document.createElement("div");
+              div.className = "na-row";
+              div.style.display = "grid";
+              div.style.gridTemplateColumns = "1fr 1fr 1fr auto";
+              div.style.gap = "8px";
+              div.innerHTML = `
+      <input name="new_attr_names" placeholder="Tên thuộc tính *" required />
+      <input name="new_attr_values" placeholder="Giá trị (VD: Đỏ, 10mm)" />
+      <input name="new_attr_descs" placeholder="Mô tả (tuỳ chọn)" />
+      <button type="button" class="remove-na">X</button>
+    `;
+              return div;
+            }
+
+            btn.addEventListener("click", () => wrap.appendChild(row()));
+
+            wrap.addEventListener("click", (e) => {
+              if (e.target.classList.contains("remove-na")) {
+                e.target.closest(".na-row").remove();
+              }
+            });
+
+            // Tạo sẵn 1 dòng trống
+            btn.click();
+          })();
+        </script>
 
         <div class="actions">
           <a class="btn btn-secondary" href="/admin/products">Hủy</a>
           <button class="btn btn-primary" type="submit">Lưu</button>
         </div>
-
       </form>
     </div>
   </body>
