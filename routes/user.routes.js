@@ -16,11 +16,12 @@ router.get("/", async (req, res) => {
     const [users] = await connection.query("SELECT * FROM users");
     await connection.end();
 
-    res.render("admin_pages/user/users", {
-      users,
-      title: "Quản lý Người dùng",
-      activePage: "users",
-    });
+res.render("admin_pages/user/users", {
+  title: "Quản lý Người dùng",
+  activePage: "users",
+  users,
+});
+
   } catch (err) {
     if (connection) await connection.end();
     res.status(500).send("Lỗi lấy danh sách người dùng");

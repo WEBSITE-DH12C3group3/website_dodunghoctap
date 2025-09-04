@@ -1,0 +1,36 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Danh sách Nhà cung cấp</h2>
+  <a href="/admin/supplier/add" class="btn btn-primary mb-3">➕ Thêm nhà cung cấp</a>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Tên nhà cung cấp</th>
+        <th>Thông tin liên hệ</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (suppliers.length > 0) { %>
+        <% suppliers.forEach(supplier => { %>
+          <tr>
+            <td><%= supplier.supplier_id %></td>
+            <td><%= supplier.supplier_name %></td>
+            <td><%= supplier.contact_info || "" %></td>
+            <td>
+              <a href="/admin/supplier/edit/<%= supplier.supplier_id %>" class="btn btn-warning btn-sm">✏️ Sửa</a>
+              <form action="/admin/supplier/delete/<%= supplier.supplier_id %>" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa nhà cung cấp này?')">
+                <button type="submit" class="btn btn-danger btn-sm">🗑️ Xóa</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      <% } else { %>
+        <tr>
+          <td colspan="4" class="text-center">Không có nhà cung cấp nào</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

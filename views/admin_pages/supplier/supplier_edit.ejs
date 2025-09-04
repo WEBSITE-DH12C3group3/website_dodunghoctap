@@ -1,0 +1,18 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Sửa Nhà cung cấp</h2>
+
+  <form action="/admin/supplier/edit/<%= supplier.supplier_id %>" method="POST">
+    <div class="mb-3">
+      <label for="supplier_name" class="form-label">Tên nhà cung cấp</label>
+      <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="<%= supplier.supplier_name %>" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="contact_info" class="form-label">Thông tin liên hệ</label>
+      <textarea class="form-control" id="contact_info" name="contact_info" rows="3"><%= supplier.contact_info || "" %></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+    <a href="/admin/supplier" class="btn btn-secondary">Quay lại</a>
+  </form>
+</div>
