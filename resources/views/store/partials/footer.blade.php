@@ -1,6 +1,6 @@
 @php
 // Tuỳ biến nhanh bằng biến truyền vào khi include (có mặc định)
-$brandLogo = $brandLogo ?? asset('images/logo.svg');
+$brandLogo = $brandLogo ?? asset('images/logoo.svg');
 $brandName = $brandName ?? 'Tập đoàn Itaewon';
 $siteName = $siteName ?? 'peakvl.com';
 $hotline = $hotline ?? '1900 866 819';

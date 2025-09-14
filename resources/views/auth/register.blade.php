@@ -1,61 +1,332 @@
-@extends('layouts.app')
+@extends('layouts.store')
+
 @section('content')
-<div class="min-h-[70vh] grid place-items-center">
-    <div class="w-full max-w-2xl rounded-2xl bg-white/80 dark:bg-slate-900/50 backdrop-blur p-6 md:p-8 shadow-xl ring-1 ring-slate-900/5 dark:ring-white/10">
-        <div class="mb-6 flex items-center gap-3">
-            <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 text-white grid place-items-center shadow">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm-8 9a8 8 0 1 1 16 0Z" />
-                </svg>
+<section class="relative overflow-hidden">
+    <div id="sky" class="absolute inset-0 animated-gradient overflow-hidden"></div>
+
+    <style>
+        input[type=password]::-ms-reveal,
+        input[type=password]::-ms-clear {
+            display: none;
+        }
+
+        input[type=password]::-webkit-reveal {
+            display: none;
+        }
+
+        .animated-gradient {
+            background: linear-gradient(270deg, #01062dff, #0e1333ff, #1B1F3B, #262354, #2e439bff, #2f649fff);
+            background-size: 800% 800%;
+            animation: gradientAnimation 30s ease infinite;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        /* SAO */
+        .star {
+            position: absolute;
+            top: -10px;
+            /* xuất phát trên đỉnh */
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: .6;
+            box-shadow: 0 0 6px #fff;
+            pointer-events: none;
+            z-index: 2;
+            will-change: transform, opacity;
+        }
+
+        /* rơi tốc độ “chuẩn” – duration/ delay sẽ được gán bằng CSS variables */
+        .falling {
+            animation:
+                fallStar var(--dur, 2s) linear var(--delay, 0s) infinite,
+                twinkle var(--twinkle, 2s) ease-in-out var(--delay, 0s) infinite alternate;
+        }
+
+        /* một số sao dùng quỹ đạo/nhịp rơi khác (không theo tốc độ chung) */
+        .falling.odd {
+            /* đổi keyframe + timing để tạo đoạn chậm rồi tăng tốc */
+            animation-name: fallStarAlt, twinkle;
+            animation-duration: var(--dur, 2s), var(--twinkle, 2s);
+            animation-timing-function: cubic-bezier(.25, .1, .25, 1), ease-in-out;
+            /* ease tuỳ biến */
+            animation-delay: var(--delay, 0s), var(--delay, 0s);
+            animation-iteration-count: infinite, infinite;
+        }
+
+        /* Keyframes */
+        @keyframes fallStar {
+            0% {
+                transform: translateY(0);
+                opacity: .6
+            }
+
+            70% {
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(110vh);
+                opacity: 0
+            }
+        }
+
+        /* Rơi “khác thường”: khựng nhẹ ở 30–40% rồi tăng tốc mạnh */
+        @keyframes fallStarAlt {
+            0% {
+                transform: translateY(0);
+                opacity: .6
+            }
+
+            30% {
+                transform: translateY(12vh);
+                opacity: .9
+            }
+
+            40% {
+                transform: translateY(14vh);
+                opacity: 1
+            }
+
+            /* chậm lại một nhịp */
+            70% {
+                transform: translateY(65vh);
+                opacity: 1
+            }
+
+            /* tăng tốc */
+            100% {
+                transform: translateY(110vh);
+                opacity: 0
+            }
+        }
+
+        /* nhấp nháy nhẹ cho đẹp */
+        @keyframes twinkle {
+            from {
+                opacity: .5
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        /* tôn trọng người dùng không thích hiệu ứng động */
+        @media (prefers-reduced-motion: reduce) {
+            .star {
+                animation: none !important
+            }
+        }
+    </style>
+
+    <script>
+        (function() {
+            const container = document.getElementById('sky');
+
+            const STAR_COUNT = 60; // nhiều sao hơn
+            const MAX_DELAY = 5; // < 3.5s như yêu cầu
+
+            for (let i = 0; i < STAR_COUNT; i++) {
+                const s = document.createElement('span');
+                s.className = 'star falling';
+
+                // Vị trí ngang & kích thước sao
+                const left = Math.random() * 100; // 0–100%
+                const size = 2 + Math.random() * 3; // 2–5px
+                s.style.left = left.toFixed(2) + '%';
+                s.style.width = s.style.height = size.toFixed(1) + 'px';
+
+                // Delay luôn < 3.5s
+                const delay = Math.random() * MAX_DELAY; // 0–3.4
+                s.style.setProperty('--delay', delay.toFixed(2) + 's');
+
+                // Duration đa dạng: 1.6–8.0s
+                const dur = 1.6 + Math.random() * 3;
+                s.style.setProperty('--dur', dur.toFixed(2) + 's');
+
+                // Twinkle riêng cho từng sao: 1–3s
+                const tw = 1 + Math.random() * 2;
+                s.style.setProperty('--twinkle', tw.toFixed(2) + 's');
+
+                // ~30% sao “không theo tốc độ chung” (keyframe Alt khác nhịp)
+                // if (Math.random() < 0.30) {
+                //     s.classList.add('odd');
+                // }
+
+                container.appendChild(s);
+            }
+        })();
+    </script>
+
+    {{-- Form giữa màn hình --}}
+    <div class="relative mx-auto max-w-screen-2xl px-4 py-16 md:py-24 min-h-[calc(100vh-200px)] grid place-items-center">
+        <div class="w-full max-w-xl rounded-2xl bg-[#000000]/40 p-6 md:p-10 ring-1 ring-white/10 shadow-2xl backdrop-blur-sm">
+            <h1 class="text-center text-white text-2xl md:text-3xl font-semibold tracking-wide">ĐĂNG KÝ</h1>
+
+            @if ($errors->any())
+            <div class="mt-4 rounded-lg bg-red-500/10 border border-red-400/40 text-red-50 px-4 py-3 text-sm">
+                <ul class="list-disc pl-5 space-y-1">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-            <div>
-                <h1 class="text-xl font-semibold">Tạo tài khoản</h1>
-                <p class="text-sm text-slate-600 dark:text-slate-300">Mua sắm & quản lý đơn hàng dễ dàng</p>
+            @endif
+
+            <form method="POST" action="{{ route('register') }}" class="mt-6">
+                @csrf
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                    {{-- Row 1 --}}
+                    <div>
+                        <label class="block text-white/90 font-semibold">Họ tên <span class="text-red-300">*</span></label>
+                        <div class="border-b border-white/30 focus-within:border-white transition">
+                            <input type="text" name="full_name" value="{{ old('full_name') }}"
+                                placeholder="Nhập Họ tên" autocomplete="name"
+                                class="w-full bg-transparent text-white placeholder-white/60 py-3 outline-none" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-white/90 font-semibold">Email <span class="text-red-300">*</span></label>
+                        <div class="border-b border-white/30 focus-within:border-white transition">
+                            <input type="email" name="email" value="{{ old('email') }}"
+                                placeholder="Nhập Email" autocomplete="email"
+                                class="w-full bg-transparent text-white placeholder-white/60 py-3 outline-none" />
+                        </div>
+                    </div>
+
+                    {{-- Row 2 --}}
+                    <div>
+                        <label class="block text-white/90 font-semibold">Số điện thoại</label>
+                        <div class="border-b border-white/30 focus-within:border-white transition">
+                            <input type="tel" name="phone" value="{{ old('phone') }}"
+                                placeholder="Nhập Số điện thoại" autocomplete="tel"
+                                class="w-full bg-transparent text-white placeholder-white/60 py-3 outline-none" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-white/90 font-semibold">Địa chỉ</label>
+                        <div class="border-b border-white/30 focus-within:border-white transition">
+                            <input type="text" name="address" value="{{ old('address') }}"
+                                placeholder="Nhập Địa chỉ" autocomplete="street-address"
+                                class="w-full bg-transparent text-white placeholder-white/60 py-3 outline-none" />
+                        </div>
+                    </div>
+
+                    {{-- Row 3 --}}
+                    <div>
+                        <label class="block text-white/90 font-semibold">Mật khẩu <span class="text-red-300">*</span></label>
+                        <div class="relative border-b border-white/30 focus-within:border-white transition">
+                            <input id="pwd" type="password" name="password"
+                                placeholder="Nhập Mật khẩu" autocomplete="new-password"
+                                class="w-full bg-transparent text-white placeholder-white/60 py-3 pr-10 outline-none" />
+                            <button type="button" data-toggle="pwd"
+                                class="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+                                aria-label="Hiện/ẩn mật khẩu">
+                                <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current">
+                                    <path d="M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-white/90 font-semibold">Nhập lại mật khẩu <span class="text-red-300">*</span></label>
+                        <div class="relative border-b border-white/30 focus-within:border-white transition">
+                            <input id="pwd2" type="password" name="password_confirmation"
+                                placeholder="Nhập lại Mật khẩu" autocomplete="new-password"
+                                class="w-full bg-transparent text-white placeholder-white/60 py-3 pr-10 outline-none" />
+                            <button type="button" data-toggle="pwd2"
+                                class="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white"
+                                aria-label="Hiện/ẩn mật khẩu">
+                                <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current">
+                                    <path d="M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    {{-- Điều khoản & nút: full width hàng dưới --}}
+                    <label class="md:col-span-2 mt-2 flex items-start gap-3 text-white/90 text-sm">
+                        <input type="checkbox" name="agree" required class="mt-1 h-4 w-4 rounded">
+                        <span style="margin-top: 3px;">Tôi đồng ý với
+                            <a href="{{ route('store.page.privacy') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 underline">Chính sách bảo mật</a>
+                            và
+                            <a href="{{ route('store.page.buying_guide') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 underline">Điều khoản mua hàng</a>.
+                        </span>
+                    </label>
+
+                    <button type="submit"
+                        class="md:col-span-2 w-full h-12 rounded-full bg-[#F6D34B] hover:bg-[#efd034] active:translate-y-[1px]
+                   text-[#242528] font-semibold text-lg shadow-[0_8px_18px_rgba(0,0,0,0.15)] transition">
+                        Đăng ký
+                    </button>
+                </div>
+            </form>
+
+            <script>
+                (function() {
+                    const bind = (attr, id) => {
+                        const btn = document.querySelector(`[data-toggle="${attr}"]`);
+                        const inp = document.getElementById(id);
+                        if (!btn || !inp) return;
+                        btn.addEventListener('click', () => {
+                            inp.type = inp.type === 'password' ? 'text' : 'password';
+                        });
+                    };
+                    bind('pwd', 'pwd');
+                    bind('pwd2', 'pwd2');
+                })();
+            </script>
+
+
+            <p class="mt-4 text-center text-white/90">
+                Đã có tài khoản?
+                <a href="{{ route('login') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 underline">
+                    Đăng nhập
+                </a>
+            </p>
+            {{-- Đăng nhập mạng xã hội --}}
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <a href="#"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#C6262C] px-4 py-3 text-white font-medium
+                  hover:brightness-110 transition">
+                    {{-- Google icon --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
+                        <path d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z" />
+                    </svg>
+                    Google
+                </a>
+
+                <a href="#"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#072B47] px-4 py-3 text-white font-medium
+                  hover:brightness-110 transition">
+                    {{-- Facebook icon --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-facebook" viewBox="0 0 16 16">
+                        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951" />
+                    </svg>
+                    Facebook
+                </a>
             </div>
+
         </div>
+    </div>
 
-        <form method="POST" action="{{ route('register.post') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @csrf
-            <div class="md:col-span-2">
-                <label class="block text-sm mb-1">Họ tên</label>
-                <input type="text" name="full_name" value="{{ old('full_name') }}" required
-                    class="w-full rounded-xl border border-slate-300/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2.5 shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-600/50">
-            </div>
-
-            <div>
-                <label class="block text-sm mb-1">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" required
-                    class="w-full rounded-xl border border-slate-300/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2.5 shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-600/50">
-            </div>
-            <div>
-                <label class="block text-sm mb-1">Số điện thoại</label>
-                <input type="text" name="phone" value="{{ old('phone') }}"
-                    class="w-full rounded-xl border border-slate-300/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2.5 shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-600/50">
-            </div>
-
-            <div class="md:col-span-2">
-                <label class="block text-sm mb-1">Địa chỉ</label>
-                <input type="text" name="address" value="{{ old('address') }}"
-                    class="w-full rounded-xl border border-slate-300/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2.5 shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-600/50">
-            </div>
-
-            <div>
-                <label class="block text-sm mb-1">Mật khẩu</label>
-                <input type="password" name="password" required
-                    class="w-full rounded-xl border border-slate-300/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2.5 shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-600/50">
-            </div>
-            <div>
-                <label class="block text-sm mb-1">Nhập lại mật khẩu</label>
-                <input type="password" name="password_confirmation" required
-                    class="w-full rounded-xl border border-slate-300/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2.5 shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-600/50">
-            </div>
-
-            <div class="md:col-span-2">
-                <button class="mt-2 w-full rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 text-white py-2.5 font-medium shadow hover:opacity-95">
-                    Tạo tài khoản
-                </button>
-            </div>
-        </form>
-
-        <p class="mt-4 text-center text-sm text-slate-600 dark:text-slate-300">
-            Đã có tài khoản? <a class="font-m
+</section>
+@endsection

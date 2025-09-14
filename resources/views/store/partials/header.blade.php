@@ -4,41 +4,38 @@
 $categories = $categories ?? collect();
 $cartCount = $cartCount ?? collect(session('cart') ?? [])->sum('qty'); // nếu dùng session cart
 $activeCategoryId = $activeCategoryId ?? null;
+$brandLogo = $brandLogo ?? asset('images/logoo.svg');
 @endphp
 
 <header class="shadow">
-    {{-- Hàng trên: logo + tìm kiếm + account + cart --}}
-    {{-- Hàng trên: logo + search + hotline/đăng nhập/giỏ 1 HÀNG --}}
     <div class="bg-[#144591] text-white">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-[auto,1fr,auto] items-center gap-4 md:gap-6 py-3">
+            <div class="grid grid-cols-1 min-[1030px]:grid-cols-[auto,1fr,auto] min-[1030px]:items-center gap-3 min-[1030px]:gap-6 py-3">
 
-                {{-- Logo --}}
-                <a href="{{ url('/') }}" class="flex items-center gap-3 shrink-0">
-                    <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="h-8 w-auto md:h-9">
+                <a href="{{ url('/') }}"
+                    class="flex items-center gap-3 shrink-0 justify-self-center min-[1030px]:justify-self-start">
+                    <img src="{{ $brandLogo }}" alt="Logo" class="h-8 w-auto min-[1030px]:h-9">
                     <span class="sr-only">Trang chủ</span>
                 </a>
 
-                {{-- SEARCH: giới hạn width + ẩn nút X mặc định --}}
-                <form action="{{ route('store.search') }}" method="GET" class="min-w-0 justify-self-center w-full">
-                    <div class="mx-auto w-full sm:max-w-[520px] lg:max-w-[620px] xl:max-w-[700px]">
-                        <div class="flex h-11 md:h-12 w-full">
+                <form action="{{ route('store.search') }}" method="GET"
+                    class="min-w-0 w-full justify-self-stretch min-[1030px]:justify-self-center">
+                    <div class="mx-0 sm:mx-auto w-full sm:max-w-[520px] lg:max-w-[620px] xl:max-w-[700px]">
+                        <div class="flex h-11 min-[1030px]:h-12 w-full">
                             <div class="relative flex-1 bg-white rounded-l-full">
                                 <input id="headerSearchInput" name="q" type="search" value="{{ request('q') }}"
                                     placeholder="Tìm kiếm sản phẩm..."
-                                    class="w-full h-full rounded-l-full border-0 pl-4 pr-10 text-gray-900 placeholder-gray-500
-                            focus:ring-2 focus:ring-blue-300 outline-none" />
+                                    class="w-full h-full rounded-l-full border-0 pl-4 pr-10 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-300 outline-none" />
                                 <button type="button" id="headerSearchClear"
-                                    class="absolute right-2 top-1/2 -translate-y-1/2 hidden
-                             text-[#1f4aa9] hover:text-[#0b2a5d]" aria-label="Xoá">
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 hidden text-[#1f4aa9] hover:text-[#0b2a5d]"
+                                    aria-label="Xoá">
                                     <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current">
                                         <path d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7a1 1 0 1 0-1.4 1.4L10.6 12l-4.9 4.9a1 1 0 1 0 1.4 1.4L12 13.4l4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4z" />
                                     </svg>
                                 </button>
                             </div>
                             <button type="submit"
-                                class="shrink-0 w-11 md:w-12 grid place-items-center rounded-r-full
-                           bg-[#0D2E69] hover:bg-[#0b2a5d] text-white">
+                                class="shrink-0 w-11 min-[1030px]:w-12 grid place-items-center rounded-r-full bg-[#0D2E69] hover:bg-[#0b2a5d] text-white">
                                 <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current">
                                     <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
                                 </svg>
@@ -48,8 +45,8 @@ $activeCategoryId = $activeCategoryId ?? null;
                     </div>
                 </form>
 
-                {{-- NHÓM NÚT BÊN PHẢI: giữ 1 hàng --}}
-                <div class="flex items-center gap-6 md:gap-8 whitespace-nowrap shrink-0">
+                <div class="flex items-center gap-6 min-[1030px]:gap-8 whitespace-nowrap shrink-0
+              w-full min-[1030px]:w-auto justify-between min-[1030px]:justify-end">
 
                     {{-- Hotline --}}
                     <a href="tel:1900866819" class="flex items-center gap-3 text-white/95 hover:text-white">
@@ -60,13 +57,13 @@ $activeCategoryId = $activeCategoryId ?? null;
                         </span>
                         <span class="leading-4">
                             <span class="block font-extrabold tracking-wide text-[15px]">1900 866 819</span>
-                            <span class="block text-[12px] opacity-90 -mt-0.5">Hỗ trợ khách hàng</span>
+                            <span class="block text-[12px] opacity-90 -mt-0.5 b">Hỗ trợ khách hàng</span>
                         </span>
                     </a>
 
                     {{-- Đăng nhập / Đăng ký --}}
                     @guest
-                    <a href="{{ route('login') }}" class="flex items-center gap-3 group text-white/95 hover:text-white">
+                    <a href="{{ route('login') }}" class="flex items-center gap-3 text-white/95 hover:text-white">
                         <span class="inline-grid place-items-center h-9 w-9 rounded-full bg-[#0D2E69] ring-1 ring-white/10 shadow">
                             <svg viewBox="0 0 16 16" class="h-5 w-5 fill-white">
                                 <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Z" />
@@ -75,13 +72,14 @@ $activeCategoryId = $activeCategoryId ?? null;
                         </span>
                         <span class="leading-4">
                             <span class="block font-extrabold text-[15px]">Đăng nhập</span>
-
+                            <form action="{{ route('register') }}" method="GET" class="block text-[12px] opacity-90 -mt-0.5 b">
+                                <button type="submit">Đăng ký</button>
+                            </form>
                         </span>
                     </a>
                     @endguest
-
                     @auth
-                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 text-white/95 hover:text-white">
+                    <a href="" class="flex items-center gap-3 text-white/95 hover:text-white">
                         <span class="inline-grid place-items-center h-9 w-9 rounded-full bg-[#0D2E69] ring-1 ring-white/10 shadow">
                             <svg viewBox="0 0 16 16" class="h-5 w-5 fill-white">
                                 <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Z" />
@@ -90,21 +88,22 @@ $activeCategoryId = $activeCategoryId ?? null;
                         </span>
                         <span class="leading-4">
                             <span class="block font-extrabold text-[15px] max-w-[160px] truncate">{{ auth()->user()->full_name ?? auth()->user()->name }}</span>
-                            <span class="block text-[12px] opacity-90 -mt-0.5">Tài khoản của tôi</span>
+                            <form action="{{ route('logout') }}" method="POST" class="block text-[12px] opacity-90 -mt-0.5 b">
+                                @csrf
+                                <button type="submit" class="hover:underline">Đăng xuất</button>
+                            </form>
                         </span>
                     </a>
                     @endauth
 
                     {{-- Giỏ hàng --}}
-                    <a href="" class="relative flex items-center gap-2 hover:opacity-90">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                d="M2.25 3h1.386l.383 1.437M7.5 14.25h9.03a1.5 1.5 0 001.47-1.2l1.2-6a1.125 1.125 0 00-1.115-1.35H5.108" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7.5 14.25L4.5 5.25" />
-                            <circle cx="9" cy="19.5" r="1" />
-                            <circle cx="17.25" cy="19.5" r="1" />
-                        </svg>
-                        <span class="hidden sm:inline">Giỏ hàng</span>
+                    <a href="" class="flex items-center gap-3 text-white/95 hover:text-white">
+                        <span class="inline-grid place-items-center h-9 w-9 rounded-full bg-[#0D2E69] ring-1 ring-white/10 shadow">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-fill" viewBox="0 0 16 16">
+                                <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4z" />
+                            </svg>
+                        </span>
+                        <span class="hidden sm:inline block font-extrabold text-[15px] ">Giỏ hàng</span>
                         @if(($cartCount ?? 0) > 0)
                         <span class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center">{{ $cartCount }}</span>
                         @endif
@@ -112,6 +111,7 @@ $activeCategoryId = $activeCategoryId ?? null;
                 </div>
 
             </div>
+
         </div>
     </div>
 
@@ -131,6 +131,10 @@ $activeCategoryId = $activeCategoryId ?? null;
             display: none;
             width: 0;
             height: 0;
+        }
+
+        .b {
+            margin-top: 5px;
         }
     </style>
     <script>
@@ -153,34 +157,28 @@ $activeCategoryId = $activeCategoryId ?? null;
     </script>
 
 
-    {{-- Hàng dưới: thanh danh mục --}}
+    {{-- Hàng dưới: thanh danh mục (đẹp & tự wrap nhiều dòng) --}}
     <nav class="bg-blue-50 border-t border-blue-100">
         <div class="container mx-auto px-4">
-            <ul class="flex gap-6 overflow-x-auto py-3 text-sm">
+            <ul class="flex flex-wrap items-center gap-x-3 gap-y-2 md:gap-x-4 md:gap-y-3 py-3">
                 @foreach($categories as $cat)
                 @php
                 $id = $cat->category_id ?? $cat['category_id'] ?? null;
                 $name = $cat->category_name ?? $cat['category_name'] ?? '';
                 $active = (string)($activeCategoryId ?? '') === (string)$id;
                 @endphp
-                <li class="group relative shrink-0">
-                    <a href="{{ route('store.category', $id) }}"
-                        class="flex items-center gap-2 font-medium {{ $active ? 'text-blue-700' : 'text-gray-800 hover:text-blue-700' }}">
-                        <span class="text-lg">•</span>
-                        <span>{{ $name }}</span>
-                        <svg class="h-4 w-4 opacity-70" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                <li class="shrink-0">
+                    <a href="{{ $id ? route('store.category', $id) : '#' }}"
+                        class="inline-flex items-center gap-2 rounded-full px-3.5 py-2
+                    text-[13px] md:text-sm leading-none ring-1 transition
+                    {{ $active
+                        ? 'bg-white text-blue-700 ring-blue-200 shadow-sm'
+                        : 'bg-white/90 text-gray-800 ring-gray-200 hover:bg-white hover:text-blue-700 hover:ring-blue-200 hover:shadow-sm' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
                         </svg>
+                        <span class="whitespace-nowrap">{{ $name }}</span>
                     </a>
-
-                    {{-- Dropdown demo: thay bằng dữ liệu thực nếu có subcategory --}}
-                    <div class="absolute left-0 top-full hidden group-hover:block bg-white shadow-lg rounded-xl p-4 min-w-[240px] z-20">
-                        <div class="grid gap-2">
-                            <a href="{{ route('store.category', $id) }}" class="hover:text-blue-700">Tất cả {{ $name }}</a>
-                            <a href="#" class="hover:text-blue-700">Bán chạy</a>
-                            <a href="#" class="hover:text-blue-700">Khuyến mãi</a>
-                        </div>
-                    </div>
                 </li>
                 @endforeach
             </ul>
