@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Store\HomeController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
 use App\Http\Controllers\Admin\OrderController;
@@ -53,6 +54,19 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage_products')->name('admin.products.update');
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])
             ->middleware('permission:manage_products')->name('admin.products.destroy');
+
+        Route::get('/categories', [CategoryController::class, 'index'])
+            ->middleware('permission:manage_categories')->name('admin.categories');
+        Route::get('/categories/create', [CategoryController::class, 'create'])
+            ->middleware('permission:manage_categories')->name('admin.categories.create');
+        Route::post('/categories', [CategoryController::class, 'store'])
+            ->middleware('permission:manage_categories')->name('admin.categories.store');
+        Route::get('/categories/edit/{id}', [CategoryController::class, 'edit'])
+            ->middleware('permission:manage_categories')->name('admin.categories.edit');
+        Route::put('/categories/{id}', [CategoryController::class, 'update'])
+            ->middleware('permission:manage_categories')->name('admin.categories.update');
+        Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])
+            ->middleware('permission:manage_categories')->name('admin.categories.destroy');
 
         Route::get('/users', [UserController::class, 'index'])
             ->middleware('permission:manage_users')->name('admin.users');

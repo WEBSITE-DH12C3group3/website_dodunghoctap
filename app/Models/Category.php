@@ -7,8 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $primaryKey = 'category_id';
+    public $incrementing = false; // Tắt tự động tăng cho category_id
+    protected $table = 'categories';
+    public $timestamps = false; // Bảng chỉ có created_at
+    protected $fillable = [
+        'category_id',
+        'category_name',
+    ];
 
-    protected $fillable = ['category_name', 'description'];
-
-    public $timestamps = false; // nếu bảng không có created_at/updated_at
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'category_id', 'category_id');
+    }
 }

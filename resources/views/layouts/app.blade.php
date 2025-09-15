@@ -54,11 +54,19 @@
                 <!-- Navigation -->
                 <nav class="space-y-2 flex-1">
                     @if(auth()->check() && auth()->user()->hasPermission('manage_products'))
-                    <a href="{{ route('admin.products') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.products') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                    <a href="{{ route('admin.products') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.products*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M3 4h18v2H3V4Zm2 4h14l-1 12H6L5 8Zm4 2v8h2v-8H9Zm4 0v8h2v-8h-2Z" />
                         </svg>
                         <span>Quản lý sản phẩm</span>
+                    </a>
+                    @endif
+                    @if(auth()->check() && auth()->user()->hasPermission('manage_categories'))
+                    <a href="{{ route('admin.categories') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.categories*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 4h18v2H3V4Zm2 4h14l-1 12H6L5 8Zm4 2v8h2v-8H9Zm4 0v8h2v-8h-2Z" />
+                        </svg>
+                        <span>Quản lý danh mục</span>
                     </a>
                     @endif
                     @if(auth()->check() && auth()->user()->hasPermission('manage_users'))
