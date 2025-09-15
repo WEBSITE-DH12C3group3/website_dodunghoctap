@@ -33,8 +33,8 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->middleware('role:admin|employee')->name('dashboard'); // <— thêm role guard
 
-Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
-Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
+    Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
+    Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
 
 
     // Ví dụ khu admin: chỉ admin hoặc employee

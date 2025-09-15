@@ -1,66 +1,136 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PeakVL.com — Website Thương Mại Điện Tử
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Dự án **PeakVL.com** là website TMĐT (Laravel + MySQL + Vite + TailwindCSS). Tài liệu này hướng dẫn cài đặt nhanh trên máy local, **bao gồm các lệnh tạo `node_modules` và `.env`**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1) Yêu cầu hệ thống
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   **PHP** ≥ 8.1 (khuyến nghị 8.2+)
+-   **Composer** ≥ 2.5
+-   **Node.js** LTS 18/20 + **npm**
+-   **MySQL/MariaDB**
+-   **Git**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Kiểm tra nhanh:
 
-## Learning Laravel
+```bash
+php -v
+composer -V
+node -v
+npm -v
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 2) Bắt đầu nhanh (Quick Start)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+# 2.1 Clone dự án
+git clone https://github.com/<your-org-or-user>/peakvl.com.git
+cd peakvl.com
 
-## Laravel Sponsors
+# 2.2 CÀI PHP DEPENDENCIES (tạo thư mục vendor/)
+composer install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+# 2.3 TẠO FILE .env
+# Cách 1: copy từ .env.example (khuyến nghị)
+cp .env.example .env        # macOS/Linux/PowerShell
+# Windows CMD:
+# copy .env.example .env
 
-### Premium Partners
+# 2.4 Tạo APP_KEY
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+# 2.5 CÀI JS DEPENDENCIES (TẠO node_modules/)
+# Ưu tiên npm ci nếu có package-lock.json
+npm ci
+# hoặc (nếu không có lockfile)
+# npm install
 
-## Contributing
+# 2.6 Cấu hình DB trong .env, tạo database 'peakvl' rồi migrate/seed
+php artisan migrate --seed   # nếu có seeder
+# hoặc chỉ migrate
+# php artisan migrate
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 2.7 Link storage (nếu dự án dùng upload)
+php artisan storage:link
 
-## Code of Conduct
+# 2.8 Chạy server Laravel + Vite (2 tab)
+php artisan serve
+npm run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+> **Ghi chú** (XAMPP mặc định): MySQL user `root`, mật khẩu rỗng. Tạo database `peakvl` trong phpMyAdmin trước khi migrate.
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 3) Các lệnh “bỏ túi” (Cheat‑sheet)
 
-## License
+**TẠO `node_modules`**
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+npm ci        # chuẩn/nhanh (khi có package-lock.json)
+# hoặc
+npm install   # nếu không có lockfile
+```
+
+**TẠO `.env`**
+
+```bash
+cp .env.example .env  # macOS/Linux/PowerShell
+# Windows CMD:
+# copy .env.example .env
+php artisan key:generate
+```
+
+**Chạy dev**
+
+```bash
+php artisan serve
+npm run dev
+```
+
+**Build production**
+
+```bash
+npm run build
+php artisan optimize        # gom cache view/config/route
+```
+
+**Dọn cache khi lỗi lạ**
+
+```bash
+php artisan optimize:clear
+composer dump-autoload
+```
+
+**Migrate/Seed**
+
+```bash
+php artisan migrate
+php artisan migrate --seed
+```
+
+**Storage symlink (media/upload)**
+
+```bash
+php artisan storage:link
+```
+
+---
+
+## 6) Công nghệ chính
+
+-   **Backend**: Laravel (API + Blade/Inertia tùy dự án), Policy/Middleware, Validation
+-   **Frontend**: Vite, TailwindCSS, (có thể kèm Inertia/Vue/React nếu dùng)
+-   **Database**: MySQL/MariaDB
+-   **Auth**: Laravel Auth/Passport/Sanctum (tùy cấu hình)
+-   **Assets**: Vite build, `public/` + `storage/app/public`
+
+---
+
+## 9) Giấy phép & liên hệ
+
+-   Bản quyền © PeakVL.
+-   Vấn đề kỹ thuật/bugs: tạo **Issue** trên repo hoặc liên hệ đội phát triển.
