@@ -79,7 +79,7 @@ $brandLogo = $brandLogo ?? asset('images/logoo.svg');
                     </a>
                     @endguest
                     @auth
-                    <a href="" class="flex items-center gap-3 text-white/95 hover:text-white">
+                    <a href="{{ route('profile.index') }}" class="flex items-center gap-3 text-white/95 hover:text-white">
                         <span class="inline-grid place-items-center h-9 w-9 rounded-full bg-[#0D2E69] ring-1 ring-white/10 shadow">
                             <svg viewBox="0 0 16 16" class="h-5 w-5 fill-white">
                                 <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Z" />
@@ -87,7 +87,7 @@ $brandLogo = $brandLogo ?? asset('images/logoo.svg');
                             </svg>
                         </span>
                         <span class="leading-4">
-                            <span class="block font-extrabold text-[15px] max-w-[160px] truncate">{{ auth()->user()->full_name ?? auth()->user()->name }}</span>
+                            <span class="block font-extrabold text-[15px] max-w-[160px] truncate">Hi, {{ auth()->user()->full_name ?? auth()->user()->name }}</span>
                             <form action="{{ route('logout') }}" method="POST" class="block text-[12px] opacity-90 -mt-0.5 b">
                                 @csrf
                                 <button type="submit" class="hover:underline">Đăng xuất</button>

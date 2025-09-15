@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -17,6 +18,8 @@ Route::get('/', [HomeController::class, 'index'])->name('store.index');
 Route::get('/categories', fn() => 'all categories')->name('store.categories.index');
 Route::get('/category/{id}', fn($id) => "category $id")->name('store.category');
 Route::get('/product/{id}', fn($id) => "product $id")->name('store.product.show');
+
+Route::get('/cart', fn() => 'cart')->name('cart.index');
 Route::get('/cart/add/{id}', fn($id) => "add $id")->name('cart.add');
 
 Route::get('/products/new', fn() => 'new products')->name('store.products.new');
@@ -29,8 +32,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::get('/profile',   [ProfileController::class, 'index'])->name('profile.index');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
-
+require __DIR__ . '/auth.php';
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');

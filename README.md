@@ -33,12 +33,23 @@ cd website_dodunghoctap
 
 ```bash
 #  Required instructions
-composer install
-cp .env.example .env
-php artisan key:generate
+# Front-end
 npm ci
-php artisan serve
-npm run dev
+npm run build             # sinh public/build với file có hash (immutable)
+
+# Laravel
+cp .env.example .env      # nếu chưa có
+php artisan key:generate  # nếu APP_KEY trống
+# đặt .env:
+APP_ENV=production
+APP_DEBUG=false
+
+composer install --no-dev --optimize-autoloader
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan optimize:clear    # clear rác cũ, giữ cache mới
+
 ```
 
 ---

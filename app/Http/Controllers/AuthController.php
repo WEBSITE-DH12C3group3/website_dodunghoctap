@@ -35,7 +35,8 @@ class AuthController extends Controller
         ]);
 
         // Mặc định gán role "customer"
-        $customerRoleId = Role::where('role_name', 'customer')->value('role_id') ?? 3; // DB của bạn có "customer" id=3 :contentReference[oaicite:2]{index=2}
+        $customerRoleId = Role::where('role_name', 'customer')->value('role_id') ?? 3;
+        // DB của bạn có "customer" id=3 :contentReference[oaicite:2]{index=2}
 
         $user = User::create([
             'full_name' => $data['full_name'],

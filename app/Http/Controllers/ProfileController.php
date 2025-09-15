@@ -2,59 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
+    public function index()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = auth()->user();
+        return view('user.index', compact('user'));
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $user = auth()->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $validated = $request->validate([
+            'first_name'      => 'nullable|string|max:100',
+            'last_name'       => 'nullable|string|max:100',
+            'phone'           => 'nullable|string|max:30',
+            'address'         => 'nullable|string|max:255',
+        ]);
+
+        $table = 'users';
+        $update = [];
+
+        // Tên
+        if (Schema::hasColumn($table, 'first_name')) $update['first_name'] = $validated['first_name'] ?? null;
+        if (Schema::hasColumn($table, 'last_name'))  $update['last_name']  = $validated['last_name']  ?? null;
+
+        // full_name nếu DB dùng cột này
+        if (Schema::hasColumn($table, 'full_name')) {
+            $full = trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? ''));
+            if ($full !== '') $update['full_name'] = $full;
         }
 
-        $request->user()->save();
+        // Các cột khác
+        foreach (['phone', 'address'] as $col) {
+            if (Schema::hasColumn($table, $col)) $update[$col] = $validated[$col] ?? null;
+        }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current-password'],
-        ]);
+        if (!empty($update)) {
+            // hỗ trợ cả id hoặc user_id
+            $pkCol = isset($user->user_id) ? 'user_id' : 'id';
+            $pkVal = $user->$pkCol;
+            DB::table($table)->where($pkCol, $pkVal)->update($update);
+        }
 
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return back()->with('success', 'Cập nhật thông tin thành công!');
     }
 }
