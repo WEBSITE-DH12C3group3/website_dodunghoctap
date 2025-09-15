@@ -3,10 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Store\HomeController;
-use Illuminate\Http\Request;
 use App\Http\Controllers\GoogleLoginController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\StatsController;
+use App\Http\Controllers\Admin\OrderController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-Route::get('/', [HomeController::class, 'index'])->name('store.index'); // đổi name
+Route::get('/', [HomeController::class, 'index'])->name('store.index');
 
 Route::get('/categories', fn() => 'all categories')->name('store.categories.index');
 Route::get('/category/{id}', fn($id) => "category $id")->name('store.category');
@@ -21,13 +26,16 @@ Route::get('/search', fn() => 'search')->name('store.search');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
+<<<<<<< HEAD
+Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
+=======
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -35,29 +43,38 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
     Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
+>>>>>>> 0110afcabfd9095d9bceca7844a50325ac1b679a
 
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->middleware('role:admin|employee')->name('dashboard');
 
-    // Ví dụ khu admin: chỉ admin hoặc employee
     Route::prefix('admin')->middleware('role:admin|employee')->group(function () {
-        Route::get('/products', fn() => 'Trang quản lý sản phẩm (đã có permission: manage_products)')
+        Route::get('/products', [ProductController::class, 'index'])
             ->middleware('permission:manage_products')->name('admin.products');
+        Route::get('/products/create', [ProductController::class, 'create'])
+            ->middleware('permission:manage_products')->name('admin.products.create');
+        Route::post('/products', [ProductController::class, 'store'])
+            ->middleware('permission:manage_products')->name('admin.products.store');
+        Route::get('/products/edit/{id}', [ProductController::class, 'edit'])
+            ->middleware('permission:manage_products')->name('admin.products.edit');
+        Route::put('/products/{id}', [ProductController::class, 'update'])
+            ->middleware('permission:manage_products')->name('admin.products.update');
+        Route::delete('/products/{id}', [ProductController::class, 'destroy'])
+            ->middleware('permission:manage_products')->name('admin.products.destroy');
 
-        Route::get('/users', fn() => 'Trang quản lý người dùng (permission: manage_users)')
+        Route::get('/users', [UserController::class, 'index'])
             ->middleware('permission:manage_users')->name('admin.users');
-
-        Route::get('/stats', fn() => 'Trang thống kê (permission: view_statistics)')
+        Route::get('/stats', [StatsController::class, 'index'])
             ->middleware('permission:view_statistics')->name('admin.stats');
-
-        Route::get('/orders', fn() => 'Trang đơn hàng (permission: manage_orders)')
+        Route::get('/orders', [OrderController::class, 'index'])
             ->middleware('permission:manage_orders')->name('admin.orders');
     });
 });
 
-// newsletter + pages giữ nguyên...
-
 Route::post('/newsletter/subscribe', function (Request $request) {
     $data = $request->validate(['email' => 'required|email:rfc,dns']);
-    // Nếu có bảng newsletter_subscribers thì lưu, không có thì chỉ flash thông báo.
     try {
         if (\Illuminate\Support\Facades\Schema::hasTable('newsletter_subscribers')) {
             \Illuminate\Support\Facades\DB::table('newsletter_subscribers')->updateOrInsert(
@@ -70,18 +87,23 @@ Route::post('/newsletter/subscribe', function (Request $request) {
         return back()->with('error', 'Không thể đăng ký lúc này.');
     }
 })->name('store.newsletter.subscribe');
-Route::name('store.page.')->group(function () {
-    Route::view('/huong-dan-mua-hang',     'store.pages.stub', ['title' => 'Hướng dẫn mua hàng'])->name('buying_guide');
-    Route::view('/huong-dan-thanh-toan',   'store.pages.stub', ['title' => 'Hướng dẫn thanh toán'])->name('payment_guide');
-    Route::view('/chinh-sach-giao-hang',   'store.pages.stub', ['title' => 'Chính sách giao hàng'])->name('shipping_policy');
-    Route::view('/chinh-sach-doi-tra',     'store.pages.stub', ['title' => 'Chính sách đổi trả & hoàn tiền'])->name('return_policy');
-    Route::view('/khach-hang-than-thiet',  'store.pages.stub', ['title' => 'Khách hàng thân thiết'])->name('loyalty');
-    Route::view('/khach-hang-uu-tien',     'store.pages.stub', ['title' => 'Khách hàng ưu tiên'])->name('priority');
 
-    Route::view('/gioi-thieu',             'store.pages.stub', ['title' => 'Giới thiệu'])->name('about');
+Route::name('store.page.')->group(function () {
+    Route::view('/huong-dan-mua-hang', 'store.pages.stub', ['title' => 'Hướng dẫn mua hàng'])->name('buying_guide');
+    Route::view('/huong-dan-thanh-toan', 'store.pages.stub', ['title' => 'Hướng dẫn thanh toán'])->name('payment_guide');
+    Route::view('/chinh-sach-giao-hang', 'store.pages.stub', ['title' => 'Chính sách giao hàng'])->name('shipping_policy');
+    Route::view('/chinh-sach-doi-tra', 'store.pages.stub', ['title' => 'Chính sách đổi trả & hoàn tiền'])->name('return_policy');
+    Route::view('/khach-hang-than-thiet', 'store.pages.stub', ['title' => 'Khách hàng thân thiết'])->name('loyalty');
+    Route::view('/khach-hang-uu-tien', 'store.pages.stub', ['title' => 'Khách hàng ưu tiên'])->name('priority');
+    Route::view('/gioi-thieu', 'store.pages.stub', ['title' => 'Giới thiệu'])->name('about');
     Route::view('/dich-vu-in-an-quang-cao', 'store.pages.stub', ['title' => 'Dịch vụ in ấn quảng cáo'])->name('ads_service');
-    Route::view('/bao-mat-chung',          'store.pages.stub', ['title' => 'Chính sách bảo mật chung'])->name('privacy');
+    Route::view('/bao-mat-chung', 'store.pages.stub', ['title' => 'Chính sách bảo mật chung'])->name('privacy');
     Route::view('/bao-mat-thong-tin-ca-nhan', 'store.pages.stub', ['title' => 'Bảo mật thông tin cá nhân'])->name('privacy_personal');
-    Route::view('/lien-he',                'store.pages.stub', ['title' => 'Thông tin liên hệ'])->name('contact');
-    Route::view('/affiliate',              'store.pages.stub', ['title' => 'Chương trình Affiliate'])->name('affiliate');
+    Route::view('/lien-he', 'store.pages.stub', ['title' => 'Thông tin liên hệ'])->name('contact');
+    Route::view('/affiliate', 'store.pages.stub', ['title' => 'Chương trình Affiliate'])->name('affiliate');
+});
+
+Route::fallback(function () {
+    Log::error('Fallback route triggered for path: ' . request()->path());
+    return redirect()->route('dashboard')->with('error', 'Không tìm thấy trang yêu cầu.');
 });
