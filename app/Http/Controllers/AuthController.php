@@ -50,22 +50,26 @@ class AuthController extends Controller
         return redirect()->route('dashboard')->with('ok', 'Đăng ký thành công!');
     }
 
-    public function login(Request $req)
+    public function login(Request $request)
     {
-        $req->validate([
-            'email'    => ['required', 'email'],
-            'password' => ['required']
-        ], [], ['email' => 'Email', 'password' => 'Mật khẩu']);
+        $data = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        $user = User::where('email', $req->email)->first();
+        if (Auth::attempt($data, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            $user = Auth::user();
 
-        if ($user && User::verifyPassword($req->password, $user->password)) {
-            Auth::login($user);
-            return redirect()->route('dashboard')->with('ok', 'Đăng nhập thành công!');
+            // admin/employee → dashboard, còn lại → store.index
+            if ($user->hasRole(['admin', 'employee'])) {
+                return redirect()->intended(route('dashboard'));
+            }
+            return redirect()->intended(route('store.index'));
         }
-        return back()->withErrors(['email' => 'Email hoặc mật khẩu không đúng'])->withInput();
-    }
 
+        return back()->withErrors(['email' => 'Thông tin đăng nhập không đúng.'])->onlyInput('email');
+    }
     public function logout(Request $req)
     {
         Auth::logout();

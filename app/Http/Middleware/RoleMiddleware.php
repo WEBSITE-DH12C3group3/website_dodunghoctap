@@ -3,18 +3,25 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Str;
 
 class RoleMiddleware
 {
-    // Dùng: ->middleware('role:admin|employee')
     public function handle($request, Closure $next, $roles)
     {
-        if (!auth()->check()) return redirect()->route('login');
-
-        $userRole = optional(auth()->user()->role)->role_name;
-        foreach (explode('|', $roles) as $role) {
-            if ($userRole === $role) return $next($request);
+        $user = $request->user();
+        if (!$user) {
+            return redirect()->route('login');
         }
-        abort(403, 'Bạn không có quyền truy cập.');
+
+        $allowed = collect(explode('|', $roles))
+            ->map(fn($r) => Str::lower(trim($r)))
+            ->contains(fn($r) => $user->hasRole($r));
+
+        if (!$allowed) {
+            return redirect()->route('store.index')
+                ->with('error', 'Bạn không có quyền truy cập khu vực này.');
+        }
+        return $next($request);
     }
 }

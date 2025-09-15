@@ -5,7 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Store\HomeController;
 use Illuminate\Http\Request;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('store.index'); // đổi name
+
 Route::get('/categories', fn() => 'all categories')->name('store.categories.index');
 Route::get('/category/{id}', fn($id) => "category $id")->name('store.category');
 Route::get('/product/{id}', fn($id) => "product $id")->name('store.product.show');
@@ -14,7 +15,8 @@ Route::get('/cart/add/{id}', fn($id) => "add $id")->name('cart.add');
 Route::get('/products/new', fn() => 'new products')->name('store.products.new');
 Route::get('/products/best', fn() => 'best sellers')->name('store.products.best');
 Route::get('/products/featured', fn() => 'featured products')->name('store.products.featured');
-Route::get('/search',      fn() => 'search')->name('store.search');
+Route::get('/search', fn() => 'search')->name('store.search');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -28,32 +30,24 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
-    })->name('dashboard');
+    })->middleware('role:admin|employee')->name('dashboard'); // <— thêm role guard
 
-    // Ví dụ khu admin: chỉ admin hoặc employee
     Route::prefix('admin')->middleware('role:admin|employee')->group(function () {
+        Route::get('/products', fn() => 'Trang quản lý sản phẩm (đã có permission: manage_products)')
+            ->middleware('permission:manage_products')->name('admin.products');
 
-        // Ví dụ quản lý sản phẩm: cần permission manage_products
-        Route::get('/products', function () {
-            return 'Trang quản lý sản phẩm (đã có permission: manage_products)';
-        })->middleware('permission:manage_products')->name('admin.products');
+        Route::get('/users', fn() => 'Trang quản lý người dùng (permission: manage_users)')
+            ->middleware('permission:manage_users')->name('admin.users');
 
-        // Ví dụ quản lý user
-        Route::get('/users', function () {
-            return 'Trang quản lý người dùng (permission: manage_users)';
-        })->middleware('permission:manage_users')->name('admin.users');
+        Route::get('/stats', fn() => 'Trang thống kê (permission: view_statistics)')
+            ->middleware('permission:view_statistics')->name('admin.stats');
 
-        // Ví dụ thống kê
-        Route::get('/stats', function () {
-            return 'Trang thống kê (permission: view_statistics)';
-        })->middleware('permission:view_statistics')->name('admin.stats');
-
-        // Ví dụ đơn hàng
-        Route::get('/orders', function () {
-            return 'Trang đơn hàng (permission: manage_orders)';
-        })->middleware('permission:manage_orders')->name('admin.orders');
+        Route::get('/orders', fn() => 'Trang đơn hàng (permission: manage_orders)')
+            ->middleware('permission:manage_orders')->name('admin.orders');
     });
 });
+
+// newsletter + pages giữ nguyên...
 
 Route::post('/newsletter/subscribe', function (Request $request) {
     $data = $request->validate(['email' => 'required|email:rfc,dns']);

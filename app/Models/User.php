@@ -19,8 +19,23 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(Role::class, 'role_id', 'role_id');
+        return $this->belongsTo(\App\Models\Role::class, 'role_id');
     }
+
+    public function roleName(): ?string
+    {
+        return optional($this->role)->name ?? optional($this->role)->role_name;
+    }
+
+    public function hasRole($roles): bool
+    {
+        $current = strtolower((string) $this->roleName());
+        foreach ((array) $roles as $r) {
+            if ($current === strtolower((string) $r)) return true;
+        }
+        return false;
+    }
+
 
     public function hasPermission(string $permissionName): bool
     {

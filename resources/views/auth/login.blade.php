@@ -5,8 +5,14 @@
     <div id="sky" class="absolute inset-0 animated-gradient overflow-hidden"></div>
 
     <style>
+        input[type=password]::-ms-reveal,
+        input[type=password]::-ms-clear {
+            display: none;
+        }
+
+
         .animated-gradient {
-            background: linear-gradient(270deg, #01062dff, #0e1333ff, #1B1F3B, #262354, #2e439bff, #2f649fff);
+            background: linear-gradient(270deg, #000c6aff, #172160ff, #2e356aff, #37327eff, #344ba7ff, #3067a5ff);
             background-size: 800% 800%;
             animation: gradientAnimation 30s ease infinite;
         }
