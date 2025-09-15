@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Store\HomeController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\GoogleLoginController;
 
 Route::get('/', [HomeController::class, 'index'])->name('store.index'); // đổi name
 
@@ -32,6 +33,11 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->middleware('role:admin|employee')->name('dashboard'); // <— thêm role guard
 
+Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
+
+
+    // Ví dụ khu admin: chỉ admin hoặc employee
     Route::prefix('admin')->middleware('role:admin|employee')->group(function () {
         Route::get('/products', fn() => 'Trang quản lý sản phẩm (đã có permission: manage_products)')
             ->middleware('permission:manage_products')->name('admin.products');
