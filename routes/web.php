@@ -3,15 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Store\HomeController;
+use App\Http\Controllers\Store\ProfileController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
 use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+
+require __DIR__ . '/auth.php';
 
 Route::get('/', [HomeController::class, 'index'])->name('store.index');
 
@@ -27,20 +29,23 @@ Route::get('/products/best', fn() => 'best sellers')->name('store.products.best'
 Route::get('/products/featured', fn() => 'featured products')->name('store.products.featured');
 Route::get('/search', fn() => 'search')->name('store.search');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-    Route::get('/profile',   [ProfileController::class, 'index'])->name('profile.index');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-});
-require __DIR__ . '/auth.php';
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+// Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
 
+Route::middleware('guest')->group(function () {
+    // Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    // Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    // Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    // Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    // Route::get('/profile',   [ProfileController::class, 'index'])->name('profile.index');
+    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
+Route::middleware('auth')->group(function () {
+    Route::get('/profile',  [ProfileController::class, 'index'])->name('profile.index');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
