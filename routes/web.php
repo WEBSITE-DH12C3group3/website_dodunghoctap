@@ -7,8 +7,11 @@ use App\Http\Controllers\Store\ProfileController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
+
 use App\Http\Controllers\Admin\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,10 +20,14 @@ use App\Http\Controllers\Store\CartController;
 
 require __DIR__ . '/auth.php';
 
+
 Route::get('/', [HomeController::class, 'index'])->name('store.index');
 
 Route::get('/categories', fn() => 'all categories')->name('store.categories.index');
 Route::get('/category/{id}', fn($id) => "category $id")->name('store.category');
+
+Route::get('/product/{id}', fn($id) => "product $id")->name('store.product.show');
+Route::get('/cart/add/{id}', fn($id) => "add $id")->name('cart.add');
 
 
 Route::get('/product/{id}', [ProductShowController::class, 'show'])->name('store.product.show');
@@ -32,7 +39,6 @@ Route::get('/products/best', fn() => 'best sellers')->name('store.products.best'
 Route::get('/products/featured', fn() => 'featured products')->name('store.products.featured');
 Route::get('/search', fn() => 'search')->name('store.search');
 
-// Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
@@ -81,12 +87,36 @@ Route::middleware('auth')->group(function () {
         Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])
             ->middleware('permission:manage_categories')->name('admin.categories.destroy');
 
+        Route::get('/orders', [OrderController::class, 'index'])
+            ->middleware('permission:manage_orders')->name('admin.orders');
+        Route::get('/orders/show/{id}', [OrderController::class, 'show'])
+            ->middleware('permission:manage_orders')->name('admin.orders.show');
+        Route::get('/orders/edit/{id}', [OrderController::class, 'edit'])
+            ->middleware('permission:manage_orders')->name('admin.orders.edit');
+        Route::put('/orders/{id}', [OrderController::class, 'update'])
+            ->middleware('permission:manage_orders')->name('admin.orders.update');
+        Route::delete('/orders/{id}', [OrderController::class, 'destroy'])
+            ->middleware('permission:manage_orders')->name('admin.orders.destroy');
+
+        Route::get('/purchase_orders', [PurchaseOrderController::class, 'index'])
+            ->middleware('permission:manage_purchases')->name('admin.purchase_orders');
+        Route::get('/purchase_orders/create', [PurchaseOrderController::class, 'create'])
+            ->middleware('permission:manage_purchases')->name('admin.purchase_orders.create');
+        Route::post('/purchase_orders', [PurchaseOrderController::class, 'store'])
+            ->middleware('permission:manage_purchases')->name('admin.purchase_orders.store');
+        Route::get('/purchase_orders/show/{id}', [PurchaseOrderController::class, 'show'])
+            ->middleware('permission:manage_purchases')->name('admin.purchase_orders.show');
+        Route::get('/purchase_orders/edit/{id}', [PurchaseOrderController::class, 'edit'])
+            ->middleware('permission:manage_purchases')->name('admin.purchase_orders.edit');
+        Route::put('/purchase_orders/{id}', [PurchaseOrderController::class, 'update'])
+            ->middleware('permission:manage_purchases')->name('admin.purchase_orders.update');
+        Route::delete('/purchase_orders/{id}', [PurchaseOrderController::class, 'destroy'])
+            ->middleware('permission:manage_purchases')->name('admin.purchase_orders.destroy');
+
         Route::get('/users', [UserController::class, 'index'])
             ->middleware('permission:manage_users')->name('admin.users');
         Route::get('/stats', [StatsController::class, 'index'])
             ->middleware('permission:view_statistics')->name('admin.stats');
-        Route::get('/orders', [OrderController::class, 'index'])
-            ->middleware('permission:manage_orders')->name('admin.orders');
     });
 });
 
@@ -118,9 +148,4 @@ Route::name('store.page.')->group(function () {
     Route::view('/bao-mat-thong-tin-ca-nhan', 'store.pages.stub', ['title' => 'Bảo mật thông tin cá nhân'])->name('privacy_personal');
     Route::view('/lien-he', 'store.pages.stub', ['title' => 'Thông tin liên hệ'])->name('contact');
     Route::view('/affiliate', 'store.pages.stub', ['title' => 'Chương trình Affiliate'])->name('affiliate');
-});
-
-Route::fallback(function () {
-    Log::error('Fallback route triggered for path: ' . request()->path());
-    return redirect()->route('dashboard')->with('error', 'Không tìm thấy trang yêu cầu.');
 });
