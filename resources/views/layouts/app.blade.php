@@ -93,6 +93,14 @@
                         <span>Đơn hàng</span>
                     </a>
                     @endif
+                     @if(auth()->check() && auth()->user()->hasPermission('manage_purchases'))
+                    <a href="{{ route('admin.purchase_orders') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.purchase_orders') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 6h18v2H3V6Zm2 4h14l-1 8H6l-1-8Zm5 2v4h2v-4H10Zm4 0v4h2v-4h-2Z" />
+                        </svg>
+                        <span>Quản lý nhập kho</span>
+                    </a>
+                    @endif
                 </nav>
                 <!-- User Info and Actions -->
                 <div class="mt-auto border-t border-slate-200 dark:border-slate-700 pt-4">
