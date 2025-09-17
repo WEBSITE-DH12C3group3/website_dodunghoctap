@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -31,15 +32,21 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+            'full_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'phone'     => ['nullable', 'string', 'max:20'],
+            'address'   => ['nullable', 'string', 'max:500'],
         ]);
+        $customerRoleId = Role::where('role_name', 'customer')->value('role_id') ?? 3;
 
         $user = User::create([
-            'name' => $request->name,
+            'full_name' => $request->full_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'role_id'   => $customerRoleId,
         ]);
 
         event(new Registered($user));

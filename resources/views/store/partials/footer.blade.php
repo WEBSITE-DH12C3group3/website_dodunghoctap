@@ -42,10 +42,7 @@ $year = date('Y');
                     <button class="px-4 py-3 bg-[#0E3271] hover:bg-[#0b2a5d] whitespace-nowrap">Đăng ký</button>
                 </form>
 
-                {{-- Logo đối tác (tuỳ chọn) --}}
-                <div class="mt-3 flex items-center gap-3">
-                    <img src="https://theme.hstatic.net/1000230347/1001380508/14/footer_bct.png?v=729" alt="Đã thông báo Bộ Công Thương" class="h-10">
-                </div>
+
             </div>
 
             {{-- Cột 2: Địa chỉ công ty --}}
@@ -57,14 +54,17 @@ $year = date('Y');
                 <p>
                     <span class="font-semibold text-[#F6D34B]">Miền Bắc:</span> {{ $northOffice }}
                 </p>
+                <div class="mt-3 flex items-center gap-3">
+                    <img src="https://theme.hstatic.net/1000230347/1001380508/14/footer_bct.png?v=729" alt="Đã thông báo Bộ Công Thương" class="h-15 w-auto">
+                </div>
             </div>
 
             {{-- Cột 3: Hỗ trợ khách hàng --}}
             <div>
                 <h3 class="font-bold text-[#F6D34B] mb-3">HỖ TRỢ KHÁCH HÀNG</h3>
-                <p><span class="font-semibold text-[#F6D34B]">Hotline:</span> {{ $hotline }}</p>
-                <p>{{ $supportTime }}</p>
-                <p class="mb-3"><a href="mailto:{{ $supportMail }}" class="underline">{{ $supportMail }}</a></p>
+                <p><span class="font-semibold text-[#F6D34B]">Hotline:</span> <a class="font-bold" style="text-decoration: none" href="tel:{{ $hotline }}" class="underline">{{ $hotline }}</a></p>
+                <p class="text-[#F6D34B] font-bold">{{ $supportTime }}</p>
+                <p class="mb-3 text-[#F6D34B] font-bold"><a style="text-decoration: none" href="mailto:{{ $supportMail }}" class="underline">{{ $supportMail }}</a></p>
                 <ul class="space-y-2">
                     <li><a class="hover:underline" href="{{ route('store.page.buying_guide') }}">– Hướng dẫn mua hàng</a></li>
                     <li><a class="hover:underline" href="{{ route('store.page.payment_guide') }}">– Hướng dẫn thanh toán</a></li>
@@ -113,7 +113,7 @@ $year = date('Y');
     {{-- Bar dưới cùng --}}
     <div class="bg-[#123C86]">
         <div class="mx-auto max-w-screen-2xl px-4 py-3 text-center text-sm opacity-90">
-            {{ $year }} © {{ ucfirst($siteName) }} – Bản quyền thuộc {{ $brandName }}.
+            {{ $year }} © {{ ucfirst($siteName) }} – Bản quyền thuộc {{ $brandName }}
         </div>
     </div>
 </footer>

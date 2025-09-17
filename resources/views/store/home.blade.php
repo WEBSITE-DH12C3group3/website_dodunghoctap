@@ -41,7 +41,6 @@
             <img class="h-full w-full object-cover" src="{{ asset('images/banners/4.webp') }}" alt="Khuyến mãi">
         </a>
     </section>
-
     {{-- BÁN CHẠY --}}
     <section class="mb-8 md:mb-10">
         <div class="flex items-center justify-between mb-3 md:mb-4">
