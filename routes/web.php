@@ -12,11 +12,8 @@ use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
 
-use App\Http\Controllers\Admin\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Store\ProductShowController;
-use App\Http\Controllers\Store\CartController;
 
 require __DIR__ . '/auth.php';
 
@@ -30,10 +27,6 @@ Route::get('/product/{id}', fn($id) => "product $id")->name('store.product.show'
 Route::get('/cart/add/{id}', fn($id) => "add $id")->name('cart.add');
 
 
-Route::get('/product/{id}', [ProductShowController::class, 'show'])->name('store.product.show');
-Route::get('/cart', fn() => 'cart')->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::post('/buy-now', [CartController::class, 'buyNow'])->name('cart.buy_now');
 Route::get('/products/new', fn() => 'new products')->name('store.products.new');
 Route::get('/products/best', fn() => 'best sellers')->name('store.products.best');
 Route::get('/products/featured', fn() => 'featured products')->name('store.products.featured');
@@ -43,14 +36,6 @@ Route::get('/search', fn() => 'search')->name('store.search');
 Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
 
-// Route::middleware('guest')->group(function () {
-//     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-//     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-//     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-//     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-//     Route::get('/profile',   [ProfileController::class, 'index'])->name('profile.index');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-// });
 Route::middleware('auth')->group(function () {
     Route::get('/profile',  [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
