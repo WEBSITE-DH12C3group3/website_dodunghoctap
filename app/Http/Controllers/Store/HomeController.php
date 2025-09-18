@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Models\Product;
 
 class HomeController extends Controller
 {
     public function index()
     {
+        $products = Product::query()
+            ->latest('created_at')
+            ->paginate(12);
+
         // Danh mục
         $categories = DB::table('categories')
             ->select('category_id', 'category_name')
@@ -64,7 +69,7 @@ class HomeController extends Controller
                 ->limit(10)->get();
         }
 
-        return view('store.home', compact('categories', 'newProducts', 'bestSellers', 'featured'));
+        return view('store.home', compact('products', 'categories', 'newProducts', 'bestSellers', 'featured'));
     }
 
     private function hasColumn(string $table, string $column): bool

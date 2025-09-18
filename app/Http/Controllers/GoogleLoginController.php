@@ -15,14 +15,14 @@ class GoogleLoginController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    
+
     public function redirectToGoogle()
     {
-         \Log::info('Redirecting to Google'); // Ghi log
+        \Log::info('Redirecting to Google'); // Ghi log
         return Socialite::driver('google')->redirect();
     }
 
-   
+
 
 
     /**
@@ -58,14 +58,13 @@ class GoogleLoginController extends Controller
                 ]);
             }
 
-    
+
 
             // Đăng nhập user
             Auth::login($user);
 
             // Chuyển hướng đến dashboard (hoặc trang mong muốn)
             return redirect()->intended('/dashboard');
-
         } catch (\Exception $e) {
             // Xử lý lỗi và chuyển hướng về login
             return redirect('/login')->with('error', 'Đăng nhập Google thất bại: ' . $e->getMessage());

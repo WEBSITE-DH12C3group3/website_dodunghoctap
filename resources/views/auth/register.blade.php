@@ -1,5 +1,5 @@
 @extends('layouts.store')
-
+@section('title', 'Đăng ký')
 @section('content')
 <section class="relative overflow-hidden">
     <div id="sky" class="absolute inset-0 animated-gradient overflow-hidden"></div>

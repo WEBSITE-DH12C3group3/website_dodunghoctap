@@ -35,3 +35,4 @@ class Brand extends Model
         return $this->categories()->distinct()->count();
     }
 }
+
