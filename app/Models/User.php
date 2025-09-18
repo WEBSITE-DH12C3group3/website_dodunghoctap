@@ -3,53 +3,50 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Carbon;
 
 class User extends Authenticatable
 {
     protected $table = 'users';
     protected $primaryKey = 'user_id';
+    public $timestamps = false;
 
-    // Bảng chỉ có created_at; không có updated_at
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = null;
+    protected $fillable = [
+        'full_name',
+        'email',
+        'password',
+        'role_id',
+        'is_active',
+        'last_activity',
+    ];
 
-    protected $fillable = ['full_name', 'email', 'phone', 'address', 'password', 'role_id'];
-    protected $hidden   = ['password'];
+    protected $casts = [
+        'last_activity' => 'datetime', // Chuyển last_activity thành Carbon
+    ];
 
     public function role()
     {
-        return $this->belongsTo(\App\Models\Role::class, 'role_id');
+        return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
 
-    public function roleName(): ?string
+    public function hasPermission($permission)
     {
-        return optional($this->role)->name ?? optional($this->role)->role_name;
+        return $this->role && $this->role->permissions()->where('permission_name', $permission)->exists();
     }
 
-    public function hasRole($roles): bool
+    public function hasRole($roles)
     {
-        $current = strtolower((string) $this->roleName());
-        foreach ((array) $roles as $r) {
-            if ($current === strtolower((string) $r)) return true;
+        if (is_string($roles)) {
+            $roles = explode('|', $roles);
         }
-        return false;
+        return $this->role && in_array($this->role->role_name, (array)$roles);
     }
 
-
-    public function hasPermission(string $permissionName): bool
+    public function isOnline()
     {
-        $role = $this->role()->with(['permissions' => function ($q) {
-            $q->select('permissions.permission_id', 'permissions.permission_name');
-        }])->first();
-
-        if (!$role) return false;
-        return $role->permissions->contains(fn($p) => $p->permission_name === $permissionName);
-    }
-
-    // Hỗ trợ đăng nhập cho dữ liệu cũ còn plaintext (khuyến cáo: chuyển hết sang bcrypt)
-    public static function verifyPassword(string $input, string $stored): bool
-    {
-        return Hash::check($input, $stored) || hash_equals($stored, $input);
+        if (!$this->last_activity) {
+            return false;
+        }
+        return now()->diffInMinutes($this->last_activity) < 5;
     }
 }

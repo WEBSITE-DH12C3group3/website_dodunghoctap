@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Log;
 
 require __DIR__ . '/auth.php';
 
-
 Route::get('/', [HomeController::class, 'index'])->name('store.index');
 
 Route::get('/categories', fn() => 'all categories')->name('store.categories.index');
@@ -27,20 +26,19 @@ Route::get('/category/{id}', fn($id) => "category $id")->name('store.category');
 Route::get('/product/{id}', fn($id) => "product $id")->name('store.product.show');
 Route::get('/cart/add/{id}', fn($id) => "add $id")->name('cart.add');
 
-
 Route::get('/products/new', fn() => 'new products')->name('store.products.new');
 Route::get('/products/best', fn() => 'best sellers')->name('store.products.best');
 Route::get('/products/featured', fn() => 'featured products')->name('store.products.featured');
 Route::get('/search', fn() => 'search')->name('store.search');
 
-
 Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile',  [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
+
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -99,24 +97,43 @@ Route::middleware('auth')->group(function () {
         Route::delete('/purchase_orders/{id}', [PurchaseOrderController::class, 'destroy'])
             ->middleware('permission:manage_purchases')->name('admin.purchase_orders.destroy');
 
-        Route::get('/users', [UserController::class, 'index'])
-            ->middleware('permission:manage_users')->name('admin.users');
         Route::get('/stats', [StatsController::class, 'index'])
             ->middleware('permission:view_statistics')->name('admin.stats');
 
+        Route::get('/suppliers', [SupplierController::class, 'index'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers');
+        Route::get('/suppliers/create', [SupplierController::class, 'create'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.create');
+        Route::post('/suppliers', [SupplierController::class, 'store'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.store');
+        Route::get('/suppliers/{id}', [SupplierController::class, 'show'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.show');
+        Route::get('/suppliers/{id}/edit', [SupplierController::class, 'edit'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.edit');
+        Route::put('/suppliers/{id}', [SupplierController::class, 'update'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.update');
+        Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.destroy');
 
-
-        Route::get('/admin/suppliers', [SupplierController::class, 'index'])->name('admin.suppliers');
-    Route::get('/admin/suppliers/create', [SupplierController::class, 'create'])->name('admin.suppliers.create');
-    Route::post('/admin/suppliers', [SupplierController::class, 'store'])->name('admin.suppliers.store');
-    Route::get('/admin/suppliers/{id}', [SupplierController::class, 'show'])->name('admin.suppliers.show');
-    Route::get('/admin/suppliers/{id}/edit', [SupplierController::class, 'edit'])->name('admin.suppliers.edit');
-    Route::put('/admin/suppliers/{id}', [SupplierController::class, 'update'])->name('admin.suppliers.update');
-    Route::delete('/admin/suppliers/{id}', [SupplierController::class, 'destroy'])->name('admin.suppliers.destroy');
-
-
-
+        Route::get('/users', [UserController::class, 'index'])
+            ->middleware('permission:manage_users')->name('admin.users');
+        Route::get('/users/{id}', [UserController::class, 'show'])
+            ->middleware('permission:manage_users')->name('admin.users.show');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])
+            ->middleware('permission:manage_users')->name('admin.users.edit');
+        Route::put('/users/{id}', [UserController::class, 'update'])
+            ->middleware('permission:manage_users')->name('admin.users.update');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])
+            ->middleware('permission:manage_users')->name('admin.users.destroy');
     });
+});
+
+Route::middleware(['auth', 'permission:manage_users'])->group(function () {
+    Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
+    Route::get('/admin/users/{id}', [UserController::class, 'show'])->name('admin.users.show');
+    Route::get('/admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
+    Route::delete('/admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 });
 
 Route::post('/newsletter/subscribe', function (Request $request) {
