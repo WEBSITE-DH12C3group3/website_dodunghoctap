@@ -19,7 +19,7 @@
         </div>
         <div>
             <span class="font-medium text-slate-700 dark:text-slate-200">Ngày tạo:</span>
-            <span class="text-slate-600 dark:text-slate-300">{{ $supplier->created_at->format('d/m/Y H:i') }}</span>
+            <span class="text-slate-600 dark:text-slate-300"> {{ $supplier->created_at ? $supplier->created_at->format('d/m/Y H:i') : 'N/A' }}</span>
         </div>
         <div>
             <span class="font-medium text-slate-700 dark:text-slate-200">Ngày cập nhật:</span>

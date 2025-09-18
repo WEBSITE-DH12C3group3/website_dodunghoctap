@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\BrandController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -115,6 +116,17 @@ Route::middleware('auth')->group(function () {
         Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy'])
             ->middleware('permission:manage_suppliers')->name('admin.suppliers.destroy');
 
+        Route::get('/brands', [BrandController::class, 'index'])
+            ->middleware('permission:manage_brands')->name('admin.brands');
+        Route::get('/brands/create', [BrandController::class, 'create'])
+            ->middleware('permission:manage_brands')->name('admin.brands.create');
+        Route::post('/brands', [BrandController::class, 'store'])
+            ->middleware('permission:manage_brands')->name('admin.brands.store');
+        Route::get('/brands/{id}', [BrandController::class, 'show'])
+            ->middleware('permission:manage_brands')->name('admin.brands.show');
+        Route::delete('/brands/{id}', [BrandController::class, 'destroy'])
+            ->middleware('permission:manage_brands')->name('admin.brands.destroy');
+
         Route::get('/users', [UserController::class, 'index'])
             ->middleware('permission:manage_users')->name('admin.users');
         Route::get('/users/{id}', [UserController::class, 'show'])
@@ -126,14 +138,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/users/{id}', [UserController::class, 'destroy'])
             ->middleware('permission:manage_users')->name('admin.users.destroy');
     });
-});
-
-Route::middleware(['auth', 'permission:manage_users'])->group(function () {
-    Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
-    Route::get('/admin/users/{id}', [UserController::class, 'show'])->name('admin.users.show');
-    Route::get('/admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
-    Route::put('/admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
-    Route::delete('/admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 });
 
 Route::post('/newsletter/subscribe', function (Request $request) {
