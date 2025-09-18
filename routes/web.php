@@ -14,11 +14,13 @@ use App\Http\Controllers\Admin\StatsController;
 use App\Http\Controllers\Store\ProductShowController;
 use App\Http\Controllers\Store\CartController;
 use App\Http\Controllers\Store\ProductReviewController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\BrandController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 require __DIR__ . '/auth.php';
-
 
 Route::get('/', [HomeController::class, 'index'])->name('store.index');
 
@@ -43,14 +45,14 @@ Route::get('/products/best', fn() => 'best sellers')->name('store.products.best'
 Route::get('/products/featured', fn() => 'featured products')->name('store.products.featured');
 Route::get('/search', fn() => 'search')->name('store.search');
 
-
 Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile',  [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
+
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -109,10 +111,45 @@ Route::middleware('auth')->group(function () {
         Route::delete('/purchase_orders/{id}', [PurchaseOrderController::class, 'destroy'])
             ->middleware('permission:manage_purchases')->name('admin.purchase_orders.destroy');
 
-        Route::get('/users', [UserController::class, 'index'])
-            ->middleware('permission:manage_users')->name('admin.users');
         Route::get('/stats', [StatsController::class, 'index'])
             ->middleware('permission:view_statistics')->name('admin.stats');
+
+        Route::get('/suppliers', [SupplierController::class, 'index'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers');
+        Route::get('/suppliers/create', [SupplierController::class, 'create'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.create');
+        Route::post('/suppliers', [SupplierController::class, 'store'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.store');
+        Route::get('/suppliers/{id}', [SupplierController::class, 'show'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.show');
+        Route::get('/suppliers/{id}/edit', [SupplierController::class, 'edit'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.edit');
+        Route::put('/suppliers/{id}', [SupplierController::class, 'update'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.update');
+        Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy'])
+            ->middleware('permission:manage_suppliers')->name('admin.suppliers.destroy');
+
+        Route::get('/brands', [BrandController::class, 'index'])
+            ->middleware('permission:manage_brands')->name('admin.brands');
+        Route::get('/brands/create', [BrandController::class, 'create'])
+            ->middleware('permission:manage_brands')->name('admin.brands.create');
+        Route::post('/brands', [BrandController::class, 'store'])
+            ->middleware('permission:manage_brands')->name('admin.brands.store');
+        Route::get('/brands/{id}', [BrandController::class, 'show'])
+            ->middleware('permission:manage_brands')->name('admin.brands.show');
+        Route::delete('/brands/{id}', [BrandController::class, 'destroy'])
+            ->middleware('permission:manage_brands')->name('admin.brands.destroy');
+
+        Route::get('/users', [UserController::class, 'index'])
+            ->middleware('permission:manage_users')->name('admin.users');
+        Route::get('/users/{id}', [UserController::class, 'show'])
+            ->middleware('permission:manage_users')->name('admin.users.show');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])
+            ->middleware('permission:manage_users')->name('admin.users.edit');
+        Route::put('/users/{id}', [UserController::class, 'update'])
+            ->middleware('permission:manage_users')->name('admin.users.update');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])
+            ->middleware('permission:manage_users')->name('admin.users.destroy');
     });
 });
 

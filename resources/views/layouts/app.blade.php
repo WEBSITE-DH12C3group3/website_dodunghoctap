@@ -101,6 +101,23 @@
                         <span>Quản lý nhập kho</span>
                     </a>
                     @endif
+
+                    @if(auth()->check() && auth()->user()->hasPermission('manage_purchases'))
+                    <a href="{{ route('admin.suppliers') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.suppliers') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 6h18v2H3V6Zm2 4h14l-1 8H6l-1-8Zm5 2v4h2v-4H10Zm4 0v4h2v-4h-2Z" />
+                        </svg>
+                        <span>Quản lý nhà cung cấp</span>
+                    </a>
+                    @endif  
+                    @if(auth()->check() && auth()->user()->hasPermission('manage_brands'))
+                    <a href="{{ route('admin.brands') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.brands*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 4h18v2H3V4Zm2 4h14l-1 12H6L5 8Zm4 2v8h2v-8H9Zm4 0v8h2v-8h-2Z" />
+        </svg>
+        <span>Quản lý thương hiệu</span>
+    </a>
+@endif
                 </nav>
                 <!-- User Info and Actions -->
                 <div class="mt-auto border-t border-slate-200 dark:border-slate-700 pt-4">
