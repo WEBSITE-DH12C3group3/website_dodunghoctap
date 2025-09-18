@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
+use App\Http\Controllers\Admin\SupplierController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -102,6 +103,19 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage_users')->name('admin.users');
         Route::get('/stats', [StatsController::class, 'index'])
             ->middleware('permission:view_statistics')->name('admin.stats');
+
+
+
+        Route::get('/admin/suppliers', [SupplierController::class, 'index'])->name('admin.suppliers');
+    Route::get('/admin/suppliers/create', [SupplierController::class, 'create'])->name('admin.suppliers.create');
+    Route::post('/admin/suppliers', [SupplierController::class, 'store'])->name('admin.suppliers.store');
+    Route::get('/admin/suppliers/{id}', [SupplierController::class, 'show'])->name('admin.suppliers.show');
+    Route::get('/admin/suppliers/{id}/edit', [SupplierController::class, 'edit'])->name('admin.suppliers.edit');
+    Route::put('/admin/suppliers/{id}', [SupplierController::class, 'update'])->name('admin.suppliers.update');
+    Route::delete('/admin/suppliers/{id}', [SupplierController::class, 'destroy'])->name('admin.suppliers.destroy');
+
+
+
     });
 });
 
