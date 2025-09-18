@@ -11,7 +11,9 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
-
+use App\Http\Controllers\Store\ProductShowController;
+use App\Http\Controllers\Store\CartController;
+use App\Http\Controllers\Store\ProductReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -23,9 +25,18 @@ Route::get('/', [HomeController::class, 'index'])->name('store.index');
 Route::get('/categories', fn() => 'all categories')->name('store.categories.index');
 Route::get('/category/{id}', fn($id) => "category $id")->name('store.category');
 
-Route::get('/product/{id}', fn($id) => "product $id")->name('store.product.show');
-Route::get('/cart/add/{id}', fn($id) => "add $id")->name('cart.add');
-
+Route::get('/product/{id}', [ProductShowController::class, 'show'])
+    ->whereNumber('id')
+    ->name('store.product.show');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+// Route::post('/buy-now', [CartController::class, 'buyNow'])->name('cart.buy_now');
+// Route::get('/checkout', [CartController::class, 'checkout'])->name('store.checkout.index');
+Route::post('/product/{id}/review', [ProductReviewController::class, 'store'])
+    ->middleware('auth')   // nếu muốn cho khách cũng đánh giá thì bỏ middleware
+    ->name('store.product.review.store');
 
 Route::get('/products/new', fn() => 'new products')->name('store.products.new');
 Route::get('/products/best', fn() => 'best sellers')->name('store.products.best');

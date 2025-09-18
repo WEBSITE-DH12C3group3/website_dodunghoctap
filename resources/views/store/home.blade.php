@@ -26,13 +26,19 @@
             <h2 class="text-lg md:text-xl font-semibold">Sản phẩm mới</h2>
             <a href="{{ route('store.products.new') }}" class="text-blue-700 hover:underline text-sm">Xem tất cả</a>
         </div>
-        <div class="grid gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            @forelse($newProducts as $p)
-            @include('store.partials.product-card', ['p' => $p])
-            @empty
-            <p class="col-span-full text-gray-500">Chưa có sản phẩm.</p>
-            @endforelse
+        @if($products->count())
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            @foreach($products as $p)
+            @include('store.partials.product-card', ['product' => $p])
+            @endforeach
         </div>
+
+        <div class="mt-6">
+            {{ $products->onEachSide(1)->links() }}
+        </div>
+        @else
+        <p>Chưa có sản phẩm.</p>
+        @endif
     </section>
 
     {{-- BANNER NHỎ --}}

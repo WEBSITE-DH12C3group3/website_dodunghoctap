@@ -25,7 +25,17 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class, 'category_id', 'category_id');
     }
-      public function purchaseOrderItems()
+    public function brand()
+    {
+        // khóa ngoại: brand_id trên bảng products -> khóa chính: brand_id trên brands
+        return $this->belongsTo(Brand::class, 'brand_id', 'brand_id');
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'product_id', 'product_id');
+    }
+
+    public function purchaseOrderItems()
     {
         return $this->hasMany(PurchaseOrderItem::class, 'product_id', 'product_id');
     }
