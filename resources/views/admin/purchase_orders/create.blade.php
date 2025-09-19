@@ -38,6 +38,10 @@
 
         <div class="mt-6">
             <h3 class="font-semibold mb-2">Sản phẩm nhập kho</h3>
+            <div class="mb-4 flex items-center gap-4">
+                <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Không tìm thấy sản phẩm?</span>
+                <a href="{{ route('admin.products.create') }}" class="rounded-xl px-3 py-1 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 shadow-sm">Thêm sản phẩm mới</a>
+            </div>
             <div id="items" class="space-y-4">
                 @if (old('items'))
                     @foreach (old('items') as $index => $item)

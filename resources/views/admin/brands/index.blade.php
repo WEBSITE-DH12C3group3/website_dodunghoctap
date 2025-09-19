@@ -25,12 +25,30 @@
         <p class="text-slate-600 dark:text-slate-300">Chưa có thương hiệu nào.</p>
     @else
         <div class="overflow-x-auto">
+<div class="mb-4">
+    <form action="{{ route('admin.brands') }}" method="GET" class="flex items-center space-x-2">
+        <input type="text" name="search" placeholder="Tìm kiếm thương hiệu..." 
+               class="flex-1 rounded-xl px-4 py-2 text-sm text-slate-700 dark:text-slate-200 
+                      bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 
+                      focus:outline-none focus:ring-2 focus:ring-brand-500"
+               value="{{ request('search') }}">
+        <button type="submit" class="rounded-xl px-4 py-2 text-sm font-medium text-white 
+                                     bg-brand-600 hover:bg-brand-700 shadow-sm">
+            Tìm kiếm
+        </button>
+        @if(request('search'))
+            <a href="{{ route('admin.brands') }}" class="text-slate-500 hover:text-red-500">
+                Xóa tìm kiếm
+            </a>
+        @endif
+    </form>
+</div>
             <table class="w-full text-left text-sm text-slate-700 dark:text-slate-200">
                 <thead class="bg-slate-100 dark:bg-slate-800">
                     <tr>
                         <th class="px-4 py-3 font-semibold">ID</th>
                         <th class="px-4 py-3 font-semibold">Tên thương hiệu</th>
-                        <th class="px-4 py-3 font-semibold">Số lượng sản phẩm</th>
+                        <th class="px-4 py-3 font-semibold">Số sản phẩm</th>
                         <th class="px-4 py-3 font-semibold">Hành động</th>
                     </tr>
                 </thead>
@@ -52,6 +70,10 @@
                     @endforeach
                 </tbody>
             </table>
+     <div class="mt-4">
+    {{ $brands->links() }}
+</div>
+
         </div>
     @endif
 </div>
