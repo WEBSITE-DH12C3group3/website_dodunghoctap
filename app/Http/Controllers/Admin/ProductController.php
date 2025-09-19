@@ -12,12 +12,38 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Log::info('ProductController@index called, fetching products');
-        $products = Product::with(['category', 'brand'])->get();
-        Log::info('Products fetched: ' . $products->count() . ' items');
-        return view('admin.products.index', compact('products'));
+
+        try {
+            $query = Product::with(['category', 'brand']);
+
+            if ($request->filled('search')) {
+                $searchTerm = $request->input('search');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('product_name', 'LIKE', "%{$searchTerm}%")
+                      ->orWhereHas('category', function ($q) use ($searchTerm) {
+                          $q->where('category_name', 'LIKE', "%{$searchTerm}%");
+                      })
+                      ->orWhereHas('brand', function ($q) use ($searchTerm) {
+                          $q->where('brand_name', 'LIKE', "%{$searchTerm}%");
+                      });
+                });
+                Log::info('Product search: ' . $searchTerm);
+            }
+
+            $products = $query->orderBy('product_id', 'desc')
+                             ->paginate(10)
+                             ->withQueryString();
+
+            Log::info('Products fetched (page): ' . $products->count() . ', total: ' . $products->total());
+
+            return view('admin.products.index', compact('products'));
+        } catch (\Exception $e) {
+            Log::error('Error in ProductController@index: ' . $e->getMessage());
+            return redirect()->route('admin.products')->with('error', 'Lỗi khi tải danh sách sản phẩm: ' . $e->getMessage());
+        }
     }
 
     public function create()

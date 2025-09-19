@@ -14,12 +14,38 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Log::info('PurchaseOrderController@index called, fetching purchase orders');
-        $purchaseOrders = PurchaseOrder::with('user', 'supplier')->orderBy('order_date', 'desc')->get();
-        Log::info('Purchase orders fetched: ' . $purchaseOrders->count() . ' items');
-        return view('admin.purchase_orders.index', compact('purchaseOrders'));
+
+        try {
+            $query = PurchaseOrder::with('user', 'supplier');
+
+            if ($request->filled('search')) {
+                $searchTerm = $request->input('search');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('code', 'LIKE', "%{$searchTerm}%")
+                      ->orWhereHas('supplier', function ($q) use ($searchTerm) {
+                          $q->where('supplier_name', 'LIKE', "%{$searchTerm}%");
+                      })
+                      ->orWhereHas('user', function ($q) use ($searchTerm) {
+                          $q->where('full_name', 'LIKE', "%{$searchTerm}%");
+                      });
+                });
+                Log::info('Purchase order search: ' . $searchTerm);
+            }
+
+            $purchaseOrders = $query->orderBy('order_date', 'desc')
+                                  ->paginate(10)
+                                  ->withQueryString();
+
+            Log::info('Purchase orders fetched (page): ' . $purchaseOrders->count() . ', total: ' . $purchaseOrders->total());
+
+            return view('admin.purchase_orders.index', compact('purchaseOrders'));
+        } catch (\Exception $e) {
+            Log::error('Error in PurchaseOrderController@index: ' . $e->getMessage());
+            return redirect()->route('admin.purchase_orders')->with('error', 'Lỗi khi tải danh sách phiếu nhập kho: ' . $e->getMessage());
+        }
     }
 
     public function create()

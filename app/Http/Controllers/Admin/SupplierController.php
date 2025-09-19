@@ -10,12 +10,33 @@ use Illuminate\Support\Facades\DB;
 
 class SupplierController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Log::info('SupplierController@index called, fetching suppliers');
-        $suppliers = Supplier::orderBy('supplier_name', 'asc')->get();
-        Log::info('Suppliers fetched: ' . $suppliers->count() . ' items');
-        return view('admin.suppliers.index', compact('suppliers'));
+
+        try {
+            $query = Supplier::query();
+
+            if ($request->filled('search')) {
+                $searchTerm = $request->input('search');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('supplier_name', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('contact_info', 'LIKE', "%{$searchTerm}%");
+                });
+                Log::info('Supplier search: ' . $searchTerm);
+            }
+
+            $suppliers = $query->orderBy('supplier_name', 'asc')
+                              ->paginate(10)
+                              ->withQueryString();
+
+            Log::info('Suppliers fetched (page): ' . $suppliers->count() . ', total: ' . $suppliers->total());
+
+            return view('admin.suppliers.index', compact('suppliers'));
+        } catch (\Exception $e) {
+            Log::error('Error in SupplierController@index: ' . $e->getMessage());
+            return redirect()->route('admin.suppliers')->with('error', 'Lỗi khi tải danh sách nhà cung cấp: ' . $e->getMessage());
+        }
     }
 
     public function create()

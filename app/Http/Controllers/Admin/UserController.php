@@ -11,12 +11,36 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Log::info('UserController@index called, fetching users');
-        $users = User::with('role')->orderBy('user_id', 'asc')->get();
-        Log::info('Users fetched: ' . $users->count() . ' items');
-        return view('admin.users.index', compact('users'));
+
+        try {
+            $query = User::with('role');
+
+            if ($request->filled('search')) {
+                $searchTerm = $request->input('search');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('full_name', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                      ->orWhereHas('role', function ($q) use ($searchTerm) {
+                          $q->where('role_name', 'LIKE', "%{$searchTerm}%");
+                      });
+                });
+                Log::info('User search: ' . $searchTerm);
+            }
+
+            $users = $query->orderBy('user_id', 'asc')
+                          ->paginate(10)
+                          ->withQueryString();
+
+            Log::info('Users fetched (page): ' . $users->count() . ', total: ' . $users->total());
+
+            return view('admin.users.index', compact('users'));
+        } catch (\Exception $e) {
+            Log::error('Error in UserController@index: ' . $e->getMessage());
+            return redirect()->route('admin.users')->with('error', 'Lỗi khi tải danh sách người dùng: ' . $e->getMessage());
+        }
     }
 
     public function show($id)

@@ -10,12 +10,36 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Log::info('OrderController@index called, fetching orders');
-        $orders = Order::with('user', 'delivery')->get();
-        Log::info('Orders fetched: ' . $orders->count() . ' items');
-        return view('admin.orders.index', compact('orders'));
+
+        try {
+            $query = Order::with('user', 'delivery');
+
+            if ($request->filled('search')) {
+                $searchTerm = $request->input('search');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('order_id', 'LIKE', "%{$searchTerm}%")
+                      ->orWhereHas('user', function ($q) use ($searchTerm) {
+                          $q->where('full_name', 'LIKE', "%{$searchTerm}%");
+                      })
+                      ->orWhere('status', 'LIKE', "%{$searchTerm}%");
+                });
+                Log::info('Order search: ' . $searchTerm);
+            }
+
+            $orders = $query->orderBy('order_id', 'desc')
+                           ->paginate(10)
+                           ->withQueryString();
+
+            Log::info('Orders fetched (page): ' . $orders->count() . ', total: ' . $orders->total());
+
+            return view('admin.orders.index', compact('orders'));
+        } catch (\Exception $e) {
+            Log::error('Error in OrderController@index: ' . $e->getMessage());
+            return redirect()->route('admin.orders')->with('error', 'Lỗi khi tải danh sách đơn hàng: ' . $e->getMessage());
+        }
     }
 
     public function show($id)
