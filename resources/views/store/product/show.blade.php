@@ -182,16 +182,16 @@
                                 {{-- nội dung --}}
                                 <div class="min-w-0 flex-1 pl-4">
                                     <div class="flex items-start gap-2">
-                                        <p class="font-semibold text-gray-900 leading-6 truncate">{{ $title }}</p>
-
-
+                                        @if($offText)
+                                        <p class="font-semibold text-gray-900 leading-6 truncate">{{ $offText }}</p>
+                                        @endif
                                     </div>
 
                                     <div class="mt-1 text-xs text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
-                                        @if($offText)
+                                        @if($title)
                                         <span class="inline-flex items-center gap-1">
                                             <span class="px-1.5 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-600">
-                                                {{ $offText }}
+                                                {{ $title }}
                                             </span>
                                         </span>
                                         @endif
@@ -206,7 +206,7 @@
 
                                     <div class="mt-2 flex items-center gap-2">
                                         <div class="text-xs bg-white border border-gray-200 rounded px-2 py-0.5">
-                                            Mã: <span class="font-mono">{{ $code }}</span>
+                                            Mã: <span class="font-bold ">{{ $code }}</span>
                                         </div>
                                         <button type="button"
                                             onclick="window.copyCoupon('{{ $code }}')"
@@ -265,89 +265,276 @@
         </div>
         @endif
 
-        {{-- Đánh giá --}}
+        {{-- ĐÁNH GIÁ --}}
         <div class="mt-6 bg-white rounded-2xl shadow-lg p-6">
             <h2 class="text-xl font-semibold mb-4">Đánh giá sản phẩm</h2>
 
+
             <div class="grid lg:grid-cols-[340px,1fr] gap-6">
-                {{-- Tổng quan --}}
-                <div class="flex items-center gap-5 bg-white rounded-xl">
-                    <div class="text-5xl font-bold text-yellow-500">{{ number_format($avg ?? 0,1) }}</div>
+                {{-- TỔNG QUAN (trái) --}}
+                <div class="flex items-start  gap-5 justify-self-start">
+                    <div class="text-5xl font-bold text-yellow-500 flex items-center justify-center min-h-[100px]">{{ number_format($avg ?? 0,1) }}</div>
                     <div class="flex-1">
                         @php $t = $total ?? 0; @endphp
-                        @for($star=5;$star>=1;$star--)
+
+                        @for($row=5; $row>=1; $row--)
                         @php
-                        $count = $dist[$star] ?? 0;
-                        $percent = $t ? round($count*100/$t) : 0;
+                        $count = (int)($dist[$row] ?? 0);
+                        $percent = $t ? round($count * 100 / $t) : 0;
                         @endphp
+
                         <div class="flex items-center gap-3 text-sm mb-2">
-                            <div class="w-12 text-gray-600">{{ $star }} <span class="text-yellow-500">★</span></div>
-                            <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="h-2 bg-yellow-400" style="width: {{ $percent }}%"></div>
+                            {{-- 5 sao bên trái: đầy = vàng, rỗng = viền xám --}}
+                            <div class="flex w-[110px] shrink-0">
+                                @for($s=1; $s<=5; $s++)
+                                    @php $filled=$s <=$row; @endphp
+                                    <svg class="w-4 h-4 mr-1 {{ $filled ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 17.3l-5.46 3.2 1.46-6.04L3 9.76l6.17-.52L12 3.5l2.83 5.74 6.17.52-5 4.7 1.46 6.04z" />
+                                    </svg>
+                                    @endfor
                             </div>
-                            <div class="w-10 text-right text-gray-600">{{ $count }}</div>
+
+                            {{-- thanh %: luôn có nền xám; chỉ vẽ thanh vàng khi >0% --}}
+                            <div class="relative grow min-w-[160px] h-2 rounded-full bg-gray-200/90 overflow-hidden">
+                                @if($percent > 0)
+                                <div class="absolute grow min-w-[160px] inset-y-0 left-0 rounded-full
+                    bg-gradient-to-b from-amber-300 to-amber-400
+                    shadow-[inset_0_0_0_1px_rgba(251,191,36,.35)]"
+                                    style="width: {{ $percent }}%"></div>
+                                @endif
+                            </div>
+
+
+                            {{-- số lượt --}}
+                            <div class="w-8 text-right text-gray-600 tabular-nums">{{ $count }}</div>
                         </div>
                         @endfor
+
                         <div class="text-xs text-gray-500 mt-1">{{ number_format($t) }} đánh giá</div>
                     </div>
                 </div>
 
-                {{-- Form + danh sách --}}
-                <div class="space-y-6">
-                    @auth
-                    <form action="{{ route('store.product.review.store', $product->product_id) }}"
-                        method="POST" class="border border-gray-100 rounded-xl p-4 shadow-lg">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="block text-sm text-gray-600 mb-1">Chọn số sao</label>
-                            <div class="flex gap-2">
-                                @for($i=1;$i<=5;$i++)
-                                    <label class="cursor-pointer">
-                                    <input type="radio" name="rating" value="{{ $i }}" class="sr-only"
-                                        onclick="document.getElementById('starV').innerText={{$i}};">
-                                    <span class="inline-flex items-center justify-center w-9 h-9 border rounded text-yellow-500">★</span>
-                                    </label>
-                                    @endfor
-                            </div>
-                            <div class="text-xs text-gray-500 mt-1">Đã chọn: <span id="starV">0</span> sao</div>
-                            @error('rating')<div class="text-rose-600 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                        <textarea name="comment" rows="3" placeholder="Chia sẻ cảm nhận của bạn..."
-                            class="w-full border rounded-lg p-3"></textarea>
-                        @error('comment')<div class="text-rose-600 text-sm">{{ $message }}</div>@enderror
-                        <div class="mt-3">
-                            <button class="h-10 px-5 rounded-full bg-blue-600 text-white font-medium shadow-lg">Gửi đánh giá</button>
-                        </div>
-                    </form>
-                    @else
-                    <div class="text-sm text-gray-600">
-                        <a class="text-blue-600 underline" href="{{ route('login') }}">Đăng nhập</a> để viết đánh giá.
+                {{-- CỤM "ĐÁNH GIÁ SẢN PHẨM" (phải) --}}
+                <div class="flex items-center justify-between rounded-2xl border border-gray-200 p-4
+                    w-full lg:w-auto lg:justify-self-end">
+                    <div class="text-sm text-gray-700 font-medium mr-3">Đánh giá sản phẩm</div>
+                    <div id="rv-star-group" class="flex items-center gap-2">
+                        @for($i=1;$i<=5;$i++)
+                            <button
+                            type="button"
+                            class="rv-star inline-grid place-items-center w-10 h-10 rounded border border-gray-500 text-gray-500 transition-colors"
+                            data-open-review="true"
+                            data-star="{{ $i }}"
+                            aria-label="{{ $i }} sao">★</button>
+                            @endfor
                     </div>
-                    @endauth
-
-                    @forelse(($comments ?? collect()) as $cmt)
-                    <div class="border-t pt-4 first:border-t-0 first:pt-0">
-                        <div class="flex items-center gap-2 text-sm">
-                            <span class="font-medium">{{ $cmt->user->name ?? 'Khách' }}</span>
-                            <span class="text-gray-400">•</span>
-                            <span class="text-gray-500">
-                                {{ \Carbon\Carbon::parse($cmt->comment_date)->diffForHumans() }}
-                            </span>
-                        </div>
-                        <div class="text-yellow-500 mt-1">
-                            {{ str_repeat('★', (int)$cmt->rating) }}
-                            <span class="text-gray-300">{{ str_repeat('★', 5-(int)$cmt->rating) }}</span>
-                        </div>
-                        @if($cmt->comment)
-                        <div class="mt-1 text-gray-800">{{ $cmt->comment }}</div>
-                        @endif
-                    </div>
-                    @empty
-                    <div class="text-sm text-gray-500">Chưa có đánh giá nào.</div>
-                    @endforelse
                 </div>
             </div>
+
+            {{-- DANH SÁCH BÌNH LUẬN --}}
+            <div class="mt-6 space-y-6">
+                @forelse(($comments ?? collect()) as $cmt)
+                <div class="border-t pt-4 first:border-t-0 first:pt-0">
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="font-medium">{{ $cmt->user->name ?? 'Khách' }}</span>
+                        <span class="text-gray-400">•</span>
+                        <span class="text-gray-500">{{ \Carbon\Carbon::parse($cmt->comment_date)->diffForHumans() }}</span>
+                    </div>
+                    <div class="text-yellow-500 mt-1">
+                        {{ str_repeat('★', (int)$cmt->rating) }}<span class="text-gray-300">{{ str_repeat('★', 5-(int)$cmt->rating) }}</span>
+                    </div>
+                    @if($cmt->comment)
+                    <div class="mt-1 text-gray-800">{{ $cmt->comment }}</div>
+                    @endif
+                </div>
+                @empty
+                <div class="text-sm text-gray-500">Chưa có đánh giá nào.</div>
+                @endforelse
+            </div>
         </div>
+
+        {{-- ===== POPUP VIẾT ĐÁNH GIÁ ===== --}}
+        @auth
+        <div id="rv-modal" class="fixed inset-0 z-[70] hidden">
+            {{-- overlay --}}
+            <div class="absolute inset-0 bg-black/40"></div>
+
+            {{-- modal --}}
+            <div class="relative max-w-xl w-[90%] mx-auto mt-20 bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <div class="bg-[#144591] text-white font-semibold text-center py-3">ĐÁNH GIÁ SẢN PHẨM</div>
+
+                <form id="rv-form" action="{{ route('store.product.review.store', $product->product_id) }}"
+                    method="POST" enctype="multipart/form-data" class="p-5">
+                    @csrf
+                    <input type="hidden" name="rating" id="rv-rating" value="5">
+
+                    {{-- Header sản phẩm + Chọn sao (giữa popup) --}}
+                    <div class="mb-4">
+                        {{-- Header sản phẩm: căn giữa --}}
+                        <div class="flex flex-col items-center text-center gap-2 mb-3">
+                            <img class="w-14 h-14 object-contain"
+                                src="{{ Str::startsWith($product->image_url, ['http://','https://']) ? $product->image_url : asset('storage/'.$product->image_url) }}"
+                                alt="">
+                            <div class="font-medium max-w-[90%]">{{ $product->product_name }}</div>
+                        </div>
+
+                        {{-- Chọn sao: giống cụm bên ngoài, hover tô vàng liên tiếp --}}
+                        <div class="flex flex-col items-center">
+                            <div id="rvm-star-group" class="flex items-center gap-2 mb-2">
+                                @for($i=1;$i<=5;$i++)
+                                    <button type="button"
+                                    class="rvm-star inline-grid place-items-center w-10 h-10 rounded border
+                               border-gray-300 text-gray-500 transition-colors select-none"
+                                    data-star="{{ $i }}" aria-label="{{ $i }} sao">★</button>
+                                    @endfor
+                            </div>
+                            <div id="rvm-label" class="text-sm text-gray-600">Hài lòng</div>
+                        </div>
+                    </div>
+
+                    {{-- Viết đánh giá --}}
+                    <label class="block text-sm text-gray-700 mb-1">Viết đánh giá*</label>
+                    <textarea name="comment" id="rvm-comment" rows="4" maxlength="500"
+                        placeholder="Hãy chia sẻ đánh giá của bạn về sản phẩm"
+                        class="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    <div class="text-xs text-gray-500 text-right" id="rvm-count">0/500 ký tự</div>
+
+                    {{-- Ảnh đánh giá (UI mô phỏng, có thể lưu hoặc bỏ qua phía server) --}}
+                    <div class="mt-3">
+                        <div class="text-sm text-gray-700 mb-1">Hình ảnh đánh giá <span class="text-xs text-gray-500">(jpg, jpeg, png)</span></div>
+                        <label class="inline-flex items-center justify-center w-16 h-16 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                            <span class="text-2xl">+</span>
+                            <input type="file" name="images[]" accept=".jpg,.jpeg,.png" class="hidden" multiple>
+                        </label>
+                    </div>
+
+                    <div class="mt-5 flex items-center justify-end gap-3">
+                        <button type="button" id="rv-cancel" class="px-4 py-2 rounded-lg border">Hủy</button>
+                        <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Gửi đánh giá</button>
+                    </div>
+                </form>
+
+                <button type="button" id="rv-close"
+                    class="absolute right-3 top-2 text-white/90 hover:text-white text-xl leading-none">×</button>
+            </div>
+        </div>
+        @else
+        {{-- nếu chưa đăng nhập: click sao sẽ chuyển tới login --}}
+        <form id="rv-login-redirect" action="{{ route('login') }}" method="GET"></form>
+        @endauth
+
+        {{-- JS nhỏ cho popup & sao --}}
+        <script>
+            (function() {
+                const openBtns = document.querySelectorAll('[data-open-review]');
+                const modal = document.getElementById('rv-modal');
+                const closeBtns = [document.getElementById('rv-close'), document.getElementById('rv-cancel')];
+                const body = document.body;
+
+                // ======= CỤM SAO Ở BÊN NGOÀI (trên trang) =======
+                const starGroup = document.getElementById('rv-star_group') || document.getElementById('rv-star-group'); // fallback
+                if (starGroup) {
+                    const rvStars = starGroup.querySelectorAll('.rv-star');
+
+                    const paintOutside = (n = 0) => {
+                        rvStars.forEach(s => {
+                            const v = parseInt(s.dataset.star, 10);
+                            const filled = v <= n;
+                            s.classList.toggle('bg-amber-400', filled);
+                            s.classList.toggle('border-amber-400', filled);
+                            s.classList.toggle('text-white', filled);
+                            s.classList.toggle('text-gray-500', !filled);
+                            s.classList.toggle('border-gray-300', !filled);
+                        });
+                    };
+
+                    rvStars.forEach(s => {
+                        s.addEventListener('mouseenter', () => paintOutside(parseInt(s.dataset.star, 10)));
+                    });
+                    starGroup.addEventListener('mouseleave', () => paintOutside(0));
+                }
+
+                // ======= SAO TRONG POPUP =======
+                const ratingInput = document.getElementById('rv-rating'); // hidden input
+                const rvmGroup = document.getElementById('rvm-star-group'); // <div id="rvm-star-group">...</div>
+                const rvmStars = rvmGroup ? rvmGroup.querySelectorAll('.rvm-star') : [];
+                const rvmLabel = document.getElementById('rvm-label');
+                const labels = {
+                    1: 'Tệ',
+                    2: 'Không hài lòng',
+                    3: 'Bình thường',
+                    4: 'Hài lòng',
+                    5: 'Tuyệt vời'
+                };
+
+                let selected = parseInt(ratingInput?.value || '5', 10);
+
+                function paintModal(n) {
+                    rvmStars.forEach(btn => {
+                        const v = parseInt(btn.dataset.star, 10);
+                        const filled = v <= n;
+                        btn.classList.toggle('bg-amber-400', filled);
+                        btn.classList.toggle('border-amber-400', filled);
+                        btn.classList.toggle('text-white', filled);
+                        btn.classList.toggle('text-gray-500', !filled);
+                        btn.classList.toggle('border-gray-300', !filled);
+                    });
+                    if (rvmLabel) rvmLabel.textContent = labels[n] || 'Hài lòng';
+                }
+
+                function applyModalRating(n) {
+                    selected = n;
+                    if (ratingInput) ratingInput.value = n;
+                    paintModal(selected);
+                }
+
+                // hover + click trong popup
+                rvmStars.forEach(btn => {
+                    const v = parseInt(btn.dataset.star, 10);
+                    btn.addEventListener('mouseenter', () => paintModal(v)); // preview
+                    btn.addEventListener('click', () => applyModalRating(v)); // chọn
+                });
+                if (rvmGroup) {
+                    rvmGroup.addEventListener('mouseleave', () => paintModal(selected));
+                }
+                // khởi tạo lần đầu
+                paintModal(selected);
+
+                // ======= MỞ / ĐÓNG POPUP =======
+                openBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        @auth
+                        const preset = parseInt(btn.dataset.star || '5', 10);
+                        applyModalRating(preset); // preset đúng số sao
+                        modal.classList.remove('hidden');
+                        body.style.overflow = 'hidden';
+                        @else
+                        document.getElementById('rv-login-redirect').submit();
+                        @endauth
+                    });
+                });
+
+                closeBtns.forEach(b => b && b.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    body.style.overflow = '';
+                }));
+                if (modal) {
+                    modal.addEventListener('click', e => {
+                        if (e.target === modal) {
+                            modal.classList.add('hidden');
+                            body.style.overflow = '';
+                        }
+                    });
+                }
+
+                // ======= Đếm ký tự =======
+                const ta = document.getElementById('rvm-comment');
+                const cnt = document.getElementById('rvm-count');
+                if (ta && cnt) {
+                    ta.addEventListener('input', () => cnt.textContent = (ta.value.length || 0) + '/500 ký tự');
+                }
+            })();
+        </script>
 
     </div>
 </div>
