@@ -10,16 +10,36 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+
 class BrandController extends Controller
 {
-    public function index()
-    {
-        Log::info('BrandController@index called, fetching brands');
-        $brands = Brand::withCount('products')->orderBy('brand_name', 'asc')->get();
-        $totalBrands = $brands->count();
-        Log::info('Brands fetched: ' . $totalBrands . ' items');
-        return view('admin.brands.index', compact('brands', 'totalBrands'));
+ 
+
+public function index(Request $request)
+{
+    \Log::info('BrandController@index called, fetching brands');
+
+    // Tổng số thương hiệu (tất cả) để hiển thị
+    $totalBrands = Brand::count();
+
+    // Truy vấn danh sách brands có đếm số sản phẩm
+    $query = Brand::withCount('products');
+
+    // Nếu có tìm kiếm
+    if ($request->filled('search')) {
+        $search = $request->input('search');
+        $query->where('brand_name', 'like', '%' . $search . '%');
+        \Log::info('Brand search: ' . $search);
     }
+
+    // Phân trang 10 thương hiệu / trang
+    $brands = $query->orderBy('brand_name', 'asc')
+                    ->paginate(10)
+                    ->withQueryString();
+
+    return view('admin.brands.index', compact('brands', 'totalBrands'));
+}
+
 
     public function create()
     {
