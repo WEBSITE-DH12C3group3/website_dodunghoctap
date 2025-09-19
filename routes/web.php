@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Store\HomeController;
 use App\Http\Controllers\Store\ProfileController;
+use App\Http\Controllers\Store\ProductShowController;
+use App\Http\Controllers\Store\CartController;
+use App\Http\Controllers\Store\ProductReviewController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -11,9 +14,6 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\StatsController;
-use App\Http\Controllers\Store\ProductShowController;
-use App\Http\Controllers\Store\CartController;
-use App\Http\Controllers\Store\ProductReviewController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\BrandController;
 
@@ -24,8 +24,14 @@ require __DIR__ . '/auth.php';
 
 Route::get('/', [HomeController::class, 'index'])->name('store.index');
 
-Route::get('/categories', fn() => 'all categories')->name('store.categories.index');
-Route::get('/category/{id}', fn($id) => "category $id")->name('store.category');
+// routes/web.php
+use App\Http\Controllers\Store\ProductListController;
+
+Route::get('/products',            [ProductListController::class, 'index'])->name('store.product.index');
+Route::get('/category/{id}',       [ProductListController::class, 'category'])->name('store.category');
+Route::get('/newProduct',          [ProductListController::class, 'new'])->name('store.product.new');
+Route::get('/bestSeller',          [ProductListController::class, 'best'])->name('store.product.best');
+Route::get('/featured',            [ProductListController::class, 'featured'])->name('store.product.featured');
 
 Route::get('/product/{id}', [ProductShowController::class, 'show'])
     ->whereNumber('id')
@@ -34,15 +40,7 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
-// Route::post('/buy-now', [CartController::class, 'buyNow'])->name('cart.buy_now');
-// Route::get('/checkout', [CartController::class, 'checkout'])->name('store.checkout.index');
-Route::post('/product/{id}/review', [ProductReviewController::class, 'store'])
-    ->middleware('auth')   // nếu muốn cho khách cũng đánh giá thì bỏ middleware
-    ->name('store.product.review.store');
 
-Route::get('/products/new', fn() => 'new products')->name('store.products.new');
-Route::get('/products/best', fn() => 'best sellers')->name('store.products.best');
-Route::get('/products/featured', fn() => 'featured products')->name('store.products.featured');
 Route::get('/search', fn() => 'search')->name('store.search');
 
 Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
@@ -51,6 +49,7 @@ Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogle
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/product/{id}/review', [ProductReviewController::class, 'store'])->name('store.product.review.store');
 });
 
 Route::middleware('auth')->group(function () {

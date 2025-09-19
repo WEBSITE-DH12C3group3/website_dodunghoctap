@@ -10,7 +10,9 @@
         <nav class="text-sm text-gray-500 mb-4">
             <a href="{{ url('/') }}" class="hover:text-blue-600">Trang chủ</a>
             <span class="mx-2">/</span>
-            <a href="{{ route('store.categories.index') }}" class="hover:text-blue-600">Danh mục</a>
+            <a href="{{ $product->category_id ? route('store.category', $product->category->category_id) : '#' }}" class="hover:text-blue-600">
+                {{ $product->category->category_name ?? 'Danh mục' }}
+            </a>
             <span class="mx-2">/</span>
             <span class="mx-2">{{ $product->product_name }}</span>
         </nav>

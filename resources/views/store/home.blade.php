@@ -24,7 +24,7 @@
     @include('store.partials.product-grid', [
     'title' => 'Sản phẩm mới',
     'items' => $newProducts,
-    'moreUrl' => route('store.products.new'),
+    'moreUrl' => route('store.product.new'),
     ])
     {{-- BANNER NHỎ --}}
     <section class="mb-8 md:mb-10">
@@ -36,13 +36,13 @@
     @include('store.partials.product-grid', [
     'title' => 'Bán chạy',
     'items' => $bestSellers,
-    'moreUrl' => route('store.products.best'),
+    'moreUrl' => route('store.product.best'),
     ])
     {{-- NỔI BẬT --}}
     @include('store.partials.product-grid', [
     'title' => 'Nổi bật',
     'items' => $featured,
-    'moreUrl' => route('store.products.featured'),
+    'moreUrl' => route('store.product.featured'),
     ])
 </main>
 @endsection
