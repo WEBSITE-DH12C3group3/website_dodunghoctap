@@ -273,7 +273,7 @@
             <div class="grid lg:grid-cols-[340px,1fr] gap-6">
                 {{-- TỔNG QUAN (trái) --}}
                 <div class="flex items-start  gap-5 justify-self-start">
-                    <div class="text-5xl font-bold text-yellow-500">{{ number_format($avg ?? 0,1) }}</div>
+                    <div class="text-5xl font-bold text-yellow-500 flex items-center justify-center min-h-[100px]">{{ number_format($avg ?? 0,1) }}</div>
                     <div class="flex-1">
                         @php $t = $total ?? 0; @endphp
 

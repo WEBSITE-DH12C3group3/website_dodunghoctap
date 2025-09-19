@@ -95,19 +95,25 @@ $brandLogo = $brandLogo ?? asset('images/logoo.svg');
                         </span>
                     </a>
                     @endauth
-
                     {{-- Giỏ hàng --}}
                     <a href="{{ route('cart.index') }}" class="flex items-center gap-3 text-white/95 hover:text-white">
-                        <span class="inline-grid place-items-center h-9 w-9 rounded-full bg-[#0D2E69] ring-1 ring-white/10 shadow">
+                        <!-- Vòng tròn icon làm cha tương đối -->
+                        <span class="relative inline-grid place-items-center h-9 w-9 rounded-full bg-[#0D2E69] ring-1 ring-white/10 shadow">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-fill" viewBox="0 0 16 16">
                                 <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4z" />
                             </svg>
+
+                            @if(($cartCount ?? 0) > 0)
+                            <!-- Badge bám góc trên-phải của vòng tròn -->
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] leading-none rounded-full h-4 min-w-[16px] px-1 grid place-items-center">
+                                {{ $cartCount }}
+                            </span>
+                            @endif
                         </span>
-                        <span class="hidden sm:inline block font-extrabold text-[15px] ">Giỏ hàng</span>
-                        @if(($cartCount ?? 0) > 0)
-                        <span class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center">{{ $cartCount }}</span>
-                        @endif
+
+                        <span class="hidden sm:inline block font-extrabold text-[15px]">Giỏ hàng</span>
                     </a>
+
                 </div>
 
             </div>
