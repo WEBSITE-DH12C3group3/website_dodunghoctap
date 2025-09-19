@@ -294,15 +294,22 @@
                                     @endfor
                             </div>
 
-                            {{-- thanh %: luôn có nền xám; chỉ vẽ thanh vàng khi >0% --}}
-                            <div class="relative grow min-w-[160px] h-2 rounded-full bg-gray-200/90 overflow-hidden">
+                            {{-- thanh %: nền xám luôn hiển thị; vàng theo % --}}
+                            @php
+                            $percent = $t ? ($count * 100 / $t) : 0; // không round cứng
+                            $percent = max(0, min(100, $percent)); // clamp 0..100
+                            $percentCss = number_format($percent, 2, '.', ''); // "50.00"
+                            @endphp
+
+                            <div class="relative flex-1 min-w-[160px] h-2 rounded-full bg-gray-200/90 overflow-hidden">
                                 @if($percent > 0)
-                                <div class="absolute grow min-w-[160px] inset-y-0 left-0 rounded-full
+                                <div class="absolute left-0 top-0 h-full
                     bg-gradient-to-b from-amber-300 to-amber-400
                     shadow-[inset_0_0_0_1px_rgba(251,191,36,.35)]"
-                                    style="width: {{ $percent }}%"></div>
+                                    style="width: {{ $percentCss }}%"></div>
                                 @endif
                             </div>
+
 
 
                             {{-- số lượt --}}

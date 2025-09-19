@@ -21,26 +21,11 @@
     </section>
 
     {{-- SẢN PHẨM MỚI --}}
-    <section class="mb-8 md:mb-10">
-        <div class="flex items-center justify-between mb-3 md:mb-4">
-            <h2 class="text-lg md:text-xl font-semibold">Sản phẩm mới</h2>
-            <a href="{{ route('store.products.new') }}" class="text-blue-700 hover:underline text-sm">Xem tất cả</a>
-        </div>
-        @if($products->count())
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            @foreach($products as $p)
-            @include('store.partials.product-card', ['product' => $p])
-            @endforeach
-        </div>
-
-        <div class="mt-6">
-            {{ $products->onEachSide(1)->links() }}
-        </div>
-        @else
-        <p>Chưa có sản phẩm.</p>
-        @endif
-    </section>
-
+    @include('store.partials.product-grid', [
+    'title' => 'Sản phẩm mới',
+    'items' => $newProducts,
+    'moreUrl' => route('store.products.new'),
+    ])
     {{-- BANNER NHỎ --}}
     <section class="mb-8 md:mb-10">
         <a href="#" class="block overflow-hidden rounded-2xl bg-gray-100 aspect-[16/4]">
@@ -48,34 +33,16 @@
         </a>
     </section>
     {{-- BÁN CHẠY --}}
-    <section class="mb-8 md:mb-10">
-        <div class="flex items-center justify-between mb-3 md:mb-4">
-            <h2 class="text-lg md:text-xl font-semibold">Bán chạy</h2>
-            <a href="{{ route('store.products.best') }}" class="text-blue-700 hover:underline text-sm">Xem tất cả</a>
-        </div>
-        <div class="grid gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            @forelse($bestSellers as $p)
-            @include('store.partials.product-card', ['p' => $p])
-            @empty
-            <p class="col-span-full text-gray-500">Chưa có dữ liệu.</p>
-            @endforelse
-        </div>
-    </section>
-
+    @include('store.partials.product-grid', [
+    'title' => 'Bán chạy',
+    'items' => $bestSellers,
+    'moreUrl' => route('store.products.best'),
+    ])
     {{-- NỔI BẬT --}}
-    <section class="mb-4 md:mb-12">
-        <div class="flex items-center justify-between mb-3 md:mb-4">
-            <h2 class="text-lg md:text-xl font-semibold">Nổi bật</h2>
-            <a href="{{ route('store.products.featured') }}" class="text-blue-700 hover:underline text-sm">Xem tất cả</a>
-        </div>
-        <div class="grid gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            @forelse($featured as $p)
-            @include('store.partials.product-card', ['p' => $p])
-            @empty
-            <p class="col-span-full text-gray-500">Chưa có dữ liệu.</p>
-            @endforelse
-        </div>
-    </section>
-
+    @include('store.partials.product-grid', [
+    'title' => 'Nổi bật',
+    'items' => $featured,
+    'moreUrl' => route('store.products.featured'),
+    ])
 </main>
 @endsection

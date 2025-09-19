@@ -31,6 +31,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
 
+    // public function comments()
+    // {
+    //     return $this->hasMany(Comment::class, 'user_id', 'user_id');
+    // }
+
     public function hasPermission($permission)
     {
         return $this->role && $this->role->permissions()->where('permission_name', $permission)->exists();
