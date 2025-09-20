@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Log;
 
 require __DIR__ . '/auth.php';
 
-Route::get('/', [HomeController::class, 'index'])->name('store.index');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // routes/web.php
 use App\Http\Controllers\Store\ProductListController;

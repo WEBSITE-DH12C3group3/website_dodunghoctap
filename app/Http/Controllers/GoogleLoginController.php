@@ -7,6 +7,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class GoogleLoginController extends Controller
 {
@@ -15,15 +16,16 @@ class GoogleLoginController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-
     public function redirectToGoogle()
     {
-        \Log::info('Redirecting to Google'); // Ghi log
-        return Socialite::driver('google')->redirect();
+        Log::info('Redirecting to Google');
+        try {
+            return Socialite::driver('google')->redirect();
+        } catch (\Exception $e) {
+            Log::error('Google redirect failed: ' . $e->getMessage());
+            return redirect('/login')->with('error', 'Không thể kết nối với Google. Vui lòng thử lại.');
+        }
     }
-
-
-
 
     /**
      * Xử lý callback từ Google sau khi xác thực.
@@ -35,38 +37,32 @@ class GoogleLoginController extends Controller
         try {
             // Lấy thông tin người dùng từ Google
             $googleUser = Socialite::driver('google')->stateless()->user();
+            Log::info('Google user retrieved: ' . $googleUser->email);
 
-            // Tìm user theo email
-            $user = User::where('email', $googleUser->email)->first();
+            // Tìm hoặc tạo user
+            $user = User::updateOrCreate(
+                ['email' => $googleUser->email],
+                [
+                    'full_name' => $googleUser->getName(),
+                    'google_id' => $googleUser->getId(),
+                    'role_id' => 3,
+                    'password' => Hash::make(rand(100000, 999999)),
+                    'is_active' => 1,
+                ]
+            );
+            Log::info('User processed: ' . $user->id);
 
-            if ($user) {
-                // Nếu user tồn tại, cập nhật google_id và avatar nếu cần
-                if (!$user->google_id) {
-                    $user->update([
-                        'google_id' => $googleUser->id,
-                        'avatar' => $googleUser->avatar ?? null,
-                    ]);
-                }
-            } else {
-                // Tạo user mới nếu chưa tồn tại
-                $user = User::create([
-                    'name' => $googleUser->name,
-                    'email' => $googleUser->email,
-                    'google_id' => $googleUser->id,
-                    'avatar' => $googleUser->avatar ?? null,
-                    'password' => Hash::make(rand(100000, 999999)), // Password ngẫu nhiên
-                ]);
-            }
-
-
-
-            // Đăng nhập user
+            // Đăng nhập user và tái tạo session
             Auth::login($user);
+            session()->regenerate();
+            Log::info('User logged in: ' . $user->id);
 
-            // Chuyển hướng đến dashboard (hoặc trang mong muốn)
-            return redirect()->intended('/dashboard');
+            // Chuyển hướng đến trang home
+            $redirect = redirect()->route('home')->with('success', 'Đăng nhập thành công!');
+            Log::info('Redirecting to: ' . route('home') . ', Response: ' . $redirect->getTargetUrl());
+            return $redirect;
         } catch (\Exception $e) {
-            // Xử lý lỗi và chuyển hướng về login
+            Log::error('Google callback failed: ' . $e->getMessage());
             return redirect('/login')->with('error', 'Đăng nhập Google thất bại: ' . $e->getMessage());
         }
     }

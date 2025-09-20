@@ -20,6 +20,7 @@ class User extends Authenticatable
         'role_id',
         'is_active',
         'last_activity',
+        'google_id',
     ];
 
     protected $casts = [
