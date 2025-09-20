@@ -96,21 +96,45 @@ class ProductListController extends Controller
     public function index(Request $r)
     {
         $data = $this->buildListing($r, null);
+      if ($r->ajax()) {
+        return response()->json([
+            'html' => view('store.product._grid', $data)->render(), // đường dẫn đúng với file _grid.blade.php
+        ]);
+    
+}
         return view('store.product.index', $data);
     }
     public function new(Request $r)
     {
         $data = $this->buildListing($r, 'new');
+        if (request()->ajax()) {
+    // Chỉ trả phần grid + pagination
+    return response()->json([
+        'html' => view('store.products._grid', $data)->render(),
+    ]);
+}
         return view('store.product.index', $data);
     }
     public function best(Request $r)
     {
         $data = $this->buildListing($r, 'best');
+        if (request()->ajax()) {
+    // Chỉ trả phần grid + pagination
+    return response()->json([
+        'html' => view('store.products._grid', $data)->render(),
+    ]);
+}
         return view('store.product.index', $data);
     }
     public function featured(Request $r)
     {
         $data = $this->buildListing($r, 'featured');
+        if (request()->ajax()) {
+    // Chỉ trả phần grid + pagination
+    return response()->json([
+        'html' => view('store.products._grid', $data)->render(),
+    ]);
+}
         return view('store.product.index', $data);
     }
     public function category(Request $r, $id)
@@ -118,16 +142,22 @@ class ProductListController extends Controller
         $id = (int) $id;
 
         // Nếu URL như /category/13?category=11 -> chuyển về /category/11 (giữ brand/price/sort)
-        if ($r->filled('category') && (int)$r->category !== $id) {
-            $q = $r->query();
-            unset($q['category'], $q['page']); // bỏ category trùng & trang cũ
-            return redirect()->route('store.category', ['id' => (int)$r->category] + $q);
-        }
+        // if ($r->filled('category') && (int)$r->category !== $id) {
+        //     $q = $r->query();
+        //     unset($q['category'], $q['page']); // bỏ category trùng & trang cũ
+        //     return redirect()->route('store.category', ['id' => (int)$r->category] + $q);
+        // }
 
-        // Không cho buildListing áp dụng thêm query category lần nữa
-        $r->query->remove('category');
+        // // Không cho buildListing áp dụng thêm query category lần nữa
+        // $r->query->remove('category');
 
         $data = $this->buildListing($r, ['category_id' => $id]);
+        if (request()->ajax()) {
+    // Chỉ trả phần grid + pagination
+    return response()->json([
+        'html' => view('store.products._grid', $data)->render(),
+    ]);
+}
         return view('store.product.index', $data);
     }
 }

@@ -9,173 +9,163 @@
     </div> -->
 
     <div class="grid grid-cols-12 gap-5">
-        @php
-        // helper giữ lại query khi đổi filter
-        function keep_query_except($except) {
-        $html = '';
-        foreach(request()->except($except) as $k=>$v){
-        if(is_array($v)){ foreach($v as $vv){ $html.="<input type='hidden' name='{$k}[]' value='".e($vv)."'>"; }
-        }else{ $html.="<input type='hidden' name='{$k}' value='".e($v)."'>"; }
-        } return $html;
-        }
-        @endphp
+      @php
+  $kept = collect(request()->query())->except(['category','page']); // đổi key cho phù hợp 'brand','price' ở form tương ứng
+@endphp
 
-        <aside class="col-span-12 md:col-span-3 space-y-5 md:sticky md:top-4 self-start">
-            {{-- Danh mục (đơn chọn) --}}
-            <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
-                <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Loại sản phẩm</div>
-
-                <form id="form-category" class="space-y-2" onchange="gotoCategory(event)">
-                    {{-- giữ lại query TRỪ category & page --}}
-                    @foreach(collect(request()->query())->except(['category','page']) as $k => $v)
-                    @if(is_array($v))
-                    @foreach($v as $vv) <input type="hidden" name="{{ $k }}[]" value="{{ e($vv) }}"> @endforeach
-                    @else
-                    <input type="hidden" name="{{ $k }}" value="{{ e($v) }}">
-                    @endif
-                    @endforeach
-
-                    @foreach($categories as $c)
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="category" value="{{ $c->category_id }}"
-                            class="h-4 w-4 accent-blue-600"
-                            {{ (string)$category === (string)$c->category_id ? 'checked' : '' }}>
-                        <span class="text-sm text-gray-700">{{ $c->category_name }}</span>
-                    </label>
-                    @endforeach
-                </form>
-            </div>
-
-            <script>
-                function gotoCategory(e) {
-                    const form = document.getElementById('form-category');
-                    const picked = form.querySelector('input[name="category"]:checked');
-                    if (!picked) return;
-                    const params = new URLSearchParams(new FormData(form));
-                    // /category/{id}?brand=..&price=..&sort=..
-                    const url = "{{ url('/category') }}/" + encodeURIComponent(picked.value) + "?" + params.toString();
-                    window.location.href = url;
-                }
-            </script>
+@foreach($kept as $k => $v)
+  @if(is_array($v))
+    @foreach($v as $vv)
+      <input type="hidden" name="{{ $k }}[]" value="{{ e($vv) }}">
+    @endforeach
+  @else
+    <input type="hidden" name="{{ $k }}" value="{{ e($v) }}">
+  @endif
+@endforeach
 
 
-            {{-- Thương hiệu (đơn chọn) --}}
-            <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
-                <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Thương hiệu</div>
-                <form method="GET" class="space-y-2">
-                    {!! keep_query_except('brand') !!}
-                    @foreach($brands as $b)
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="brand" value="{{ $b->brand_id }}"
-                            class="h-4 w-4 accent-blue-600"
-                            {{ (string)$brand===(string)$b->brand_id ? 'checked' : '' }}
-                            onchange="this.form.submit()">
-                        <span class="text-sm text-gray-700">{{ $b->brand_name }}</span>
-                    </label>
-                    @endforeach
-                </form>
-            </div>
+<aside class="col-span-12 md:col-span-3 space-y-5 md:sticky md:top-4 self-start">
+  {{-- Danh mục --}}
+  <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
+    <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Loại sản phẩm</div>
+    <div class="space-y-2" data-filter-group="category">
+      @foreach($categories as $c)
+        <label class="flex items-center gap-2">
+          <input type="checkbox" value="{{ $c->category_id }}" class="h-4 w-4 accent-blue-600 filter-input"
+                 {{ (string)$category===(string)$c->category_id ? 'checked' : '' }}>
+          <span class="text-sm text-gray-700">{{ $c->category_name }}</span>
+        </label>
+      @endforeach
+    </div>
+  </div>
 
-            {{-- Mức giá (đơn chọn) --}}
-            <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
-                <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Mức giá</div>
-                <form method="GET" class="space-y-2">
-                    {!! keep_query_except('price') !!}
-                    @foreach($priceRanges as $pr)
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="price" value="{{ $pr['value'] }}"
-                            class="h-4 w-4 accent-blue-600"
-                            {{ (string)$price===(string)$pr['value'] ? 'checked' : '' }}
-                            onchange="this.form.submit()">
-                        <span class="text-sm text-gray-700">{{ $pr['label'] }}</span>
-                    </label>
-                    @endforeach
-                </form>
-            </div>
-        </aside>
+  {{-- Thương hiệu --}}
+  <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
+    <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Thương hiệu</div>
+    <div class="space-y-2" data-filter-group="brand">
+      @foreach($brands as $b)
+        <label class="flex items-center gap-2">
+          <input type="checkbox" value="{{ $b->brand_id }}" class="h-4 w-4 accent-blue-600 filter-input"
+                 {{ (string)$brand===(string)$b->brand_id ? 'checked' : '' }}>
+          <span class="text-sm text-gray-700">{{ $b->brand_name }}</span>
+        </label>
+      @endforeach
+    </div>
+  </div>
+
+  {{-- Mức giá --}}
+  <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
+    <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Mức giá</div>
+    <div class="space-y-2" data-filter-group="price">
+      @foreach($priceRanges as $pr)
+        <label class="flex items-center gap-2">
+          <input type="checkbox" value="{{ $pr['value'] }}" class="h-4 w-4 accent-blue-600 filter-input"
+                 {{ (string)$price===(string)$pr['value'] ? 'checked' : '' }}>
+          <span class="text-sm text-gray-700">{{ $pr['label'] }}</span>
+        </label>
+      @endforeach
+    </div>
+  </div>
+</aside>
+
 
 
         {{-- Content --}}
-        <section class="col-span-12 md:col-span-9">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-                <h1 class="text-2xl font-bold tracking-wide text-gray-900 uppercase">Văn phòng phẩm</h1>
+<section class="col-span-12 md:col-span-9">
+  {{-- header + sort giữ nguyên, chỉ thêm id cho select nếu dùng --}}
+  <div id="list-container">
+    @include('store.product._grid') {{-- lần load đầu render sẵn --}}
+  </div>
+</section>        
+<script>
+(function(){
+  const container = document.getElementById('list-container');
 
-                {{-- Sắp xếp: link ngang giống ảnh --}}
-                @php $sort = request('sort'); @endphp
-                <div class="flex flex-wrap items-center gap-4 text-sm">
-                    <span class="text-gray-500">Sắp xếp:</span>
-                    @php
-                    $sortLinks = [
-                    '' => 'Mặc định',
-                    'name_asc' => 'Tên A → Z',
-                    'name_desc' => 'Tên Z → A',
-                    'price_asc' => 'Giá tăng dần',
-                    'price_desc' => 'Giá giảm dần',
-                    'newest' => 'Hàng mới',
-                    ];
-                    $q = request()->query();
-                    @endphp
-                    @foreach($sortLinks as $k => $label)
-                    @php $url = url()->current().'?'.http_build_query(array_replace($q, ['sort'=>$k ?: null])); @endphp
-                    <a href="{{ $url }}"
-                        class="inline-flex items-center h-8 px-2.5 rounded-full
-                  {{ $sort===$k || ($k==='' && !$sort) ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'text-gray-600 hover:text-blue-700' }}">
-                        {{ $label }}
-                    </a>
-                    @endforeach
-                </div>
+  // ép đơn chọn cho mỗi nhóm checkbox
+  document.querySelectorAll('[data-filter-group]').forEach(group => {
+    group.addEventListener('change', e => {
+      if (!e.target.classList.contains('filter-input')) return;
+      // bỏ chọn các ô khác trong nhóm
+      group.querySelectorAll('.filter-input').forEach(inp => {
+        if (inp !== e.target) inp.checked = false;
+      });
+      applyFilters();
+    });
+  });
 
-                {{-- Grid --}}
-                @if($products->isEmpty())
-                <div class="h-40 grid place-items-center rounded-xl border border-dashed text-gray-500">
-                    Không có sản phẩm nào
-                </div>
-                @else
-                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                    @foreach($products as $p)
-                    {{-- card tái dùng như bạn đang dùng cho home, giữ hover nổi + bóng xanh --}}
-                    <a href="{{ route('store.product.show', $p->product_id) }}"
-                        class="group block bg-white ring-1 ring-gray-200/70 rounded-2xl p-3
-                     transition-all duration-300 hover:-translate-y-1 hover:ring-blue-300
-                     hover:shadow-[0_14px_32px_-8px_rgba(37,99,235,0.45)]">
-                        <div class="aspect-[4/3] rounded-xl overflow-hidden bg-gray-50">
-                            <img src="{{ Str::startsWith($p->image_url, ['http://','https://','/']) ? $p->image_url : asset('storage/'.$p->image_url) }}"
-                                alt="{{ $p->product_name }}"
-                                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
-                        </div>
-                        <div class="mt-3 space-y-2 text-center">
-                            <div class="flex justify-start">
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 ring-1 ring-blue-200 text-[13px]">
-                                    Đã bán {{ number_format($p->sold ?? 0, 0, ',', '.') }}
-                                </span>
-                            </div>
-                            <h3 class="text-sm font-medium text-gray-900 leading-5 line-clamp-2">{{ $p->product_name }}</h3>
-                            <div class="flex items-center justify-center gap-2 text-amber-500">
-                                <div class="flex">
-                                    @for($i=1;$i<=5;$i++)
-                                        <svg class="w-4 h-4 {{ $i <= floor($p->avg_rating ?? 0) ? 'fill-current' : 'fill-gray-200 text-gray-200' }}" viewBox="0 0 20 20">
-                                        <path d="M10 1.5l2.59 5.25 5.8.84-4.2 4.1.99 5.76L10 14.9 4.82 17.45l.99-5.76-4.2-4.1 5.8-.84L10 1.5z" /></svg>
-                                        @endfor
-                                </div>
-                                <span class="text-xs text-gray-500">({{ $p->reviews_count ?? 0 }})</span>
-                            </div>
-                            <div class="text-[17px] font-semibold text-blue-700">
-                                {{ number_format($p->price,0,',','.') }}₫
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="inline-flex items-center justify-center w-full h-9 rounded-full text-blue-700 ring-1 ring-blue-300 hover:bg-blue-50 transition-colors">Xem nhanh</span>
-                        </div>
-                    </a>
-                    @endforeach
-                </div>
-                @endif
+  // nếu có select sort
+  const sortSelect = document.querySelector('select[name="sort"]');
+  if (sortSelect) sortSelect.addEventListener('change', applyFilters);
 
-                {{-- Pagination --}}
-                <div class="mt-6">
-                    {{ $products->onEachSide(1)->links() }}
-                </div>
-        </section>
+  // bắt link phân trang để AJAX
+  container.addEventListener('click', function(e){
+    const a = e.target.closest('a');
+    if (!a) return;
+    if (a.closest('#products-pagination')) {
+      e.preventDefault();
+      fetchAndSwap(a.href);
+    }
+  });
+
+  function applyFilters(){
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+// nếu đang ở /category/<id> và có params.category -> đổi pathname
+const m = location.pathname.match(/^\/category\/(\d+)/);
+if (m) {
+  const pickedCat = params.get('category');
+  if (pickedCat && pickedCat !== m[1]) {
+    url.pathname = '/category/' + pickedCat;
+    params.delete('category'); // vì id đã nằm trên path
+  }
+}
+
+    // reset các param đơn chọn
+    ['category','brand','price'].forEach(k => params.delete(k));
+
+    // đọc checked mỗi nhóm -> đặt 1 value
+    document.querySelectorAll('[data-filter-group]').forEach(group => {
+      const key = group.getAttribute('data-filter-group');
+      const picked = group.querySelector('.filter-input:checked');
+      if (picked) params.set(key, picked.value);
+    });
+
+    if (sortSelect && sortSelect.value) params.set('sort', sortSelect.value);
+    else params.delete('sort');
+
+    // luôn bỏ trang cũ
+    params.delete('page');
+
+    const newUrl = url.pathname + '?' + params.toString();
+    history.pushState({}, '', newUrl);
+    fetchAndSwap(newUrl);
+  }
+
+async function fetchAndSwap(url){
+  try{
+    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+    let data;
+    try {
+      data = await res.json();              // ưu tiên JSON
+    } catch {
+      const html = await res.text();        // fallback nếu server trả HTML
+      data = { html };
+    }
+    if (!data || typeof data.html !== 'string') {
+      console.error('AJAX format error:', data);
+      return;
+    }
+    document.getElementById('list-container').innerHTML = data.html;
+    document.getElementById('list-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }catch(err){
+    console.error(err);
+  }
+}
+
+  // khi back/forward: tải lại fragment đúng với URL
+  window.addEventListener('popstate', () => fetchAndSwap(location.href));
+})();
+</script>
     </div>
 </div>
 @endsection
