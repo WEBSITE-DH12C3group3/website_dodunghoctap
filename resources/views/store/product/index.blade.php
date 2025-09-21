@@ -9,163 +9,178 @@
     </div> -->
 
     <div class="grid grid-cols-12 gap-5">
-      @php
-  $kept = collect(request()->query())->except(['category','page']); // đổi key cho phù hợp 'brand','price' ở form tương ứng
-@endphp
+        @php
+        $kept = collect(request()->query())->except(['category','page']); // đổi key cho phù hợp 'brand','price' ở form tương ứng
+        @endphp
 
-@foreach($kept as $k => $v)
-  @if(is_array($v))
-    @foreach($v as $vv)
-      <input type="hidden" name="{{ $k }}[]" value="{{ e($vv) }}">
-    @endforeach
-  @else
-    <input type="hidden" name="{{ $k }}" value="{{ e($v) }}">
-  @endif
-@endforeach
-
-
-<aside class="col-span-12 md:col-span-3 space-y-5 md:sticky md:top-4 self-start">
-  {{-- Danh mục --}}
-  <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
-    <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Loại sản phẩm</div>
-    <div class="space-y-2" data-filter-group="category">
-      @foreach($categories as $c)
-        <label class="flex items-center gap-2">
-          <input type="checkbox" value="{{ $c->category_id }}" class="h-4 w-4 accent-blue-600 filter-input"
-                 {{ (string)$category===(string)$c->category_id ? 'checked' : '' }}>
-          <span class="text-sm text-gray-700">{{ $c->category_name }}</span>
-        </label>
-      @endforeach
-    </div>
-  </div>
-
-  {{-- Thương hiệu --}}
-  <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
-    <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Thương hiệu</div>
-    <div class="space-y-2" data-filter-group="brand">
-      @foreach($brands as $b)
-        <label class="flex items-center gap-2">
-          <input type="checkbox" value="{{ $b->brand_id }}" class="h-4 w-4 accent-blue-600 filter-input"
-                 {{ (string)$brand===(string)$b->brand_id ? 'checked' : '' }}>
-          <span class="text-sm text-gray-700">{{ $b->brand_name }}</span>
-        </label>
-      @endforeach
-    </div>
-  </div>
-
-  {{-- Mức giá --}}
-  <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
-    <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Mức giá</div>
-    <div class="space-y-2" data-filter-group="price">
-      @foreach($priceRanges as $pr)
-        <label class="flex items-center gap-2">
-          <input type="checkbox" value="{{ $pr['value'] }}" class="h-4 w-4 accent-blue-600 filter-input"
-                 {{ (string)$price===(string)$pr['value'] ? 'checked' : '' }}>
-          <span class="text-sm text-gray-700">{{ $pr['label'] }}</span>
-        </label>
-      @endforeach
-    </div>
-  </div>
-</aside>
+        @foreach($kept as $k => $v)
+        @if(is_array($v))
+        @foreach($v as $vv)
+        <input type="hidden" name="{{ $k }}[]" value="{{ e($vv) }}">
+        @endforeach
+        @else
+        <input type="hidden" name="{{ $k }}" value="{{ e($v) }}">
+        @endif
+        @endforeach
 
 
+        <aside class="col-span-12 md:col-span-3 space-y-5 md:sticky md:top-4 self-start">
+            {{-- Danh mục (đơn chọn) --}}
+            <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
+                <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Loại sản phẩm</div>
+                <div class="space-y-2" data-filter-group="category">
+                    @foreach($categories as $c)
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox"
+                            value="{{ $c->category_id }}"
+                            class="h-4 w-4 accent-blue-600 filter-input"
+                            {{ (string)request('category') === (string)$c->category_id ? 'checked' : '' }}>
+                        <span class="text-sm text-gray-700">{{ $c->category_name }}</span>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
 
+            {{-- Thương hiệu --}}
+            <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
+                <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Thương hiệu</div>
+                <div class="space-y-2" data-filter-group="brand">
+                    @foreach($brands as $b)
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox"
+                            value="{{ $b->brand_id }}"
+                            class="h-4 w-4 accent-blue-600 filter-input"
+                            {{ (string)request('brand') === (string)$b->brand_id ? 'checked' : '' }}>
+                        <span class="text-sm text-gray-700">{{ $b->brand_name }}</span>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Mức giá --}}
+            <div class="bg-white rounded-2xl p-4 ring-1 ring-gray-200/70">
+                <div class="text-sm font-semibold text-gray-900 mb-3 uppercase">Mức giá</div>
+                <div class="space-y-2" data-filter-group="price">
+                    @foreach($priceRanges as $pr)
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox"
+                            value="{{ $pr['value'] }}"
+                            class="h-4 w-4 accent-blue-600 filter-input"
+                            {{ (string)request('price') === (string)$pr['value'] ? 'checked' : '' }}>
+                        <span class="text-sm text-gray-700">{{ $pr['label'] }}</span>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
+        </aside>
         {{-- Content --}}
-<section class="col-span-12 md:col-span-9">
-  {{-- header + sort giữ nguyên, chỉ thêm id cho select nếu dùng --}}
-  <div id="list-container">
-    @include('store.product._grid') {{-- lần load đầu render sẵn --}}
-  </div>
-</section>        
-<script>
-(function(){
-  const container = document.getElementById('list-container');
+        <section class="col-span-12 md:col-span-9">
+            {{-- header + sort giữ nguyên, chỉ thêm id cho select nếu dùng --}}
+            <div id="list-container">
+                @include('store.product._grid') {{-- lần load đầu render sẵn --}}
+            </div>
+        </section>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const container = document.getElementById('list-container');
+                const PRODUCTS_BASE = @json(route('store.product.index')); // "/products"
 
-  // ép đơn chọn cho mỗi nhóm checkbox
-  document.querySelectorAll('[data-filter-group]').forEach(group => {
-    group.addEventListener('change', e => {
-      if (!e.target.classList.contains('filter-input')) return;
-      // bỏ chọn các ô khác trong nhóm
-      group.querySelectorAll('.filter-input').forEach(inp => {
-        if (inp !== e.target) inp.checked = false;
-      });
-      applyFilters();
-    });
-  });
+                function getPicked(groupKey) {
+                    const g = document.querySelector(`[data-filter-group="${groupKey}"]`);
+                    if (!g) return null;
+                    const picked = g.querySelector('.filter-input:checked');
+                    return picked ? picked.value : null;
+                }
 
-  // nếu có select sort
-  const sortSelect = document.querySelector('select[name="sort"]');
-  if (sortSelect) sortSelect.addEventListener('change', applyFilters);
+                // ép đơn chọn trong mỗi nhóm
+                document.querySelectorAll('[data-filter-group]').forEach(group => {
+                    group.addEventListener('change', e => {
+                        if (!e.target.classList.contains('filter-input')) return;
+                        group.querySelectorAll('.filter-input').forEach(inp => {
+                            if (inp !== e.target) inp.checked = false;
+                        });
+                        applyFilters();
+                    });
+                });
 
-  // bắt link phân trang để AJAX
-  container.addEventListener('click', function(e){
-    const a = e.target.closest('a');
-    if (!a) return;
-    if (a.closest('#products-pagination')) {
-      e.preventDefault();
-      fetchAndSwap(a.href);
-    }
-  });
+                // sort (nếu dùng select)
+                const sortSelect = document.querySelector('select[name="sort"]');
+                if (sortSelect) sortSelect.addEventListener('change', applyFilters);
 
-  function applyFilters(){
-    const url = new URL(window.location.href);
-    const params = url.searchParams;
-// nếu đang ở /category/<id> và có params.category -> đổi pathname
-const m = location.pathname.match(/^\/category\/(\d+)/);
-if (m) {
-  const pickedCat = params.get('category');
-  if (pickedCat && pickedCat !== m[1]) {
-    url.pathname = '/category/' + pickedCat;
-    params.delete('category'); // vì id đã nằm trên path
-  }
-}
+                // phân trang ajax
+                container.addEventListener('click', function(e) {
+                    const a = e.target.closest('a');
+                    if (a && a.closest('#products-pagination')) {
+                        e.preventDefault();
+                        fetchAndSwap(a.href);
+                    }
+                });
 
-    // reset các param đơn chọn
-    ['category','brand','price'].forEach(k => params.delete(k));
+                function applyFilters() {
+                    const base = new URL(PRODUCTS_BASE, window.location.origin);
+                    const params = base.searchParams;
 
-    // đọc checked mỗi nhóm -> đặt 1 value
-    document.querySelectorAll('[data-filter-group]').forEach(group => {
-      const key = group.getAttribute('data-filter-group');
-      const picked = group.querySelector('.filter-input:checked');
-      if (picked) params.set(key, picked.value);
-    });
+                    const cat = getPicked('category');
+                    const brand = getPicked('brand');
+                    const price = getPicked('price');
+                    const sort = sortSelect ? sortSelect.value : '';
 
-    if (sortSelect && sortSelect.value) params.set('sort', sortSelect.value);
-    else params.delete('sort');
+                    params.delete('category');
+                    params.delete('brand');
+                    params.delete('price');
+                    params.delete('sort');
+                    params.delete('page');
 
-    // luôn bỏ trang cũ
-    params.delete('page');
+                    if (cat) params.set('category', cat);
+                    if (brand) params.set('brand', brand);
+                    if (price) params.set('price', price);
+                    if (sort) params.set('sort', sort);
 
-    const newUrl = url.pathname + '?' + params.toString();
-    history.pushState({}, '', newUrl);
-    fetchAndSwap(newUrl);
-  }
+                    // nếu từ trang scope (new/best/featured) muốn giữ logic đó:
+                    @if(!empty($scope))
+                    params.set('scope', @json($scope)); // 'new' | 'best' | 'feat'
+                    @endif
 
-async function fetchAndSwap(url){
-  try{
-    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
-    let data;
-    try {
-      data = await res.json();              // ưu tiên JSON
-    } catch {
-      const html = await res.text();        // fallback nếu server trả HTML
-      data = { html };
-    }
-    if (!data || typeof data.html !== 'string') {
-      console.error('AJAX format error:', data);
-      return;
-    }
-    document.getElementById('list-container').innerHTML = data.html;
-    document.getElementById('list-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }catch(err){
-    console.error(err);
-  }
-}
+                    const newUrl = base.pathname + (params.toString() ? ('?' + params.toString()) : '');
+                    history.pushState({}, '', newUrl);
+                    fetchAndSwap(newUrl);
+                }
 
-  // khi back/forward: tải lại fragment đúng với URL
-  window.addEventListener('popstate', () => fetchAndSwap(location.href));
-})();
-</script>
+                async function fetchAndSwap(url) {
+                    try {
+                        const res = await fetch(url, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        let data;
+                        try {
+                            data = await res.json();
+                        } catch {
+                            data = {
+                                html: await res.text()
+                            };
+                        }
+                        if (!data || typeof data.html !== 'string') {
+                            console.error('AJAX format error', data);
+                            return;
+                        }
+                        container.innerHTML = data.html;
+                        container.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+
+                // back/forward
+                window.addEventListener('popstate', () => fetchAndSwap(location.href));
+            });
+        </script>
+
+
     </div>
 </div>
 @endsection

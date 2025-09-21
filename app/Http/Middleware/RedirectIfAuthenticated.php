@@ -26,7 +26,7 @@ class RedirectIfAuthenticated
                 $user = Auth::user();
                 return $user->hasRole(['admin', 'employee'])
                     ? redirect()->route('dashboard')
-                    : redirect()->route('store.index');
+                    : redirect()->route('home'); // Thay '/'
             }
         }
         return $next($request);
