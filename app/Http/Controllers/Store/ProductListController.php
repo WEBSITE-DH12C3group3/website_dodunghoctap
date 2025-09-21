@@ -10,16 +10,17 @@ use Illuminate\Support\Facades\Schema;
 class ProductListController extends Controller
 {
     /** Build base query + sidebar data, apply single-select filters/sort/pagination */
-    private function buildListing(Request $r, $baseScope = null)
+    // app/Http/Controllers/Store/ProductListController.php
+
+    private function buildListing(Request $r, ?string $scope = null)
     {
         $hasCreated = Schema::hasColumn('products', 'created_at');
 
-        // --- Subquery rating ---
+        // ---- rating agg
         $ratingAgg = DB::table('comments')
             ->selectRaw('product_id, AVG(rating) avg_rating, COUNT(*) reviews_count')
             ->groupBy('product_id');
 
-        // --- Base query ---
         $q = DB::table('products as p')
             ->leftJoinSub($ratingAgg, 'r', 'r.product_id', '=', 'p.product_id')
             ->select(
@@ -28,29 +29,24 @@ class ProductListController extends Controller
                 'p.price',
                 'p.image_url',
                 'p.sold',
-                DB::raw('ROUND(COALESCE(r.avg_rating,0),1) AS avg_rating'),
-                DB::raw('COALESCE(r.reviews_count,0) AS reviews_count'),
                 'p.category_id',
-                'p.brand_id'
+                'p.brand_id',
+                DB::raw('ROUND(COALESCE(r.avg_rating,0),1) AS avg_rating'),
+                DB::raw('COALESCE(r.reviews_count,0) AS reviews_count')
             );
 
-        // --- Áp scope ---
-        if ($baseScope === 'best') $q->orderByRaw('COALESCE(p.sold,0) DESC');
-        if ($baseScope === 'new' && $hasCreated) $q->orderByDesc('p.created_at');
-        if ($baseScope === 'featured') $q->where('p.is_featured', 1)->orderByDesc('p.product_id');
-        if (is_array($baseScope) && isset($baseScope['category_id'])) $q->where('p.category_id', $baseScope['category_id']);
+        // ---- scope (giữ được khi từ /newProduct chuyển sang /products)
+        $scope = $scope ?? $r->get('scope');
+        if ($scope === 'best')      $q->orderByRaw('COALESCE(p.sold,0) DESC');
+        elseif ($scope === 'new')   $hasCreated ? $q->orderByDesc('p.created_at') : $q->orderByDesc('p.product_id');
+        elseif ($scope === 'feat' || $scope === 'featured') $q->where('p.is_featured', 1);
 
-        // --- Đọc tham số lọc (đơn chọn) ---
-        // Nếu client submit mảng (brand[]=..), ta vẫn lấy phần tử đầu để đảm bảo "đơn chọn"
-        $brand = is_array($r->brand) ? ($r->brand[0] ?? null) : $r->brand;
-        $category = is_array($r->category) ? ($r->category[0] ?? null) : $r->category;
-        $price = is_array($r->price) ? ($r->price[0] ?? null) : $r->price;
+        // ---- filters từ query
+        if ($r->filled('category')) $q->where('p.category_id', (int)$r->category);
+        if ($r->filled('brand'))    $q->where('p.brand_id', (int)$r->brand);
 
-        if ($brand) $q->where('p.brand_id', (int)$brand);
-        if ($category) $q->where('p.category_id', (int)$category);
-
-        // Mức giá: chuỗi dạng "min-max" hoặc "max+"
-        if ($price) {
+        if ($r->filled('price')) {
+            $price = $r->price;
             if (str_ends_with($price, '+')) {
                 $min = (int) rtrim($price, '+');
                 $q->where('p.price', '>=', $min);
@@ -60,27 +56,20 @@ class ProductListController extends Controller
             }
         }
 
-        // --- Sắp xếp ---
-        // name_asc, name_desc, price_asc, price_desc, newest
+        // ---- sort
         $sort = $r->get('sort');
         match ($sort) {
-            'name_asc' => $q->orderBy('p.product_name', 'asc'),
-            'name_desc' => $q->orderBy('p.product_name', 'desc'),
-            'price_asc' => $q->orderBy('p.price', 'asc'),
+            'name_asc'   => $q->orderBy('p.product_name', 'asc'),
+            'name_desc'  => $q->orderBy('p.product_name', 'desc'),
+            'price_asc'  => $q->orderBy('p.price', 'asc'),
             'price_desc' => $q->orderBy('p.price', 'desc'),
-            'newest' => $hasCreated ? $q->orderByDesc('p.created_at') : $q->orderByDesc('p.product_id'),
-            default => null, // giữ thứ tự scope đã đặt
+            'newest'     => $hasCreated ? $q->orderByDesc('p.created_at') : $q->orderByDesc('p.product_id'),
+            default      => null,
         };
 
-        // --- Sidebar data ---
-        $brands = DB::table('brands')->select('brand_id', 'brand_name')->orderBy('brand_name')->get();
+        $products   = $q->paginate(16)->appends(collect($r->query())->except('page')->all());
+        $brands     = DB::table('brands')->select('brand_id', 'brand_name')->orderBy('brand_name')->get();
         $categories = DB::table('categories')->select('category_id', 'category_name')->orderBy('category_name')->get();
-
-        // --- Phân trang ---
-        //      $products = $q->paginate(16)->appends($r->query());
-        $products = $q->paginate(16)->appends(collect($r->query())->except('page')->all());
-
-        // Các khoảng giá mẫu
         $priceRanges = [
             ['label' => 'Giá dưới 100.000đ', 'value' => '0-100000'],
             ['label' => '100.000đ - 300.000đ', 'value' => '100000-300000'],
@@ -90,74 +79,42 @@ class ProductListController extends Controller
             ['label' => 'Giá trên 1.000.000đ', 'value' => '1000000+'],
         ];
 
-        return compact('products', 'brands', 'categories', 'priceRanges', 'brand', 'category', 'price', 'sort');
+        // biến để Blade/JS biết scope hiện tại
+        return compact('products', 'brands', 'categories', 'priceRanges', 'sort') + [
+            'brand'    => $r->brand,
+            'category' => $r->category,
+            'price'    => $r->price,
+            'scope'    => $scope,
+        ];
     }
 
     public function index(Request $r)
     {
-        $data = $this->buildListing($r, null);
-      if ($r->ajax()) {
-        return response()->json([
-            'html' => view('store.product._grid', $data)->render(), // đường dẫn đúng với file _grid.blade.php
-        ]);
-    
-}
-        return view('store.product.index', $data);
+        return $this->renderList($r, null);
     }
     public function new(Request $r)
     {
-        $data = $this->buildListing($r, 'new');
-        if (request()->ajax()) {
-    // Chỉ trả phần grid + pagination
-    return response()->json([
-        'html' => view('store.products._grid', $data)->render(),
-    ]);
-}
-        return view('store.product.index', $data);
+        return $this->renderList($r, 'new');
     }
     public function best(Request $r)
     {
-        $data = $this->buildListing($r, 'best');
-        if (request()->ajax()) {
-    // Chỉ trả phần grid + pagination
-    return response()->json([
-        'html' => view('store.products._grid', $data)->render(),
-    ]);
-}
-        return view('store.product.index', $data);
+        return $this->renderList($r, 'best');
     }
     public function featured(Request $r)
     {
-        $data = $this->buildListing($r, 'featured');
-        if (request()->ajax()) {
-    // Chỉ trả phần grid + pagination
-    return response()->json([
-        'html' => view('store.products._grid', $data)->render(),
-    ]);
-}
-        return view('store.product.index', $data);
+        return $this->renderList($r, 'feat');
     }
-    public function category(Request $r, $id)
+
+    private function renderList(Request $r, ?string $scope)
     {
-        $id = (int) $id;
+        $data = $this->buildListing($r, $scope);
 
-        // Nếu URL như /category/13?category=11 -> chuyển về /category/11 (giữ brand/price/sort)
-        // if ($r->filled('category') && (int)$r->category !== $id) {
-        //     $q = $r->query();
-        //     unset($q['category'], $q['page']); // bỏ category trùng & trang cũ
-        //     return redirect()->route('store.category', ['id' => (int)$r->category] + $q);
-        // }
-
-        // // Không cho buildListing áp dụng thêm query category lần nữa
-        // $r->query->remove('category');
-
-        $data = $this->buildListing($r, ['category_id' => $id]);
-        if (request()->ajax()) {
-    // Chỉ trả phần grid + pagination
-    return response()->json([
-        'html' => view('store.products._grid', $data)->render(),
-    ]);
-}
+        // Khi là AJAX → trả fragment grid
+        if ($r->ajax()) {
+            return response()->json([
+                'html' => view('store.product._grid', $data)->render(),
+            ]);
+        }
         return view('store.product.index', $data);
     }
 }

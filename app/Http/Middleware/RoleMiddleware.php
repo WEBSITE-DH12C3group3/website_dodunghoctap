@@ -19,7 +19,7 @@ class RoleMiddleware
             ->contains(fn($r) => $user->hasRole($r));
 
         if (!$allowed) {
-            return redirect()->route('store.index')
+            return redirect()->route('home')
                 ->with('error', 'Bạn không có quyền truy cập khu vực này.');
         }
         return $next($request);

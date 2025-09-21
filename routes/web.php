@@ -7,6 +7,7 @@ use App\Http\Controllers\Store\ProfileController;
 use App\Http\Controllers\Store\ProductShowController;
 use App\Http\Controllers\Store\CartController;
 use App\Http\Controllers\Store\ProductReviewController;
+use App\Http\Controllers\Store\SearchController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -27,11 +28,16 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // routes/web.php
 use App\Http\Controllers\Store\ProductListController;
 
-Route::get('/products',            [ProductListController::class, 'index'])->name('store.product.index');
-Route::get('/category/{id}',       [ProductListController::class, 'category'])->name('store.category');
-Route::get('/newProduct',          [ProductListController::class, 'new'])->name('store.product.new');
-Route::get('/bestSeller',          [ProductListController::class, 'best'])->name('store.product.best');
-Route::get('/featured',            [ProductListController::class, 'featured'])->name('store.product.featured');
+Route::get('/products', [ProductListController::class, 'index'])->name('store.product.index');
+Route::get('/category/{id}', function (Request $r, $id) {
+    return redirect()
+        ->route('store.product.index', array_merge($r->query(), ['category' => (int)$id]))
+        ->setStatusCode(301);
+})->name('store.category');
+Route::get('/newProduct', [ProductListController::class, 'new'])->name('store.product.new');
+Route::get('/bestSeller', [ProductListController::class, 'best'])->name('store.product.best');
+Route::get('/featured', [ProductListController::class, 'featured'])->name('store.product.featured');
+Route::get('/search', [SearchController::class, 'index'])->name('store.product.search');
 
 Route::get('/product/{id}', [ProductShowController::class, 'show'])
     ->whereNumber('id')
@@ -40,8 +46,6 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
-
-Route::get('/search', fn() => 'search')->name('store.search');
 
 Route::get('/auth/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');

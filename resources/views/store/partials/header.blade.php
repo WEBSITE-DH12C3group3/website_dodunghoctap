@@ -18,7 +18,7 @@ $brandLogo = $brandLogo ?? asset('images/logoo.svg');
                     <span class="sr-only">Trang chủ</span>
                 </a>
 
-                <form action="{{ route('store.search') }}" method="GET"
+                <form action="{{ route('store.product.search') }}" method="GET"
                     class="min-w-0 w-full justify-self-stretch min-[1030px]:justify-self-center">
                     <div class="mx-0 sm:mx-auto w-full sm:max-w-[520px] lg:max-w-[620px] xl:max-w-[700px]">
                         <div class="flex h-11 min-[1030px]:h-12 w-full">
