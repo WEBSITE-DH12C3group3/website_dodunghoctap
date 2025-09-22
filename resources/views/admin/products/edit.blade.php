@@ -44,23 +44,25 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
-            <div class="md:col-span-2">
-                <label for="description" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Mô tả</label>
-                <textarea name="description" id="description" rows="4" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600">{{ old('description', $product->description) }}</textarea>
-                @error('description')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div class="md:col-span-2">
-                <label for="image_url" class="block text-sm font-medium text-slate-700 dark:text-slate-200">URL hình ảnh</label>
-                <input type="text" name="image_url" id="image_url" value="{{ old('image_url', $product->image_url) }}" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600">
-                @error('image_url')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+            
+           <div class="md:col-span-2">
+    <label for="image_url" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Hình ảnh sản phẩm</label>
+    <!-- Hiển thị ảnh hiện tại (nếu có) -->
+    @if($product->image_url)
+        <div class="mt-2">
+            <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->product_name }}" class="h-32 w-auto object-contain rounded-lg">
         </div>
+    @endif
+    <!-- Input file để upload ảnh mới -->
+    <input type="file" name="image_url" id="image_url" class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+    <!-- Hiển thị đường dẫn hiện tại (nếu có) -->
+    @if($product->image_url)
+        <p class="mt-1 text-xs text-slate-500">Đường dẫn hiện tại: {{ $product->image_url }}</p>
+    @endif
+    @error('image_url')
+        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+    @enderror
+</div>
 
         <div class="mt-6 flex gap-4">
             <button type="submit" class="rounded-xl px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 shadow-sm">Lưu thay đổi</button>
