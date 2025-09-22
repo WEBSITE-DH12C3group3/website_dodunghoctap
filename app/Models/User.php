@@ -21,6 +21,7 @@ class User extends Authenticatable
         'is_active',
         'last_activity',
         'google_id',
+        'facebook_id',
     ];
 
     protected $casts = [
