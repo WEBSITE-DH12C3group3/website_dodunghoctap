@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
@@ -34,7 +35,21 @@ class CartController extends Controller
     {
         $cart = $this->getCart();
         $total = collect($cart)->sum(fn($i) => $i['price'] * $i['qty']);
-        return view('store.cart.index', compact('cart', 'total'));
+        $bestSellers = Product::query()
+            ->leftJoinSub(
+                DB::table('order_items')
+                    ->select('product_id', DB::raw('SUM(quantity) as sold'))
+                    ->groupBy('product_id'),
+                'oi',
+                'oi.product_id',
+                '=',
+                'products.product_id'
+            )
+            ->select('products.*', DB::raw('COALESCE(oi.sold, 0) as sold'))
+            ->orderByDesc('sold')
+            ->limit(16)
+            ->get();
+        return view('store.cart.index', compact('cart', 'total', 'bestSellers'));
     }
 
     public function add(Request $request)
