@@ -243,7 +243,7 @@
                     Đăng nhập với Google
                 </a>
 
-                <a href="#"
+                <a href="{{ url('auth/facebook') }}" 
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#072B47] px-4 py-3 text-white font-medium
                   hover:brightness-110 transition">
                     {{-- Facebook icon --}}

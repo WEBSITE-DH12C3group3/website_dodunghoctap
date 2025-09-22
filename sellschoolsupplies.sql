@@ -466,6 +466,7 @@ CREATE TABLE `users` (
   `address` text DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `google_id` varchar(255) DEFAULT NULL,
+  `facebook_id` varchar(255) DEFAULT NULL,
   `role_id` int(11) DEFAULT 3,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `is_active` tinyint(1) DEFAULT 1,
