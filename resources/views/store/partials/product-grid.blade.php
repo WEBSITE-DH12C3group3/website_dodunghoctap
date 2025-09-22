@@ -1,7 +1,7 @@
 @props([
-'title' => 'Sản phẩm',
-'items' => collect(),
-'moreUrl' => null,
+    'title' => 'Sản phẩm',
+    'items' => collect(),
+    'moreUrl' => null,
 ])
 
 @php
@@ -33,7 +33,7 @@ $items = $items instanceof \Illuminate\Support\Collection ? $items->take(8) : co
             {{-- Ảnh --}}
             <div class="aspect-[4/3] rounded-xl overflow-hidden bg-gray-50">
                 <img
-                    src="{{ Str::startsWith($p->image_url, ['http://','https://','/']) ? $p->image_url : asset('storage/'.$p->image_url) }}"
+                    src="{{ $p->image_url ? (Str::startsWith($p->image_url, ['http://', 'https://']) ? $p->image_url : asset('storage/' . ($p->image_url ? ltrim($p->image_url, '/') : ''))) : asset('images/placeholder.jpg') }}"
                     alt="{{ $p->product_name }}"
                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
             </div>
@@ -68,7 +68,7 @@ $items = $items instanceof \Illuminate\Support\Collection ? $items->take(8) : co
                             viewBox="0 0 20 20" aria-hidden="true">
                             <path d="M10 1.5l2.59 5.25 5.8.84-4.2 4.1.99 5.76L10 14.9 4.82 17.45l.99-5.76-4.2-4.1 5.8-.84L10 1.5z" />
                             </svg>
-                            @endfor
+                        @endfor
                     </div>
                     <span class="text-xs text-gray-500">({{ $cnt }})</span>
                 </div>
@@ -83,7 +83,6 @@ $items = $items instanceof \Illuminate\Support\Collection ? $items->take(8) : co
 
             {{-- Nút xem nhanh --}}
             <div class="mt-3">
-
                 <span
                     class="inline-flex items-center justify-center w-full h-9 rounded-full
              text-blue-700 ring-1 ring-blue-300

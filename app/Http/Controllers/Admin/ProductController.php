@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -78,11 +79,20 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
+            $dataToCreate = $validated;
+
             if ($request->hasFile('image_url')) {
-                $validated['image_url'] = $request->file('image_url')->store('products', 'public');
+                $imageName = time() . '_' . $request->file('image_url')->getClientOriginalName(); // Tạo tên duy nhất
+                $imagePath = $request->file('image_url')->storeAs('products', $imageName, 'public'); // Lưu vào storage/app/public/products
+                if (!$imagePath) {
+                    throw new \Exception('Lỗi khi lưu hình ảnh.');
+                }
+                $dataToCreate['image_url'] = $imagePath; // Lưu path: products/filename.jpg
+            } else {
+                $dataToCreate['image_url'] = null; // Nếu không upload ảnh, để null
             }
 
-            Product::create($validated);
+            Product::create($dataToCreate);
             DB::commit();
             Log::info('Product created successfully: ' . $validated['product_name']);
             return redirect()->route('admin.products')->with('ok', 'Thêm sản phẩm thành công!');
@@ -127,11 +137,22 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
+            $dataToUpdate = $validated;
+
             if ($request->hasFile('image_url')) {
-                $validated['image_url'] = $request->file('image_url')->store('products', 'public');
+                // Xóa ảnh cũ nếu tồn tại
+                if ($product->image_url && Storage::exists($product->image_url)) {
+                    Storage::delete($product->image_url);
+                }
+                $imageName = time() . '_' . $request->file('image_url')->getClientOriginalName();
+                $imagePath = $request->file('image_url')->storeAs('products', $imageName, 'public');
+                if (!$imagePath) {
+                    throw new \Exception('Lỗi khi lưu hình ảnh.');
+                }
+                $dataToUpdate['image_url'] = $imagePath;
             }
 
-            $product->update($validated);
+            $product->update($dataToUpdate);
             DB::commit();
             Log::info('Product updated successfully: ' . $validated['product_name']);
             return redirect()->route('admin.products')->with('ok', 'Cập nhật sản phẩm thành công!');
@@ -146,9 +167,20 @@ class ProductController extends Controller
     {
         Log::info('ProductController@destroy called for product_id: ' . $id);
         $product = Product::findOrFail($id);
-        $product->delete();
 
-        Log::info('Product deleted successfully: product_id ' . $id);
-        return redirect()->route('admin.products')->with('ok', 'Xóa sản phẩm thành công!');
+        DB::beginTransaction();
+        try {
+            if ($product->image_url && Storage::exists($product->image_url)) {
+                Storage::delete($product->image_url);
+            }
+            $product->delete();
+            DB::commit();
+            Log::info('Product deleted successfully: product_id ' . $id);
+            return redirect()->route('admin.products')->with('ok', 'Xóa sản phẩm thành công!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error deleting product: ' . $e->getMessage());
+            return back()->with('error', 'Lỗi khi xóa sản phẩm: ' . $e->getMessage());
+        }
     }
 }

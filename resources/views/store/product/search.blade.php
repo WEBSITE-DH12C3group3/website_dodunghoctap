@@ -216,20 +216,21 @@
         })();
     </script>
 
-    {{-- GRID 4x4 --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4 xl:gap-5">
-        @forelse ($products as $p)
-        <a href="{{ route('store.product.show', $p->product_id) }}"
-            class="group relative bg-white rounded-3xl border border-gray-100 shadow-sm
-                  overflow-hidden flex flex-col transition
-                  hover:-translate-y-1 hover:shadow-lg hover:ring-1 hover:ring-blue-100">
+{{-- GRID 4x4 --}}
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4 xl:gap-5">
+    @forelse ($products as $p)
+    <a href="{{ route('store.product.show', $p->product_id) }}"
+       class="group relative bg-white rounded-3xl border border-gray-100 shadow-sm
+              overflow-hidden flex flex-col transition
+              hover:-translate-y-1 hover:shadow-lg hover:ring-1 hover:ring-blue-100">
 
-            {{-- Ảnh --}}
-            <div class="aspect-[4/5] bg-gray-50/80">
-                <img src="{{ $p->image_url ? asset('uploads/'.$p->image_url) : asset('images/placeholder.webp') }}"
-                    alt="{{ $p->product_name }}"
-                    class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" />
-            </div>
+        {{-- Ảnh --}}
+        <div class="aspect-[4/5] bg-gray-50/80">
+            <img src="{{ $p->image_url ? asset('storage/' . $p->image_url) : asset('images/placeholder.webp') }}"
+                 alt="{{ $p->product_name }}"
+                 class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                 onerror="this.src='{{ asset('images/placeholder.webp') }}'; this.onerror=null;" />
+        </div>
 
             {{-- Nội dung --}}
             <div class="p-3 md:p-4">
