@@ -40,19 +40,19 @@
                         <span class="font-medium">Danh sách đơn hàng</span>
                     </a>
 
-                     @php
+                    @php
                     // kiểm tra role admin (role_id = 1)
-                        $isAdmin = $user->role_id == 1;
-                        @endphp
-                        @if($isAdmin)
-                            <a href="{{ route('dashboard') }}"
-                            class="flex items-center gap-3 px-4 py-3 text-white/95 hover:bg-white/10">
-                            <svg class="w-5 h-5 fill-white shrink-0" viewBox="0 0 20 20">
-                            <path d="M3 3h14v2H3V3Zm0 4h14v2H3V7Zm0 4h14v2H3v-2Zm0 4h14v2H3v-2Z"/>
-                            </svg>
-                            <span class="font-medium">Trang quản lý</span>
-                            </a>
-                        @endif   
+                    $isAdmin = $user->role_id == 1;
+                    @endphp
+                    @if($isAdmin)
+                    <a href="{{ route('dashboard') }}"
+                        class="flex items-center gap-3 px-4 py-3 text-white/95 hover:bg-white/10">
+                        <svg class="w-5 h-5 fill-white shrink-0" viewBox="0 0 20 20">
+                            <path d="M3 3h14v2H3V3Zm0 4h14v2H3V7Zm0 4h14v2H3v-2Zm0 4h14v2H3v-2Z" />
+                        </svg>
+                        <span class="font-medium">Trang quản lý</span>
+                    </a>
+                    @endif
 
 
 

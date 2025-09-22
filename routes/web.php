@@ -7,7 +7,9 @@ use App\Http\Controllers\Store\ProfileController;
 use App\Http\Controllers\Store\ProductShowController;
 use App\Http\Controllers\Store\CartController;
 use App\Http\Controllers\Store\ProductReviewController;
+use App\Http\Controllers\Store\ProductListController;
 use App\Http\Controllers\Store\SearchController;
+use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -25,9 +27,7 @@ require __DIR__ . '/auth.php';
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// routes/web.php
-use App\Http\Controllers\Store\ProductListController;
-
+// index.blade
 Route::get('/products', [ProductListController::class, 'index'])->name('store.product.index');
 Route::get('/category/{id}', function (Request $r, $id) {
     return redirect()
@@ -37,11 +37,16 @@ Route::get('/category/{id}', function (Request $r, $id) {
 Route::get('/newProduct', [ProductListController::class, 'new'])->name('store.product.new');
 Route::get('/bestSeller', [ProductListController::class, 'best'])->name('store.product.best');
 Route::get('/featured', [ProductListController::class, 'featured'])->name('store.product.featured');
+
+// search.blade
 Route::get('/search', [SearchController::class, 'index'])->name('store.product.search');
 
+// show.blade
 Route::get('/product/{id}', [ProductShowController::class, 'show'])
     ->whereNumber('id')
     ->name('store.product.show');
+
+// cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
@@ -56,6 +61,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/product/{id}/review', [ProductReviewController::class, 'store'])->name('store.product.review.store');
 });
 
+// checkout
+Route::post('/checkout/vnpay', [PaymentController::class, 'vnpayStart'])
+    ->name('checkout.vnpay.start');
+Route::get('/checkout/vnpay/return', [PaymentController::class, 'vnpayReturn'])
+    ->name('checkout.vnpay.return');
+
+// admin
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -156,8 +168,8 @@ Route::middleware('auth')->group(function () {
 
 
         Route::get('/stats', [StatsController::class, 'index'])
-          ->middleware('permission:view_statistics')->name('admin.stats');  
-        Route::post('/stats/export', [StatsController::class, 'exportReport'])->name('admin.stats.export');    
+            ->middleware('permission:view_statistics')->name('admin.stats');
+        Route::post('/stats/export', [StatsController::class, 'exportReport'])->name('admin.stats.export');
     });
 });
 

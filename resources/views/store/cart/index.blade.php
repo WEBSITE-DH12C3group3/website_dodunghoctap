@@ -30,9 +30,18 @@
     </div>
 
     <div class="mt-4 flex items-center justify-between">
-        <div class="text-lg">Tổng: <span class="font-bold text-blue-700">{{ number_format($total,0,',','.') }}đ</span></div>
-        <a href="#" class="h-12 px-6 rounded-full bg-indigo-700 text-white grid place-items-center">Thanh toán</a>
+        <div class="text-lg">
+            Tổng: <span class="font-bold text-blue-700">{{ number_format($total,0,',','.') }}đ</span>
+        </div>
+
+        <form action="{{ route('checkout.vnpay.start') }}" method="POST">
+            @csrf
+            <button class="h-12 px-6 rounded-full bg-indigo-700 text-white grid place-items-center">
+                Thanh toán VNPAY
+            </button>
+        </form>
     </div>
+
     @endif
 </div>
 @endsection
