@@ -72,7 +72,44 @@
 
     <!-- Nút xuất báo cáo -->
     <div class="mb-6">
-        <button onclick="alert('Chức năng xuất báo cáo đang được phát triển.')" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Xuất báo cáo doanh thu</button>
+        <button onclick="document.getElementById('exportModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Xuất báo cáo doanh thu</button>
+    </div>
+
+    <!-- Modal chọn xuất báo cáo -->
+    <div id="exportModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg w-full max-w-md">
+            <h2 class="text-lg font-semibold mb-4">Xuất báo cáo</h2>
+            <form method="POST" action="{{ route('admin.stats.export') }}">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-sm font-medium">Định dạng</label>
+                    <select name="format" class="w-full p-2 rounded border dark:bg-slate-700">
+                        <option value="pdf">PDF</option>
+                        <option value="excel">Excel</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium">Khoảng thời gian</label>
+                    <select name="period" class="w-full p-2 rounded border dark:bg-slate-700" onchange="toggleCustomDate(this)">
+                        <option value="today">Hôm nay</option>
+                        <option value="week">Tuần này</option>
+                        <option value="month">Tháng này</option>
+                        <option value="year">Năm nay</option>
+                        <option value="custom">Tùy chỉnh</option>
+                    </select>
+                </div>
+                <div id="customDate" class="hidden mb-4">
+                    <label class="block text-sm font-medium">Từ ngày</label>
+                    <input type="date" name="custom_start" class="w-full p-2 rounded border dark:bg-slate-700">
+                    <label class="block text-sm font-medium mt-2">Đến ngày</label>
+                    <input type="date" name="custom_end" class="w-full p-2 rounded border dark:bg-slate-700">
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="document.getElementById('exportModal').classList.add('hidden')" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Xuất</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Biểu đồ -->
@@ -106,6 +143,12 @@
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Toggle custom date inputs
+    function toggleCustomDate(select) {
+        const customDate = document.getElementById('customDate');
+        customDate.classList.toggle('hidden', select.value !== 'custom');
+    }
+
     // Biểu đồ cột: Tài chính
     new Chart(document.getElementById('financialChart'), {
         type: 'bar',

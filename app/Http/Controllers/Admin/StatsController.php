@@ -14,6 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SalesReportExport;
 
 class StatsController extends Controller
 {
@@ -121,7 +124,74 @@ class StatsController extends Controller
 
     public function exportReport(Request $request)
     {
-        // Chức năng xuất báo cáo sẽ được implement sau
-        return redirect()->route('admin.stats')->with('error', 'Chức năng xuất báo cáo đang được phát triển.');
+        try {
+            $format = $request->input('format', 'pdf');
+            $period = $request->input('period', 'month');
+
+            // Xác định khoảng thời gian
+            switch ($period) {
+                case 'today':
+                    $start = now()->startOfDay();
+                    $end = now()->endOfDay();
+                    $periodText = 'Hôm nay (' . now()->format('d/m/Y') . ')';
+                    break;
+                case 'week':
+                    $start = now()->startOfWeek();
+                    $end = now()->endOfWeek();
+                    $periodText = 'Tuần này (' . $start->format('d/m/Y') . ' - ' . $end->format('d/m/Y') . ')';
+                    break;
+                case 'month':
+                    $start = now()->startOfMonth();
+                    $end = now()->endOfMonth();
+                    $periodText = 'Tháng ' . now()->format('m/Y');
+                    break;
+                case 'year':
+                    $start = now()->startOfYear();
+                    $end = now()->endOfYear();
+                    $periodText = 'Năm ' . now()->format('Y');
+                    break;
+                case 'custom':
+                    $start = Carbon::parse($request->input('custom_start'));
+                    $end = Carbon::parse($request->input('custom_end'));
+                    $periodText = $start->format('d/m/Y') . ' - ' . $end->format('d/m/Y');
+                    break;
+                default:
+                    $start = now()->startOfMonth();
+                    $end = now()->endOfMonth();
+                    $periodText = 'Tháng ' . now()->format('m/Y');
+            }
+
+            // Tính toán số liệu báo cáo
+            $ordersCount = Order::whereBetween('order_date', [$start, $end])->count();
+            $sales = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.order_id')
+                ->whereBetween('orders.order_date', [$start, $end])
+                ->sum('order_items.quantity');
+            $revenue = Order::whereBetween('order_date', [$start, $end])->sum('total_amount');
+            $cost = PurchaseOrder::whereBetween('order_date', [$start, $end])->sum('total_amount');
+            $profit = $revenue - $cost;
+
+            $data = [
+                'periodText' => $periodText,
+                'userName' => auth()->user()->full_name,
+                'ordersCount' => $ordersCount,
+                'sales' => $sales,
+                'revenue' => $revenue,
+                'cost' => $cost,
+                'profit' => $profit,
+                'date' => now()->format('d/m/Y H:i'),
+            ];
+
+            // Xuất PDF
+        if ($format === 'pdf') {
+    $pdf = Pdf::loadView('admin.reports.sales', $data);
+    return $pdf->download('bao-cao-doanh-thu-' . now()->format('YmdHis') . '.pdf');
+}
+
+            // Xuất Excel
+            return Excel::download(new SalesReportExport($data), 'bao-cao-doanh-thu-' . now()->format('YmdHis') . '.xlsx');
+        } catch (\Exception $e) {
+            Log::error('Error in StatsController@exportReport: ' . $e->getMessage());
+            return redirect()->route('admin.stats')->with('error', 'Lỗi khi xuất báo cáo: ' . $e->getMessage());
+        }
     }
 }
