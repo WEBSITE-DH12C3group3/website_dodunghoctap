@@ -153,6 +153,11 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage_users')->name('admin.users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])
             ->middleware('permission:manage_users')->name('admin.users.destroy');
+
+
+        Route::get('/stats', [StatsController::class, 'index'])
+          ->middleware('permission:view_statistics')->name('admin.stats');  
+        Route::post('/stats/export', [StatsController::class, 'exportReport'])->name('admin.stats.export');    
     });
 });
 
