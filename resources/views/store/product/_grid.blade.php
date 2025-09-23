@@ -9,7 +9,8 @@
 </div> {{-- Khối này chứa tiêu đề và liên kết sắp xếp --}}
 
 @if($products->isEmpty())
-<div class="h-40 w-80 grid place-items-center rounded-xl border border-dashed text-gray-500">
+<div class="h-80 grid place-items-center rounded-xl border border-dashed text-gray-500">
+  <img src="https://cdn.hstatic.net/themes/200001055169/1001394513/14/cart_banner_image.jpg?v=468" alt="empty" class="mx-auto h-60 object-contain">
   Không có sản phẩm nào
 </div>
 @else
