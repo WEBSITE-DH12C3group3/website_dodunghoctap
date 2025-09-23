@@ -59,7 +59,7 @@
 
                         {{-- Tên / Giá / Nút: căn giữa --}}
                         <div class="px-4 pb-4">
-                            <div class="text-center font-medium line-clamp-2 min-h-[44px]">
+                            <div class="text-center font-medium line-clamp-2 min-h-[44px]  group-hover/card:text-blue-600 ">
                                 {{ $p->product_name }}
                             </div>
 

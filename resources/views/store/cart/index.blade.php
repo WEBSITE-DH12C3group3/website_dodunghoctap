@@ -52,7 +52,7 @@
                         </a>
                     </div>
                     {{-- 2) Tên sản phẩm --}}
-                    <div class="md:col-span-4 flex items-center justify-center text-center min-w-0">
+                    <div class="md:col-span-3 flex items-center justify-center text-center min-w-0">
                         <a href="{{ route('store.product.show', $item['product_id'] ?? $item['id']) }}"
                             class="group/name inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">
                             <h3 class="font-medium leading-6 line-clamp-2 text-gray-900 transition-colors
@@ -85,7 +85,7 @@
                     </div>
 
                     {{-- 5) Tạm tính (center) --}}
-                    <div class="md:col-span-1 flex flex-col items-center justify-center text-center">
+                    <div class="md:col-span-2 flex flex-col items-center justify-center text-center">
                         <div class="text-xs text-gray-500">Tạm tính</div>
                         <div class="font-semibold" data-subtotal>
                             {{ number_format($subtotal,0,',','.') }}đ

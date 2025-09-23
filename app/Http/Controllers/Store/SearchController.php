@@ -52,8 +52,8 @@ class SearchController extends Controller
             })
             ->when($min !== null && $max !== null, function ($w) use ($min, $max) {
                 $w->whereBetween('p.price', [$min, $max]);
-            })
-            ->orderBy('p.created_at', 'desc');
+            });
+        // ->orderBy('p.created_at', 'desc');
         switch ($sort) {
             case 'price_asc':
                 $query->orderBy('p.price', 'asc');

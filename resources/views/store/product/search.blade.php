@@ -91,19 +91,34 @@
                 </div>
             </form>
 
-            {{-- Thêm class 'justify-end' cho div Sắp xếp để căn phải --}}
+            @php
+            $q = request()->query(); // tất cả query hiện có
+            $sort = request('sort', 'newest'); // sort hiện tại
+            $base = $q; unset($base['page']); // bỏ page khi đổi sort
+            $urlAsc = url()->current() . '?' . http_build_query(array_replace($base, ['sort' => 'price_asc']));
+            $urlDes = url()->current() . '?' . http_build_query(array_replace($base, ['sort' => 'price_desc']));
+            $urlNew = url()->current() . '?' . http_build_query(array_replace($base, ['sort' => 'newest']));
+            @endphp
+
             <div class="flex items-center gap-3 text-sm justify-end mt-4">
                 <span class="text-gray-700">Sắp xếp:</span>
-                <a href="http://127.0.0.1:8000/search?sort=price_asc" class="text-gray-500 hover:text-gray-700">
+
+                <a href="{{ $urlAsc }}"
+                    class="{{ $sort==='price_asc' ? 'text-blue-600 font-semibold' : 'text-gray-500 hover:text-gray-700' }}">
                     Giá tăng dần
                 </a>
-                <a href="http://127.0.0.1:8000/search?sort=price_desc" class="text-gray-500 hover:text-gray-700">
+
+                <a href="{{ $urlDes }}"
+                    class="{{ $sort==='price_desc' ? 'text-blue-600 font-semibold' : 'text-gray-500 hover:text-gray-700' }}">
                     Giá giảm dần
                 </a>
-                <a href="http://127.0.0.1:8000/search?sort=newest" class="text-blue-600 font-semibold">
+
+                <a href="{{ $urlNew }}"
+                    class="{{ $sort==='newest' ? 'text-blue-600 font-semibold' : 'text-gray-500 hover:text-gray-700' }}">
                     Mới nhất
                 </a>
             </div>
+
         </div>
     </div>
     <script>
@@ -216,21 +231,21 @@
         })();
     </script>
 
-{{-- GRID 4x4 --}}
-<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4 xl:gap-5">
-    @forelse ($products as $p)
-    <a href="{{ route('store.product.show', $p->product_id) }}"
-       class="group relative bg-white rounded-3xl border border-gray-100 shadow-sm
+    {{-- GRID 4x4 --}}
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4 xl:gap-5">
+        @forelse ($products as $p)
+        <a href="{{ route('store.product.show', $p->product_id) }}"
+            class="group relative bg-white rounded-3xl border border-gray-100 shadow-sm
               overflow-hidden flex flex-col transition
               hover:-translate-y-1 hover:shadow-lg hover:ring-1 hover:ring-blue-100">
 
-        {{-- Ảnh --}}
-        <div class="aspect-[4/5] bg-gray-50/80">
-            <img src="{{ $p->image_url ? asset('storage/' . $p->image_url) : asset('images/placeholder.webp') }}"
-                 alt="{{ $p->product_name }}"
-                 class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                 onerror="this.src='{{ asset('images/placeholder.webp') }}'; this.onerror=null;" />
-        </div>
+            {{-- Ảnh --}}
+            <div class="aspect-[4/5] bg-gray-50/80">
+                <img src="{{ $p->image_url ? asset('storage/' . $p->image_url) : asset('images/placeholder.webp') }}"
+                    alt="{{ $p->product_name }}"
+                    class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    onerror="this.src='{{ asset('images/placeholder.webp') }}'; this.onerror=null;" />
+            </div>
 
             {{-- Nội dung --}}
             <div class="p-3 md:p-4">
@@ -240,11 +255,11 @@
                 </h3>
 
                 {{-- Rating + Đã bán: đổi xanh khi hover --}}
-                <div class="mt-2 flex items-center gap-2 text-[12px] text-gray-500 group-hover:text-blue-600 transition-colors">
+                <div class="mt-2 flex items-center gap-2 text-[12px] text-gray-500 transition-colors">
                     @php $rating = (int) round($p->avg_rating ?? 0); @endphp
                     <div class="flex">
                         @for ($i=1; $i<=5; $i++)
-                            <svg class="w-4 h-4 {{ $i <= $rating ? 'text-amber-400' : 'text-gray-300 group-hover:text-blue-300' }}"
+                            <svg class="w-4 h-4 {{ $i <= $rating ? 'text-amber-400' : 'text-gray-300 ' }}"
                             viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.2 3.685a1 1 0 00.95.69h3.873c.969 0 1.371 1.24.588 1.81l-3.135 2.279a1 1 0 00-.364 1.118l1.2 3.685c.3.921-.755 1.688-1.54 1.118L10 15.347l-3.273 2.065c-.784.57-1.838-.197-1.539-1.118l1.2-3.685a1 1 0 00-.364-1.118L2.89 9.112c-.783-.57-.38-1.81.588-1.81h3.873a1 1 0 00.95-.69l1.2-3.685z" />
                             </svg>
