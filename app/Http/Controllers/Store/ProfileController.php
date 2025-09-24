@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order; // Thêm model Order
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -10,7 +11,9 @@ class ProfileController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        return view('store.profile.index', compact('user'));
+        $orders = Order::where('user_id', $user->id)->orderBy('order_date', 'desc')->get();
+
+        return view('store.profile.index', compact('user', 'orders'));
     }
 
     public function update(Request $request)
