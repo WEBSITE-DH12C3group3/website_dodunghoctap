@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Comment;
 use App\Models\Coupon;
+use App\Models\Favourite;
 use Illuminate\Support\Facades\DB;
 
 class ProductShowController extends Controller
@@ -14,6 +15,13 @@ class ProductShowController extends Controller
     {
         $product = Product::with(['brand'])->findOrFail($id);
 
+        $isFav = false;
+        if (auth()->check()) {
+            $isFav = Favourite::where('user_id', auth()->id())
+                ->where('product_id', $product->product_id)
+                ->exists();
+        }
+        $favouritesCount = $product->favourites()->count();
         // Sản phẩm cùng danh mục
         $related = Product::query()
             ->where('category_id', $product->category_id)
@@ -44,6 +52,6 @@ class ProductShowController extends Controller
             ->get();
         $dist = collect([5, 4, 3, 2, 1])->mapWithKeys(fn($r) => [$r => (int)($counts[$r] ?? 0)]);
 
-        return view('store.product.show', compact('product', 'related', 'comments', 'avg', 'total', 'coupons', 'dist'));
+        return view('store.product.show', compact('product', 'related', 'comments', 'avg', 'total', 'coupons', 'dist', 'isFav', 'favouritesCount'));
     }
 }

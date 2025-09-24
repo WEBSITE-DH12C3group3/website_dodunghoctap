@@ -132,12 +132,11 @@
             const priceHiddenInput = document.getElementById('priceHidden');
             const sliderContainer = document.getElementById('priceSlider');
 
-            const MIN_GAP = 0;
             const STEP = 1000;
+            const GAP = STEP; // khoảng cách tối thiểu giữa 2 đầu
 
-            function fmt(n) {
-                return Number(n).toLocaleString('vi-VN') + '₫';
-            }
+            const toNumber = v => +v;
+            const fmt = n => Number(n).toLocaleString('vi-VN') + '₫';
 
             function updateRange() {
                 const minVal = +minRange.value;
@@ -157,38 +156,17 @@
 
             function autoSubmit() {
                 clearTimeout(t);
-                t = setTimeout(() => form.submit(), 350);
+                t = setTimeout(() => form.submit(), 300);
             }
 
-            // --- Cập nhật logic kéo bằng chuột ---
+            // ---- DRAG ----
             let isDragging = false;
             let activeHandle = null;
 
             function handleDrag(e) {
                 if (!isDragging || !activeHandle) return;
                 e.preventDefault();
-                const sliderRect = sliderContainer.getBoundingClientRect();
-                let newX = e.clientX - sliderRect.left;
-                let percent = (newX / sliderRect.width);
-                let newValue = +minRange.min + (percent * (maxRange.max - minRange.min));
-
-                // Làm tròn giá trị theo STEP
-                newValue = Math.round(newValue / STEP) * STEP;
-
-                if (activeHandle === 'min') {
-                    if (newValue <= +maxRange.value) {
-                        minRange.value = Math.max(newValue, +minRange.min);
-                    } else {
-                        minRange.value = +maxRange.value - STEP;
-                    }
-                } else if (activeHandle === 'max') {
-                    if (newValue >= +minRange.value) {
-                        maxRange.value = Math.min(newValue, +maxRange.max);
-                    } else {
-                        maxRange.value = +minRange.value + STEP;
-                    }
-                }
-                updateRange();
+                setFromClick(e.clientX, /*submit*/ false); // kéo thì chỉ render, submit khi mouseup
             }
 
             function startDrag(e, handleType) {
@@ -204,29 +182,67 @@
                 activeHandle = null;
                 document.removeEventListener('mousemove', handleDrag);
                 document.removeEventListener('mouseup', stopDrag);
-                autoSubmit(); // Gửi form khi người dùng dừng kéo
+                autoSubmit(); // submit khi dừng kéo
             }
 
-            // Bắt đầu kéo khi nhấn chuột vào nút
+            // ---- CLICK TRÊN TRACK: đặt giá trị NGAY lập tức ----
+            function valueFromClientX(clientX) {
+                const rect = sliderContainer.getBoundingClientRect();
+                let ratio = (clientX - rect.left) / rect.width; // 0..1
+                ratio = Math.max(0, Math.min(1, ratio));
+                const minAbs = +minRange.min,
+                    maxAbs = +maxRange.max;
+                let v = minAbs + ratio * (maxAbs - minAbs);
+                // làm tròn theo STEP:
+                v = Math.round(v / STEP) * STEP;
+                // kẹp biên:
+                v = Math.max(minAbs, Math.min(v, maxAbs));
+                return v;
+            }
+
+            function setFromClick(clientX, submitNow = true) {
+                const v = valueFromClientX(clientX);
+                // chọn handle gần hơn vị trí click (nếu đang kéo thì ưu tiên handle đang active)
+                const dMin = Math.abs(v - (+minRange.value));
+                const dMax = Math.abs(v - (+maxRange.value));
+                const which = activeHandle ?? (dMin <= dMax ? 'min' : 'max');
+
+                if (which === 'min') {
+                    const maxAllowed = +maxRange.value - GAP;
+                    minRange.value = Math.min(Math.max(v, +minRange.min), maxAllowed);
+                } else {
+                    const minAllowed = +minRange.value + GAP;
+                    maxRange.value = Math.max(Math.min(v, +maxRange.max), minAllowed);
+                }
+
+                updateRange();
+                if (submitNow) autoSubmit();
+            }
+
+            // --- Events ---
+            // kéo bằng chuột trên thumb
             minRange.addEventListener('mousedown', (e) => startDrag(e, 'min'));
             maxRange.addEventListener('mousedown', (e) => startDrag(e, 'max'));
-            // Bắt đầu kéo khi nhấn chuột vào vùng thanh trượt
+
+            // click trên track: cập nhật NGAY và cho phép kéo nếu giữ chuột
             sliderContainer.addEventListener('mousedown', function(e) {
+                // nếu click thẳng vào thumb thì đã có listener riêng ở trên
+                if (e.target === minRange || e.target === maxRange) return;
+                // đặt giá trị ngay tại vị trí click
+                // đồng thời xác định handle gần nhất để kéo tiếp nếu giữ chuột
                 const rect = this.getBoundingClientRect();
-                const minHandleX = (minRange.value - minRange.min) / (maxRange.max - minRange.min) * rect.width;
-                const maxHandleX = (maxRange.value - minRange.min) / (maxRange.max - minRange.min) * rect.width;
+                const minX = ((+minRange.value - +minRange.min) / (+maxRange.max - +minRange.min)) * rect.width + rect.left;
+                const maxX = ((+maxRange.value - +minRange.min) / (+maxRange.max - +minRange.min)) * rect.width + rect.left;
+                activeHandle = (Math.abs(e.clientX - minX) <= Math.abs(e.clientX - maxX)) ? 'min' : 'max';
 
-                const distMin = Math.abs(e.clientX - rect.left - minHandleX);
-                const distMax = Math.abs(e.clientX - rect.left - maxHandleX);
-
-                if (distMin <= distMax) {
-                    startDrag(e, 'min');
-                } else {
-                    startDrag(e, 'max');
-                }
+                setFromClick(e.clientX, /*submitNow*/ true); // <-- cập nhật NGAY + debounce submit
+                // nếu người dùng giữ chuột và kéo tiếp
+                isDragging = true;
+                document.addEventListener('mousemove', handleDrag);
+                document.addEventListener('mouseup', stopDrag);
             });
 
-            // Khởi tạo trạng thái ban đầu
+            // init
             updateRange();
         })();
     </script>
