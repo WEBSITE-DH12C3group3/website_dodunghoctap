@@ -52,14 +52,30 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        // Ánh xạ trạng thái đơn hàng sang tiếng Việt
+                        $statusMap = [
+                            'pending' => 'Chờ xử lý',
+                            'confirmed' => 'Đã xác nhận',
+                            'cancelled' => 'Đã hủy',
+                            'delivered' => 'Đã giao',
+                        ];
+
+                        // Ánh xạ phương thức thanh toán (nếu cần)
+                        $paymentMethodMap = [
+                            'cod' => 'Thanh toán khi nhận hàng',
+                            'bank_transfer' => 'Chuyển khoản ngân hàng',
+                            // Thêm nếu có thêm phương thức
+                        ];
+                    @endphp
                     @foreach ($orders as $order)
                     <tr class="border-b border-slate-200 dark:border-slate-700">
                         <td class="px-4 py-3">{{ $order->order_id }}</td>
                         <td class="px-4 py-3">{{ $order->user ? $order->user->full_name : 'Khách vãng lai' }}</td>
                         <td class="px-4 py-3">{{ $order->order_date }}</td>
                         <td class="px-4 py-3">{{ number_format($order->total_amount, 0, ',', '.') }} VNĐ</td>
-                        <td class="px-4 py-3">{{ ucfirst($order->payment_method) }}</td>
-                        <td class="px-4 py-3">{{ ucfirst($order->status) }}</td>
+                        <td class="px-4 py-3">{{ $paymentMethodMap[$order->payment_method] ?? ucfirst($order->payment_method) }}</td>
+                        <td class="px-4 py-3">{{ $statusMap[$order->status] ?? ucfirst($order->status) }}</td>
                         <td class="px-4 py-3 flex gap-2">
                             <a href="{{ route('admin.orders.show', $order->order_id) }}" class="text-blue-600 hover:underline">Xem chi tiết</a>
                             <a href="{{ route('admin.orders.edit', $order->order_id) }}" class="text-green-600 hover:underline">Cập nhật</a>

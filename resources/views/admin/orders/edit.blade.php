@@ -12,10 +12,10 @@
             <div>
                 <label for="status" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Trạng thái đơn hàng</label>
                 <select name="status" id="status" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600" required>
-                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
+                    <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
+                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Đã giao</option>
                 </select>
                 @error('status')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -25,8 +25,8 @@
             <div>
                 <label for="shipping_type" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Loại hình vận chuyển</label>
                 <select name="shipping_type" id="shipping_type" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600">
-                    <option value="standard" {{ old('shipping_type', $order->delivery->shipping_type ?? 'standard') == 'standard' ? 'selected' : '' }}>Standard</option>
-                    <option value="express" {{ old('shipping_type', $order->delivery->shipping_type ?? 'standard') == 'express' ? 'selected' : '' }}>Express</option>
+                    <option value="standard" {{ old('shipping_type', $order->delivery?->shipping_type ?? 'standard') == 'standard' ? 'selected' : '' }}>Chuẩn</option>
+                    <option value="express" {{ old('shipping_type', $order->delivery?->shipping_type ?? 'standard') == 'express' ? 'selected' : '' }}>Nhanh</option>
                 </select>
                 @error('shipping_type')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -36,10 +36,10 @@
             <div>
                 <label for="shipping_provider" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Đơn vị vận chuyển</label>
                 <select name="shipping_provider" id="shipping_provider" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600">
-                    <option value="GHTK" {{ old('shipping_provider', $order->delivery->shipping_provider ?? 'GHTK') == 'GHTK' ? 'selected' : '' }}>GHTK</option>
-                    <option value="GHN" {{ old('shipping_provider', $order->delivery->shipping_provider ?? 'GHTK') == 'GHN' ? 'selected' : '' }}>GHN</option>
-                    <option value="Viettel Post" {{ old('shipping_provider', $order->delivery->shipping_provider ?? 'GHTK') == 'Viettel Post' ? 'selected' : '' }}>Viettel Post</option>
-                    <option value="Other" {{ old('shipping_provider', $order->delivery->shipping_provider ?? 'GHTK') == 'Other' ? 'selected' : '' }}>Other</option>
+                    <option value="GHTK" {{ old('shipping_provider', $order->delivery?->shipping_provider ?? 'GHTK') == 'GHTK' ? 'selected' : '' }}>GHTK</option>
+                    <option value="GHN" {{ old('shipping_provider', $order->delivery?->shipping_provider ?? 'GHTK') == 'GHN' ? 'selected' : '' }}>GHN</option>
+                    <option value="Viettel Post" {{ old('shipping_provider', $order->delivery?->shipping_provider ?? 'GHTK') == 'Viettel Post' ? 'selected' : '' }}>Viettel Post</option>
+                    <option value="Other" {{ old('shipping_provider', $order->delivery?->shipping_provider ?? 'GHTK') == 'Other' ? 'selected' : '' }}>Khác</option>
                 </select>
                 @error('shipping_provider')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -48,7 +48,14 @@
 
             <div>
                 <label for="delivery_status" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Trạng thái giao hàng</label>
-                <input type="text" name="delivery_status" id="delivery_status" value="{{ old('delivery_status', $order->delivery->delivery_status ?? 'pending') }}" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600">
+                <select name="delivery_status" id="delivery_status" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600">
+                    <option value="pending" {{ old('delivery_status', $order->delivery?->delivery_status ?? 'pending') == 'pending' ? 'selected' : '' }}>Chờ giao</option>
+                    <option value="shipping" {{ old('delivery_status', $order->delivery?->delivery_status ?? 'pending') == 'shipping' ? 'selected' : '' }}>Đang giao</option>
+                    <option value="delivered" {{ old('delivery_status', $order->delivery?->delivery_status ?? 'pending') == 'delivered' ? 'selected' : '' }}>Đã giao</option>
+                    <option value="returned" {{ old('delivery_status', $order->delivery?->delivery_status ?? 'pending') == 'returned' ? 'selected' : '' }}>Hoàn hàng</option>
+                    <option value="cancelled" {{ old('delivery_status', $order->delivery?->delivery_status ?? 'pending') == 'cancelled' ? 'selected' : '' }}>Hủy giao</option>
+                    <option value="null" {{ old('delivery_status', $order->delivery?->delivery_status) === null ? 'selected' : '' }}>Chưa tạo</option>
+                </select>
                 @error('delivery_status')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -56,7 +63,7 @@
 
             <div>
                 <label for="expected_delivery_date" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Ngày giao dự kiến</label>
-                <input type="date" name="expected_delivery_date" id="expected_delivery_date" value="{{ old('expected_delivery_date', $order->delivery->expected_delivery_date ?? now()->addDays(3)->format('Y-m-d')) }}" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600">
+                <input type="date" name="expected_delivery_date" id="expected_delivery_date" value="{{ old('expected_delivery_date', $order->delivery?->expected_delivery_date ?? now()->addDays(3)->format('Y-m-d')) }}" class="mt-1 block w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:ring-brand-600 focus:border-brand-600">
                 @error('expected_delivery_date')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror

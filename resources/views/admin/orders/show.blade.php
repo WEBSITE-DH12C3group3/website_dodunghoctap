@@ -4,14 +4,40 @@
 <div class="bg-white/80 dark:bg-slate-900/50 backdrop-blur p-6 rounded-2xl shadow ring-1 ring-slate-900/5 dark:ring-white/10">
     <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-6">Chi tiết đơn hàng #{{ $order->order_id }}</h2>
 
+    @php
+        // Ánh xạ trạng thái đơn hàng sang tiếng Việt
+        $statusMap = [
+            'pending' => 'Chờ xử lý',
+            'confirmed' => 'Đã xác nhận',
+            'cancelled' => 'Đã hủy',
+            'delivered' => 'Đã giao',
+        ];
+
+        // Ánh xạ trạng thái giao hàng sang tiếng Việt
+        $deliveryStatusMap = [
+            'pending' => 'Chờ giao',
+            'shipping' => 'Đang giao',
+            'delivered' => 'Đã giao',
+            'returned' => 'Hoàn hàng',
+            'cancelled' => 'Hủy giao',
+        ];
+
+        // Trạng thái thanh toán (giả định dựa trên payment_method)
+        $paymentMethodMap = [
+            'cod' => 'Thanh toán khi nhận hàng',
+            'bank_transfer' => 'Chuyển khoản ngân hàng',
+            // Thêm nếu có thêm phương thức
+        ];
+    @endphp
+
     <div class="grid gap-6 md:grid-cols-2">
         <div>
             <h3 class="font-semibold mb-2">Thông tin đơn hàng</h3>
             <p>Khách hàng: {{ $order->user ? $order->user->full_name : 'Khách vãng lai' }}</p>
             <p>Ngày đặt: {{ $order->order_date }}</p>
             <p>Tổng tiền: {{ number_format($order->total_amount, 0, ',', '.') }} VNĐ</p>
-            <p>Thanh toán: {{ ucfirst($order->payment_method) }}</p>
-            <p>Trạng thái: {{ ucfirst($order->status) }}</p>
+            <p>Thanh toán: {{ $paymentMethodMap[$order->payment_method] ?? ucfirst($order->payment_method) }}</p>
+            <p>Trạng thái: {{ $statusMap[$order->status] ?? ucfirst($order->status) }}</p>
         </div>
 
         <div>
@@ -22,7 +48,7 @@
                 <p>Email: {{ $order->delivery->email }}</p>
                 <p>Địa chỉ: {{ $order->delivery->address }}</p>
                 <p>Ghi chú: {{ $order->delivery->note ?? 'Không có' }}</p>
-                <p>Trạng thái giao: {{ ucfirst($order->delivery->delivery_status) }}</p>
+                <p>Trạng thái giao: {{ $deliveryStatusMap[$order->delivery->delivery_status] ?? ucfirst($order->delivery->delivery_status) }}</p>
                 <p>Ngày giao dự kiến: {{ $order->delivery->expected_delivery_date ?? 'Chưa xác định' }}</p>
                 <p>Loại hình vận chuyển: {{ ucfirst($order->delivery->shipping_type) }}</p>
                 <p>Đơn vị vận chuyển: {{ $order->delivery->shipping_provider }}</p>
