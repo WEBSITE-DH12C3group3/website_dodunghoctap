@@ -54,8 +54,6 @@
                     </a>
                     @endif
 
-
-
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
@@ -101,9 +99,6 @@
                 {{-- Email (đỏ, chỉ xem) --}}
                 <div>
                     <label class="block text-[16px] font-medium text-gray-700 mb-1">Email: <span class="text-red-600 font-bold">{{ $user->email }}</span></label>
-                    <!-- <div class="h-12 flex items-center px-3 rounded-md bg-[#F3F4F6] border border-gray-300"> -->
-
-                    <!-- </div> -->
                 </div>
 
                 {{-- Số điện thoại --}}
@@ -134,6 +129,44 @@
                     </button>
                 </div>
             </form>
+
+            <!-- Section Danh sách đơn hàng -->
+            <div class="px-6 py-4 border-t border-gray-200">
+                <h2 class="text-[16px] md:text-[20px] font-semibold tracking-wide text-gray-800 mb-4">
+                    DANH SÁCH ĐƠN HÀNG
+                </h2>
+                @if($orders->isEmpty())
+                    <div class="text-center text-gray-500 py-6">Bạn chưa có đơn hàng nào.</div>
+                @else
+                    <div class="space-y-4">
+                        @foreach($orders as $order)
+                            <div class="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-100">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Đơn hàng #{{ $order->order_id }}</p>
+                                        <p class="text-xs text-gray-500">Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-semibold text-gray-800">{{ number_format($order->total, 0, ',', '.') }}₫</p>
+                                        <p class="text-xs text-gray-500">{{ $order->status }}</p>
+                                    </div>
+                                </div>
+                                <a href="{{ route('store.orders.show', $order->order_id) }}"
+                                   class="mt-2 inline-block text-sm text-[#1E4DE8] hover:underline">
+                                    Xem chi tiết
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                    <!-- Pagination nếu có nhiều trang -->
+                    @if($orders->hasPages())
+                        <div class="mt-6">
+                            {{ $orders->links() }}
+                        </div>
+                    @endif
+                @endif
+            </div>
+            <!-- End Section Danh sách đơn hàng -->
         </section>
 
     </div>

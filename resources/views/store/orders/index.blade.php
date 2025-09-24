@@ -6,7 +6,7 @@
 <div class="max-w-[1320px] mx-auto px-4 py-6">
     <div class="grid grid-cols-1 md:grid-cols-[340px,1fr] gap-6">
 
-        {{-- SIDEBAR --}}
+        {{-- SIDEBAR (giữ nguyên) --}}
         <aside class="bg-white rounded-[10px] shadow border border-gray-200">
             <div class="py-6 flex flex-col items-center">
                 @php
@@ -42,7 +42,6 @@
                     </a>
 
                     @php
-                    // kiểm tra role admin (role_id = 1)
                     $isAdmin = auth()->user()->role_id == 1;
                     @endphp
                     @if($isAdmin)
@@ -95,13 +94,13 @@
                     <tbody class="divide-y divide-gray-200">
                         @foreach ($orders as $od)
                         @php
-                        [$payText, $payClass] = $paymentBadge[$od->status] ?? ['Không rõ','bg-gray-100 text-gray-600'];
-                        [$shipText, $shipClass] = $shippingBadge[$od->delivery_status] ?? ['Không rõ','bg-gray-100 text-gray-600'];
+                        [$payText, $payClass] = $paymentBadge[$od->status] ?? ['Không rõ', 'bg-gray-100 text-gray-600'];
+                        [$shipText, $shipClass] = $shippingBadge[$od->delivery_status] ?? ['Không rõ', 'bg-gray-100 text-gray-600'];
                         @endphp
-                        <tr>
+                        <tr class="group">
                             <td class="py-3 px-4 font-medium text-gray-800">#{{ $od->order_id }}</td>
                             <td class="py-3 px-4 text-gray-600">{{ \Carbon\Carbon::parse($od->order_date)->format('d/m/Y H:i') }}</td>
-                            <td class="py-3 px-4 text-right text-gray-600">{{ number_format($od->total_amount,0,',','.') }}đ</td>
+                            <td class="py-3 px-4 text-right text-gray-600">{{ number_format($od->total_amount, 0, ',', '.') }}đ</td>
                             <td class="py-3 px-4">
                                 <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold {{ $payClass }}">
                                     {{ $payText }}
@@ -113,8 +112,25 @@
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-right">
-                                <a href="{{ url('/orders/'.$od->order_id) }}"
-                                    class="text-[#1E4DE8] hover:text-[#143BC5] font-medium">Xem chi tiết</a>
+                                <button onclick="toggleDetails(this)" class="text-[#1E4DE8] hover:text-[#143BC5] font-medium" data-order-id="{{ $od->order_id }}">
+                                    Xem chi tiết
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="hidden detail-row-{{ $od->order_id }} bg-gray-50">
+                            <td colspan="6" class="p-4">
+                                <div class="space-y-2">
+                                    <p class="text-sm font-medium text-gray-700">Thông tin chi tiết:</p>
+                                    <p class="text-gray-600">Ngày đặt: {{ \Carbon\Carbon::parse($od->order_date)->format('d/m/Y H:i') }}</p>
+                                    <p class="text-gray-600">Tổng tiền: {{ number_format($od->total_amount, 0, ',', '.') }}đ</p>
+                                    @if(in_array($od->status, ['pending', 'pending_confirmation']))
+                                        <form action="{{ route('store.orders.cancel', $od->order_id) }}" method="POST" class="mt-2 inline">
+                                            @csrf
+                                            @method('POST')
+                                            <button type="submit" class="text-sm text-red-600 hover:underline">Hủy đơn hàng</button>
+                                        </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -126,8 +142,29 @@
                 {{ $orders->links() }}
             </div>
             @endif
+
+            @if(session('ok'))
+                <div class="p-6 text-center text-green-600">{{ session('ok') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="p-6 text-center text-red-600">{{ session('error') }}</div>
+            @endif
         </section>
 
     </div>
 </div>
+
+<script>
+    function toggleDetails(button) {
+        const orderId = button.getAttribute('data-order-id');
+        const detailRow = document.querySelector(`.detail-row-${orderId}`);
+        if (detailRow.classList.contains('hidden')) {
+            detailRow.classList.remove('hidden');
+            button.textContent = 'Ẩn chi tiết';
+        } else {
+            detailRow.classList.add('hidden');
+            button.textContent = 'Xem chi tiết';
+        }
+    }
+</script>
 @endsection

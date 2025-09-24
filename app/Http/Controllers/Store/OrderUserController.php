@@ -51,4 +51,31 @@ class OrderUserController extends Controller
 
         return view('store.orders.index', compact('orders', 'paymentBadge', 'shippingBadge'));
     }
+
+    public function cancel($orderId)
+{
+    $userId = auth()->id();
+    $order = DB::table('orders')
+        ->where('order_id', $orderId)
+        ->where('user_id', $userId)
+        ->first();
+
+    if (!$order) {
+        return redirect()->back()->with('error', 'Đơn hàng không tồn tại hoặc không thuộc về bạn.');
+    }
+
+    if (!in_array($order->status, ['pending', 'pending_confirmation'])) {
+        return redirect()->back()->with('error', 'Chỉ có thể hủy đơn hàng khi trạng thái là "Chưa thanh toán" hoặc "Chờ xác nhận".');
+    }
+
+    DB::table('orders')
+        ->where('order_id', $orderId)
+        ->update(['status' => 'cancelled']);
+
+    DB::table('delivery')
+        ->where('order_id', $orderId)
+        ->update(['delivery_status' => 'cancelled']);
+
+    return redirect()->route('store.orders.index')->with('ok', 'Đơn hàng đã được hủy thành công.');
+}
 }

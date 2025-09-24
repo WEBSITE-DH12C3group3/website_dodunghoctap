@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Store\HomeController;
@@ -67,6 +66,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/orders', [OrderUserController::class, 'index'])->name('store.orders.index');
+    Route::post('/orders/{orderId}/cancel', [OrderUserController::class, 'cancel'])->name('store.orders.cancel');
 });
 
 // admin
@@ -167,7 +167,6 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage_users')->name('admin.users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])
             ->middleware('permission:manage_users')->name('admin.users.destroy');
-
 
         Route::get('/stats', [StatsController::class, 'index'])
             ->middleware('permission:view_statistics')->name('admin.stats');
