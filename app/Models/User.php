@@ -58,4 +58,9 @@ class User extends Authenticatable
         }
         return now()->diffInMinutes($this->last_activity) < 5;
     }
+
+    public function favourites()
+    {
+        return $this->hasMany(\App\Models\Favourite::class, 'user_id', 'user_id');
+    }
 }
