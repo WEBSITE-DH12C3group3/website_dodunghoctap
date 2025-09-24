@@ -94,7 +94,7 @@ class CheckoutController extends Controller
             if ($data['payment_method'] === 'vietqr') {
                 $vietqrUrl = $this->buildVietQr(
                     bankBin: '970422',                    // BIN VCB (ví dụ)
-                    accountNo: '0123456789',                // số tài khoản nhận tiền
+                    accountNo: '2009122004',                // số tài khoản nhận tiền
                     accountName: 'CONG TY TNHH PEAKVL',     // tên chủ tài khoản
                     amount: (int) $grandTotal,
                     addInfo: 'Thanh toan don hang #' . $order->order_id
