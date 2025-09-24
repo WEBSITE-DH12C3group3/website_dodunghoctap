@@ -9,7 +9,7 @@ use App\Http\Controllers\Store\CartController;
 use App\Http\Controllers\Store\ProductReviewController;
 use App\Http\Controllers\Store\ProductListController;
 use App\Http\Controllers\Store\SearchController;
-use App\Http\Controllers\Store\PaymentController;
+use App\Http\Controllers\Store\CheckoutController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -63,13 +63,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/product/{id}/review', [ProductReviewController::class, 'store'])->name('store.product.review.store');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/orders', [OrderController::class, 'storeIndex'])->name('store.orders.index');
 });
-
-// checkout
-Route::post('/checkout/vnpay', [PaymentController::class, 'vnpayStart'])
-    ->name('checkout.vnpay.start');
-Route::get('/checkout/vnpay/return', [PaymentController::class, 'vnpayReturn'])
-    ->name('checkout.vnpay.return');
 
 // admin
 Route::middleware('auth')->group(function () {

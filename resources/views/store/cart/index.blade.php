@@ -278,13 +278,10 @@
                         placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao..."></textarea>
                 </div>
 
-                <form action="#" method="POST" class="mt-5">
-                    @csrf
-                    <button type="submit"
-                        class="w-full h-12 rounded-full bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700">
-                        Tiến hành đặt hàng
-                    </button>
-                </form>
+                <a href="{{ route('checkout.index') }}"
+                    class="block w-full h-12 rounded-full bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 text-center leading-[48px]">
+                    Tiến hành đặt hàng
+                </a>
 
                 <p class="mt-3 text-[13px] text-gray-500 text-center">
                     Bằng việc tiếp tục, bạn đồng ý với <a href="#" class="text-blue-600 hover:underline">Điều khoản mua hàng</a>.
