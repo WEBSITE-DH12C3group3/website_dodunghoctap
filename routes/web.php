@@ -11,6 +11,7 @@ use App\Http\Controllers\Store\ProductListController;
 use App\Http\Controllers\Store\SearchController;
 use App\Http\Controllers\Store\CheckoutController;
 use App\Http\Controllers\Store\OrderUserController;
+use App\Http\Controllers\Store\FavouriteController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -64,6 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/product/{id}/review', [ProductReviewController::class, 'store'])->name('store.product.review.store');
+    Route::post('/favourites/toggle', [FavouriteController::class, 'toggle'])->name('favourites.toggle');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/orders', [OrderUserController::class, 'index'])->name('store.orders.index');

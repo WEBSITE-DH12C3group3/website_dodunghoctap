@@ -40,4 +40,14 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class, 'brand_id', 'brand_id');
     }
+
+    public function favourites()
+    {
+        return $this->hasMany(\App\Models\Favourite::class, 'product_id', 'product_id');
+    }
+
+    public function getFavouritesCountAttribute()
+    {
+        return $this->favourites()->count();
+    }
 }

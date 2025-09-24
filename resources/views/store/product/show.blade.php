@@ -41,20 +41,103 @@
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
                         {{ $product->product_name }}
                     </h1>
-
-                    <div class="mt-2 grid gap-1 text-sm text-gray-600">
-                        <span>Thương hiệu:
-                            <span class="font-medium text-blue-700">{{ $product->brand->brand_name ?? 'Không rõ' }}</span>
-                        </span>
-                        <span>Tình trạng:
-                            @if($product->stock_quantity > 0)
-                            <span class="text-blue-700 font-medium">Còn hàng</span>
-                            @else
-                            <span class="text-rose-600 font-medium">Hết hàng</span>
-                            @endif
-                        </span>
-                        <span>Mã sản phẩm: <span class="font-medium text-blue-700">{{ $product->product_id }}</span></span>
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mt-2 gap-4">
+                        <div class="grid gap-1 text-sm text-gray-600">
+                            <span>Thương hiệu:
+                                <span class="font-medium text-blue-700">{{ $product->brand->brand_name ?? 'Không rõ' }}</span>
+                            </span>
+                            <span>Tình trạng:
+                                @if($product->stock_quantity > 0)
+                                <span class="text-blue-700 font-medium">Còn hàng</span>
+                                @else
+                                <span class="text-rose-600 font-medium">Hết hàng</span>
+                                @endif
+                            </span>
+                            <span>Mã sản phẩm: <span class="font-medium text-blue-700">{{ $product->product_id }}</span></span>
+                        </div>
+                        <div class="flex items-center">
+                            <button
+                                type="button"
+                                class="group inline-flex items-center justify-center w-10 h-10 rounded-full
+                                bg-white/90 ring-1 ring-gray-200 shadow-md
+                                hover:ring-rose-400 hover:scale-110 hover:shadow-lg
+                                transition-all duration-300 ease-in-out
+                                {{ ($isFav ?? false) ? 'text-rose-600' : 'text-gray-400' }}"
+                                id="fav-btn"
+                                data-product-id="{{ $product->product_id }}"
+                                data-require-login="{{ auth()->check() ? '0' : '1' }}"
+                                aria-pressed="{{ ($isFav ?? false) ? 'true' : 'false' }}"
+                                title="{{ ($isFav ?? false) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}">
+                                {{-- Heart icon --}}
+                                @if($isFav ?? false)
+                                {{-- Hiển thị trái tim đầy (filled) khi sản phẩm đã được yêu thích --}}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-heart-fill transform transition-all duration-300 group-hover:scale-110" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314" />
+                                </svg>
+                                @else
+                                {{-- Hiển thị trái tim rỗng (empty) khi sản phẩm chưa được yêu thích --}}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
+                                </svg>
+                                @endif
+                            </button>
+                            <span id="fav-count" class="text-gray-600" style="margin-left: 7px;">{{ $favouritesCount ? $favouritesCount : 0 }}</span>
+                            <span class="ml-1 text-gray-600">lượt yêu thích</span>
+                        </div>
                     </div>
+
+                    <script>
+                        (function() {
+                            const btn = document.getElementById('fav-btn');
+                            if (!btn) return;
+
+                            btn.addEventListener('click', async () => {
+                                if (btn.dataset.requireLogin === '1') {
+                                    window.location.href = "{{ route('login') }}";
+                                    return;
+                                }
+
+                                const productId = btn.dataset.productId;
+                                btn.disabled = true;
+
+                                try {
+                                    const res = await fetch("{{ route('favourites.toggle') }}", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                            "Accept": "application/json"
+                                        },
+                                        body: JSON.stringify({
+                                            product_id: productId
+                                        })
+                                    });
+                                    const data = await res.json();
+
+                                    const added = data.status === 'added';
+
+                                    // đổi màu / trạng thái
+                                    btn.classList.toggle('text-rose-600', added);
+                                    btn.classList.toggle('text-gray-400', !added);
+                                    btn.setAttribute('aria-pressed', added ? 'true' : 'false');
+                                    btn.title = added ? 'Bỏ yêu thích' : 'Thêm vào yêu thích';
+
+                                    // cập nhật đếm (nếu có)
+                                    const countEl = document.getElementById('fav-count');
+                                    if (countEl) {
+                                        let n = parseInt(countEl.textContent || '0', 10);
+                                        countEl.textContent = String(Math.max(0, n + (added ? 1 : -1)));
+                                    }
+                                } catch (e) {
+                                    alert('Không thể cập nhật yêu thích. Vui lòng thử lại.');
+                                } finally {
+                                    btn.disabled = false;
+                                }
+                            });
+                        })();
+                    </script>
+
+
 
                     {{-- Giá (không giảm) --}}
                     <div class="mt-4">
