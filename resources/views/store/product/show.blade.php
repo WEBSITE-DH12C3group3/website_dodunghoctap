@@ -344,7 +344,7 @@
             <h2 class="text-xl font-semibold mb-4">Sản phẩm cùng loại</h2>
             <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 @foreach($related as $p)
-                @include('store.partials.product-card', ['product' => $p])
+                @include('store.partials.product-grid', ['product' => $p])
                 @endforeach
             </div>
         </div>
