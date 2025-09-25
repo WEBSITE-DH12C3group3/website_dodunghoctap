@@ -144,14 +144,14 @@
                                 <div class="flex justify-between items-center">
                                     <div>
                                         <p class="text-sm font-medium text-gray-700">Đơn hàng #{{ $order->order_id }}</p>
-                                        <p class="text-xs text-gray-500">Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p>
+                                         Ngày đặt: {{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y H:i') }}
                                     </div>
                                     <div class="text-right">
                                         <p class="text-sm font-semibold text-gray-800">{{ number_format($order->total, 0, ',', '.') }}₫</p>
                                         <p class="text-xs text-gray-500">{{ $order->status }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ route('store.orders.show', $order->order_id) }}"
+                                <a href="{{ route('store.orders.index', $order->order_id) }}"
                                    class="mt-2 inline-block text-sm text-[#1E4DE8] hover:underline">
                                     Xem chi tiết
                                 </a>
@@ -167,6 +167,40 @@
                 @endif
             </div>
             <!-- End Section Danh sách đơn hàng -->
+<!-- Section Danh sách yêu thích -->
+<div class="px-6 py-4 border-t border-gray-200">
+    <h2 class="text-[16px] md:text-[20px] font-semibold tracking-wide text-gray-800 mb-4">
+        DANH SÁCH YÊU THÍCH
+    </h2>
+    @if($favourites->isEmpty())
+        <div class="text-center text-gray-500 py-6">Bạn chưa có sản phẩm yêu thích nào.</div>
+    @else
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            @foreach($favourites as $fav)
+                <div class="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-100 flex items-center gap-4">
+                    <img src="{{ Str::startsWith($fav->image_url, ['http://', 'https://']) ? $fav->image_url : asset('storage/' . $fav->image_url) }}"
+                         alt="{{ $fav->product_name }}"
+                         class="w-16 h-16 object-cover rounded-md">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-700">{{ $fav->product_name }}</p>
+                        <p class="text-sm text-gray-500">{{ number_format($fav->price, 0, ',', '.') }}₫</p>
+                        <a href="{{ route('store.product.show', $fav->product_id) }}" 
+                           class="inline-block mt-1 text-sm text-[#1E4DE8] hover:underline">
+                           Xem sản phẩm
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        @if($favourites->hasPages())
+            <div class="mt-6">
+                {{ $favourites->links() }}
+            </div>
+        @endif
+    @endif
+</div>
+<!-- End Section Danh sách yêu thích -->
+
         </section>
 
     </div>
