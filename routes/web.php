@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Store\HomeController;
@@ -70,7 +71,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderUserController::class, 'index'])->name('store.orders.index');
     Route::post('/orders/{orderId}/cancel', [OrderUserController::class, 'cancel'])->name('store.orders.cancel');
 });
+Route::get('/checkout/return', [CheckoutController::class, 'payosReturn'])
+    ->name('payos.return');
 
+Route::get('/checkout/cancel', [CheckoutController::class, 'payosCancel'])
+    ->name('payos.cancel');
 // admin
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {

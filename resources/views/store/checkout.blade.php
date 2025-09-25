@@ -48,6 +48,11 @@
                     <input type="radio" name="payment_method" value="vietqr" class="size-4">
                     <span>Thẻ ATM/Visa/Master/JCB/QR Pay qua cổng VietQR</span>
                 </label>
+                <label class="flex items-center gap-3 border rounded-xl px-4 py-3">
+                    <input type="radio" name="payment_method" value="payos" class="size-4">
+                    <span>Thẻ ATM/Visa/Master/JCB/QR Pay qua cổng PayOS</span>
+                </label>
+
             </div>
         </div>
 
