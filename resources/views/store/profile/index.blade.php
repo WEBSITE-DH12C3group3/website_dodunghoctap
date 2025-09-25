@@ -54,6 +54,11 @@
                     </a>
                     @endif
 
+                    <a href="{{ route('profile.password.request') }}" class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium border">
+                        Đổi mật khẩu (OTP email)
+                    </a>
+
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"

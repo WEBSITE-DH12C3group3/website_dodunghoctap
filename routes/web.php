@@ -25,6 +25,7 @@ use App\Http\Controllers\Auth\FacebookController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Store\PasswordOtpController;
 
 
 use Illuminate\Http\Request;
@@ -74,6 +75,24 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/orders', [OrderUserController::class, 'index'])->name('store.orders.index');
     Route::post('/orders/{orderId}/cancel', [OrderUserController::class, 'cancel'])->name('store.orders.cancel');
+
+    Route::get('/profile/password', [PasswordOtpController::class, 'requestForm'])
+    ->name('profile.password.request');
+
+Route::post('/profile/password/otp/send', [PasswordOtpController::class, 'sendOtp'])
+    ->name('profile.password.otp.send');
+
+Route::get('/profile/password/otp/verify', [PasswordOtpController::class, 'verifyForm'])
+    ->name('profile.password.verify.form');
+
+Route::post('/profile/password/otp/verify', [PasswordOtpController::class, 'verifySubmit'])
+    ->name('profile.password.verify.submit');
+
+Route::get('/profile/password/reset', [PasswordOtpController::class, 'resetForm'])
+    ->name('profile.password.reset.form');
+
+Route::post('/profile/password/reset', [PasswordOtpController::class, 'resetSubmit'])
+    ->name('profile.password.reset.submit');
 });
 Route::get('/checkout/return', [CheckoutController::class, 'payosReturn'])
     ->name('payos.return');
