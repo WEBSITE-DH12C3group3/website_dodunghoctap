@@ -69,13 +69,52 @@
                         <span>Quản lý danh mục</span>
                     </a>
                     @endif
-                    @if(auth()->check() && auth()->user()->hasPermission('manage_users'))
+                    <!-- @if(auth()->check() && auth()->user()->hasPermission('manage_users'))
                     <a href="{{ route('admin.users') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.users') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm-7 7a7 7 0 0 1 14 0H5z" />
                         </svg>
                         <span>Quản lý người dùng</span>
                     </a>
+                    @endif -->
+                    {{-- USERS --}}
+                    @if(auth()->check() && auth()->user()->hasPermission('manage_users'))
+                    <a href="{{ route('admin.users') }}"
+                        class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.users*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm-7 7a7 7 0 0 1 14 0H5z" />
+                        </svg>
+                        <span>Quản lý người dùng</span>
+                    </a>
+
+                    {{-- ROLES --}}
+                    <a href="{{ route('admin.roles') }}"
+                        class="mt-1 flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.roles*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/>
+                        </svg>
+                        <span>Nhóm quyền (Roles)</span>
+                    </a>
+
+                    {{-- PERMISSIONS --}}
+                    <a href="{{ route('admin.permissions') }}"
+                        class="mt-1 flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.permissions*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 1a5 5 0 00-5 5v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 7V6a3 3 0 016 0v2H9z"/>
+                        </svg>
+                        <span>Quyền (Permissions)</span>
+                    </a>
+
+                    {{-- CUSTOMERS --}}
+                    <a href="{{ route('admin.customers') }}"
+                        class="mt-1 flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.customers*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 11a4 4 0 110-8 4 4 0 010 8zm10 0a4 4 0 110-8 4 4 0 010 8zM2 20a5 5 0 015-5h2a5 5 0 015 5v1H2v-1zm13 0a6.97 6.97 0 00-2.05-4.95A4.98 4.98 0 0120 20v1h-5v-1z"/>
+                        </svg>
+                        <span>Khách hàng</span>
+                    </a>
+
+
                     @endif
                     @if(auth()->check() && auth()->user()->hasPermission('view_statistics'))
                     <a href="{{ route('admin.stats') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.stats') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">

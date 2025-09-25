@@ -15,6 +15,7 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
+
     public function showRegister()
     {
         return view('auth.register');
@@ -36,7 +37,6 @@ class AuthController extends Controller
 
         // Mặc định gán role "customer"
         $customerRoleId = Role::where('role_name', 'customer')->value('role_id') ?? 3;
-        // DB của bạn có "customer" id=3 :contentReference[oaicite:2]{index=2}
 
         $user = User::create([
             'full_name' => $data['full_name'],
@@ -54,23 +54,27 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $data = $request->validate([
-            'email' => 'required|email',
+            'email'    => 'required|email',
             'password' => 'required',
         ]);
 
+        // Không dùng named arguments
         if (Auth::attempt($data, $request->boolean('remember'))) {
             $request->session()->regenerate();
             $user = Auth::user();
 
             // admin/employee → dashboard, còn lại → store.index
-            if ($user->hasRole(['admin', 'employee'])) {
+            if ($user && !$user->hasRole(['customer'])) {
                 return redirect()->intended(route('dashboard'));
             }
             return redirect()->intended(route('store.index'));
         }
 
-        return back()->withErrors(['email' => 'Thông tin đăng nhập không đúng.'])->onlyInput('email');
+        return back()
+            ->withErrors(['email' => 'Thông tin đăng nhập không đúng.'])
+            ->onlyInput('email');
     }
+
     public function logout(Request $req)
     {
         Auth::logout();
