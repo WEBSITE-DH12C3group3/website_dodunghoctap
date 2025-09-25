@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Coupon;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Cookie;
 
 class CheckoutController extends Controller
 {
@@ -62,15 +63,24 @@ class CheckoutController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::create([
-                'user_id'      => Auth::id(),
-                'status'       => $data['payment_method'] === 'cod' ? 'processing' : 'pending',
-                'total_amount' => $grandTotal,
-                'fullname'     => $data['fullname'],
-                'phone'        => $data['phone'],
-                'address'      => $data['address'],
-                'note'         => $data['note'] ?? null,
-                'coupon_code'  => $data['coupon'] ?? null,
+                'user_id'        => Auth::id(),
+                'status'         => $data['payment_method'] === 'cod' ? 'processing' : 'confirmed',
+                'total_amount'   => $grandTotal,
+                'payment_method' => $data['payment_method'], // DB có cột này
             ]);
+
+            // Thêm thông tin giao hàng vào bảng delivery
+            DB::table('delivery')->insert([
+                'order_id'      => $order->order_id,
+                'receiver_name' => $data['fullname'],
+                'phone'         => $data['phone'],
+                'address'       => $data['address'],
+                'note'          => $data['note'] ?? null,
+                'delivery_status' => 'pending',
+                'shipping_type'   => 'standard',
+                'shipping_provider' => 'GHTK',
+            ]);
+
 
             foreach ($cart as $i) {
                 OrderItem::create([
@@ -80,11 +90,36 @@ class CheckoutController extends Controller
                     'price'      => (int)$i['price'],
                 ]);
             }
-
+            if ($coupon) {
+                $coupon->increment('used_count');
+            }
             if ($data['payment_method'] === 'cod') {
                 DB::commit();
                 session()->forget('cart');
+                Cookie::queue(Cookie::forget('cart'));
                 return redirect()->route('store.orders.index')->with('success', 'Đặt hàng COD thành công.');
+            } else if ($data['payment_method'] === 'vietqr') {
+                $vietqrUrl = $this->buildVietQr(
+                    bankBin: '970422',                  // BIN MB Bank
+                    accountNo: '2009122004',
+                    accountName: 'CONG TY TNHH PEAKVL',
+                    amount: (int) $grandTotal,
+                    addInfo: 'Thanh toan don hang #' . $order->order_id
+                );
+                session()->forget('cart');
+                Cookie::queue(Cookie::forget('cart'));
+
+                DB::commit();
+
+                // Hiển thị trang QR để KH quét
+                return view('store.payment_qr', [
+                    'order'     => $order,
+                    'vietqrUrl' => $vietqrUrl,
+                    'grandTotal' => $grandTotal,
+                ]);
+                DB::commit();
+                return redirect()->route('store.orders.index') // nếu bạn có trang danh sách đơn
+                    ->with('success', 'Đặt hàng thành công (COD). Mã đơn #' . $order->order_id);
             }
 
             // ==== PAYOS qua REST ====
@@ -205,6 +240,7 @@ class CheckoutController extends Controller
                 }
 
                 session()->forget('cart');
+                Cookie::queue(Cookie::forget('cart'));
                 return redirect()->route('store.orders.index')->with('success', 'Thanh toán thành công.');
             }
 
