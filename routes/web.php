@@ -22,6 +22,10 @@ use App\Http\Controllers\Admin\StatsController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Auth\FacebookController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\CustomerController;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -80,9 +84,10 @@ Route::get('/checkout/cancel', [CheckoutController::class, 'payosCancel'])
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
-    })->middleware('role:admin|employee')->name('dashboard');
+    })->middleware(['auth', 'not_role:customer'])->name('dashboard');
 
-    Route::prefix('admin')->middleware('role:admin|employee')->group(function () {
+
+    Route::prefix('admin')->middleware(['auth', 'not_role:customer'])->group(function () {
         Route::get('/products', [ProductController::class, 'index'])
             ->middleware('permission:manage_products')->name('admin.products');
         Route::get('/products/create', [ProductController::class, 'create'])
@@ -179,7 +184,34 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:view_statistics')->name('admin.stats');
         Route::post('/stats/export', [StatsController::class, 'exportReport'])->name('admin.stats.export');
     });
+
+    
 });
+
+Route::middleware('permission:manage_users')->group(function () {
+
+        // --- Roles management ---
+        Route::get('/roles', [RoleController::class, 'index'])->name('admin.roles');
+        Route::get('/roles/create', [RoleController::class, 'create'])->name('admin.roles.create');
+        Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
+        Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('admin.roles.edit');
+        Route::put('/roles/{id}', [RoleController::class, 'update'])->name('admin.roles.update');
+        Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
+
+        // --- Permissions management ---
+        Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.permissions');
+        Route::post('/permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');
+        Route::put('/permissions/{id}', [PermissionController::class, 'update'])->name('admin.permissions.update');
+        Route::delete('/permissions/{id}', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
+
+        // --- Gán/bỏ quyền cho role ---
+        Route::post('/roles/{id}/permissions/attach', [RoleController::class, 'attachPermissions'])->name('admin.roles.permissions.attach');
+        Route::post('/roles/{id}/permissions/detach', [RoleController::class, 'detachPermissions'])->name('admin.roles.permissions.detach');
+
+        // --- Customers (role = customer) ---
+        Route::get('/customers', [CustomerController::class, 'index'])->name('admin.customers');
+        Route::get('/customers/{id}', [CustomerController::class, 'show'])->name('admin.customers.show');
+    });
 
 Route::post('/newsletter/subscribe', function (Request $request) {
     $data = $request->validate(['email' => 'required|email:rfc,dns']);

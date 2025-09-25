@@ -24,7 +24,7 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 $user = Auth::user();
-                return $user->hasRole(['admin', 'employee'])
+                return !$user->hasRole(['customer'])
                     ? redirect()->route('dashboard')
                     : redirect()->route('home'); // Thay '/'
             }
