@@ -8,6 +8,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('icons/apple-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('icons/apple-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('icons/apple-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('icons/apple-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ asset('icons/apple-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ asset('icons/apple-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ asset('icons/apple-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('icons/apple-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-icon-180x180.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('icons/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('icons/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ asset('icons/manifest.json') }}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{ asset('icons/ms-icon-144x144.png') }}">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -47,7 +64,7 @@
                     </button>
                 </div>
                 <!-- Logo and Title -->
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-semibold tracking-tight mb-6"> 
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-semibold tracking-tight mb-6">
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 text-white shadow-sm">S3</span>
                     <span>S3 — Stationery Shop</span>
                 </a>
@@ -82,7 +99,7 @@
                     <a href="{{ route('admin.users') }}"
                         class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.users*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm-7 7a7 7 0 0 1 14 0H5z" />
+                            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm-7 7a7 7 0 0 1 14 0H5z" />
                         </svg>
                         <span>Quản lý người dùng</span>
                     </a>
@@ -91,7 +108,7 @@
                     <a href="{{ route('admin.roles') }}"
                         class="mt-1 flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.roles*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/>
+                            <path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z" />
                         </svg>
                         <span>Nhóm quyền (Roles)</span>
                     </a>
@@ -100,7 +117,7 @@
                     <a href="{{ route('admin.permissions') }}"
                         class="mt-1 flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.permissions*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 1a5 5 0 00-5 5v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 7V6a3 3 0 016 0v2H9z"/>
+                            <path d="M12 1a5 5 0 00-5 5v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 7V6a3 3 0 016 0v2H9z" />
                         </svg>
                         <span>Quyền (Permissions)</span>
                     </a>
@@ -109,7 +126,7 @@
                     <a href="{{ route('admin.customers') }}"
                         class="mt-1 flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.customers*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M7 11a4 4 0 110-8 4 4 0 010 8zm10 0a4 4 0 110-8 4 4 0 010 8zM2 20a5 5 0 015-5h2a5 5 0 015 5v1H2v-1zm13 0a6.97 6.97 0 00-2.05-4.95A4.98 4.98 0 0120 20v1h-5v-1z"/>
+                            <path d="M7 11a4 4 0 110-8 4 4 0 010 8zm10 0a4 4 0 110-8 4 4 0 010 8zM2 20a5 5 0 015-5h2a5 5 0 015 5v1H2v-1zm13 0a6.97 6.97 0 00-2.05-4.95A4.98 4.98 0 0120 20v1h-5v-1z" />
                         </svg>
                         <span>Khách hàng</span>
                     </a>

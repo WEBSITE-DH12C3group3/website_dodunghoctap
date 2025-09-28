@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Store\HomeController;
 use App\Http\Controllers\Store\ProfileController;
 use App\Http\Controllers\Store\ProductShowController;
@@ -26,7 +28,6 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Store\PasswordOtpController;
-
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -66,6 +67,21 @@ Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogle
 Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook']);
 Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
 
+// // forget password
+// Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
+//     ->name('password.request');
+
+// // Gửi email có link reset
+// Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+//     ->name('password.email');
+
+// // Form đặt mật khẩu mới (từ link email)
+// Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
+//     ->name('password.reset');
+
+// // Submit đặt mật khẩu mới
+// Route::post('/reset-password', [NewPasswordController::class, 'store'])
+//     ->name('password.update');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -77,22 +93,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{orderId}/cancel', [OrderUserController::class, 'cancel'])->name('store.orders.cancel');
 
     Route::get('/profile/password', [PasswordOtpController::class, 'requestForm'])
-    ->name('profile.password.request');
+        ->name('profile.password.request');
 
-Route::post('/profile/password/otp/send', [PasswordOtpController::class, 'sendOtp'])
-    ->name('profile.password.otp.send');
+    Route::post('/profile/password/otp/send', [PasswordOtpController::class, 'sendOtp'])
+        ->name('profile.password.otp.send');
 
-Route::get('/profile/password/otp/verify', [PasswordOtpController::class, 'verifyForm'])
-    ->name('profile.password.verify.form');
+    Route::get('/profile/password/otp/verify', [PasswordOtpController::class, 'verifyForm'])
+        ->name('profile.password.verify.form');
 
-Route::post('/profile/password/otp/verify', [PasswordOtpController::class, 'verifySubmit'])
-    ->name('profile.password.verify.submit');
+    Route::post('/profile/password/otp/verify', [PasswordOtpController::class, 'verifySubmit'])
+        ->name('profile.password.verify.submit');
 
-Route::get('/profile/password/reset', [PasswordOtpController::class, 'resetForm'])
-    ->name('profile.password.reset.form');
+    Route::get('/profile/password/reset', [PasswordOtpController::class, 'resetForm'])
+        ->name('profile.password.reset.form');
 
-Route::post('/profile/password/reset', [PasswordOtpController::class, 'resetSubmit'])
-    ->name('profile.password.reset.submit');
+    Route::post('/profile/password/reset', [PasswordOtpController::class, 'resetSubmit'])
+        ->name('profile.password.reset.submit');
 });
 Route::get('/checkout/return', [CheckoutController::class, 'payosReturn'])
     ->name('payos.return');
@@ -203,34 +219,32 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:view_statistics')->name('admin.stats');
         Route::post('/stats/export', [StatsController::class, 'exportReport'])->name('admin.stats.export');
     });
-
-    
 });
 
 Route::middleware('permission:manage_users')->group(function () {
 
-        // --- Roles management ---
-        Route::get('/roles', [RoleController::class, 'index'])->name('admin.roles');
-        Route::get('/roles/create', [RoleController::class, 'create'])->name('admin.roles.create');
-        Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
-        Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('admin.roles.edit');
-        Route::put('/roles/{id}', [RoleController::class, 'update'])->name('admin.roles.update');
-        Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
+    // --- Roles management ---
+    Route::get('/roles', [RoleController::class, 'index'])->name('admin.roles');
+    Route::get('/roles/create', [RoleController::class, 'create'])->name('admin.roles.create');
+    Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
+    Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('admin.roles.edit');
+    Route::put('/roles/{id}', [RoleController::class, 'update'])->name('admin.roles.update');
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
 
-        // --- Permissions management ---
-        Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.permissions');
-        Route::post('/permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');
-        Route::put('/permissions/{id}', [PermissionController::class, 'update'])->name('admin.permissions.update');
-        Route::delete('/permissions/{id}', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
+    // --- Permissions management ---
+    Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.permissions');
+    Route::post('/permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');
+    Route::put('/permissions/{id}', [PermissionController::class, 'update'])->name('admin.permissions.update');
+    Route::delete('/permissions/{id}', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
 
-        // --- Gán/bỏ quyền cho role ---
-        Route::post('/roles/{id}/permissions/attach', [RoleController::class, 'attachPermissions'])->name('admin.roles.permissions.attach');
-        Route::post('/roles/{id}/permissions/detach', [RoleController::class, 'detachPermissions'])->name('admin.roles.permissions.detach');
+    // --- Gán/bỏ quyền cho role ---
+    Route::post('/roles/{id}/permissions/attach', [RoleController::class, 'attachPermissions'])->name('admin.roles.permissions.attach');
+    Route::post('/roles/{id}/permissions/detach', [RoleController::class, 'detachPermissions'])->name('admin.roles.permissions.detach');
 
-        // --- Customers (role = customer) ---
-        Route::get('/customers', [CustomerController::class, 'index'])->name('admin.customers');
-        Route::get('/customers/{id}', [CustomerController::class, 'show'])->name('admin.customers.show');
-    });
+    // --- Customers (role = customer) ---
+    Route::get('/customers', [CustomerController::class, 'index'])->name('admin.customers');
+    Route::get('/customers/{id}', [CustomerController::class, 'show'])->name('admin.customers.show');
+});
 
 Route::post('/newsletter/subscribe', function (Request $request) {
     $data = $request->validate(['email' => 'required|email:rfc,dns']);

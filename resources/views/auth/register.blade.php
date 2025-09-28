@@ -266,9 +266,9 @@
                     <label class="md:col-span-2 mt-2 flex items-start gap-3 text-white/90 text-sm">
                         <input type="checkbox" name="agree" required class="mt-1 h-4 w-4 rounded">
                         <span style="margin-top: 3px;">Tôi đồng ý với
-                            <a href="{{ route('store.page.privacy') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 underline">Chính sách bảo mật</a>
+                            <a href="{{ route('store.page.privacy') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 ">Chính sách bảo mật</a>
                             và
-                            <a href="{{ route('store.page.buying_guide') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 underline">Điều khoản mua hàng</a>.
+                            <a href="{{ route('store.page.buying_guide') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 ">Điều khoản mua hàng</a>.
                         </span>
                     </label>
 
@@ -298,7 +298,7 @@
 
             <p class="mt-4 text-center text-white/90">
                 Đã có tài khoản?
-                <a href="{{ route('login') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 underline">
+                <a href="{{ route('login') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 ">
                     Đăng nhập
                 </a>
             </p>

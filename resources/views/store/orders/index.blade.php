@@ -54,6 +54,13 @@
                     </a>
                     @endif
 
+                    <a href="{{ route('profile.password.request') }}" class="flex items-center gap-3 px-4 py-3 text-white/95 hover:bg-white/10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4m0 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3" />
+                        </svg>
+                        <span class="font-medium">Đổi mật khẩu (OTP email)</span>
+                    </a>
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
@@ -124,11 +131,11 @@
                                     <p class="text-gray-600">Ngày đặt: {{ \Carbon\Carbon::parse($od->order_date)->format('d/m/Y H:i') }}</p>
                                     <p class="text-gray-600">Tổng tiền: {{ number_format($od->total_amount, 0, ',', '.') }}đ</p>
                                     @if(in_array($od->status, ['pending', 'pending_confirmation']))
-                                        <form action="{{ route('store.orders.cancel', $od->order_id) }}" method="POST" class="mt-2 inline">
-                                            @csrf
-                                            @method('POST')
-                                            <button type="submit" class="text-sm text-red-600 hover:underline">Hủy đơn hàng</button>
-                                        </form>
+                                    <form action="{{ route('store.orders.cancel', $od->order_id) }}" method="POST" class="mt-2 inline">
+                                        @csrf
+                                        @method('POST')
+                                        <button type="submit" class="text-sm text-red-600 hover:underline">Hủy đơn hàng</button>
+                                    </form>
                                     @endif
                                 </div>
                             </td>
@@ -144,10 +151,10 @@
             @endif
 
             @if(session('ok'))
-                <div class="p-6 text-center text-green-600">{{ session('ok') }}</div>
+            <div class="p-6 text-center text-green-600">{{ session('ok') }}</div>
             @endif
             @if(session('error'))
-                <div class="p-6 text-center text-red-600">{{ session('error') }}</div>
+            <div class="p-6 text-center text-red-600">{{ session('error') }}</div>
             @endif
         </section>
 
