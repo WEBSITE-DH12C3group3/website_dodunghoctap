@@ -7,26 +7,6 @@
         <i class="fas fa-chart-line mr-2 text-blue-600 dark:text-blue-400"></i> Thống kê hệ thống
     </h1>
 
- <!-- Form chọn khoảng thời gian -->
-<form id="statsFilterForm" method="GET" class="mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl shadow">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-            <label class="block text-sm font-medium">Từ ngày</label>
-            <input id="start_date" type="date" name="start_date" value="{{ $start }}" class="w-full p-2 rounded border dark:bg-slate-700">
-        </div>
-        <div>
-            <label class="block text-sm font-medium">Đến ngày</label>
-            <input id="end_date" type="date" name="end_date" value="{{ $end }}" class="w-full p-2 rounded border dark:bg-slate-700">
-        </div>
-        <div class="flex items-end">
-            <button type="submit" id="filterSubmit" class="px-4 py-2 bg-brand-600 text-white rounded hover:bg-brand-700">Xem</button>
-        </div>
-    </div>
-
-    <!-- lỗi ngày (hiển thị dưới form) -->
-    <div id="dateError" class="mt-3 text-sm text-red-500" role="alert" aria-live="polite"></div>
-</form>
-
 
     <!-- Tổng quan số liệu -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -47,30 +27,6 @@
             <p class="text-sm text-gray-600 dark:text-gray-400">Hôm nay: <span class="font-bold text-gray-900 dark:text-white">{{ $ordersToday ?? 0 }}</span></p>
             <p class="text-sm text-gray-600 dark:text-gray-400">Tuần này: <span class="font-bold text-gray-900 dark:text-white">{{ $ordersWeek ?? 0 }}</span></p>
             <p class="text-sm text-gray-600 dark:text-gray-400">Khoảng chọn: <span class="font-bold text-blue-600 dark:text-blue-400">{{ $ordersInPeriod ?? 0 }}</span></p>
-        </div>
-    </div>
-
-    <!-- Thống kê nhập/bán/lợi nhuận -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700">
-            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
-                <i class="fas fa-arrow-down mr-2 text-red-500"></i> Hàng nhập kho
-            </h2>
-            <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $purchases ?? 0 }} sản phẩm</p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Chi phí: <span class="font-bold">{{ number_format($cost ?? 0) }} VNĐ</span></p>
-        </div>
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700">
-            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
-                <i class="fas fa-arrow-up mr-2 text-blue-500"></i> Hàng bán ra
-            </h2>
-            <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $sales ?? 0 }} sản phẩm</p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Doanh thu: <span class="font-bold">{{ number_format($revenue ?? 0) }} VNĐ</span></p>
-        </div>
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700">
-            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
-                <i class="fas fa-hand-holding-usd mr-2 text-green-500"></i> Lợi nhuận
-            </h2>
-            <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ number_format($profit ?? 0) }} VNĐ</p>
         </div>
     </div>
 
@@ -133,6 +89,50 @@
                     <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">Xuất</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+     <!-- Form chọn khoảng thời gian -->
+<form id="statsFilterForm" method="GET" class="mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl shadow">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <label class="block text-sm font-medium">Từ ngày</label>
+            <input id="start_date" type="date" name="start_date" value="{{ $start }}" class="w-full p-2 rounded border dark:bg-slate-700">
+        </div>
+        <div>
+            <label class="block text-sm font-medium">Đến ngày</label>
+            <input id="end_date" type="date" name="end_date" value="{{ $end }}" class="w-full p-2 rounded border dark:bg-slate-700">
+        </div>
+        <div class="flex items-end">
+            <button type="submit" id="filterSubmit" class="px-4 py-2 bg-brand-600 text-white rounded hover:bg-brand-700">Xem</button>
+        </div>
+    </div>
+
+    <!-- lỗi ngày (hiển thị dưới form) -->
+    <div id="dateError" class="mt-3 text-sm text-red-500" role="alert" aria-live="polite"></div>
+</form>
+
+    <!-- Thống kê nhập/bán/lợi nhuận -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
+                <i class="fas fa-arrow-down mr-2 text-red-500"></i> Hàng nhập kho
+            </h2>
+            <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $purchases ?? 0 }} sản phẩm</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Chi phí: <span class="font-bold">{{ number_format($cost ?? 0) }} VNĐ</span></p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
+                <i class="fas fa-arrow-up mr-2 text-blue-500"></i> Hàng bán ra
+            </h2>
+            <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $sales ?? 0 }} sản phẩm</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Doanh thu: <span class="font-bold">{{ number_format($revenue ?? 0) }} VNĐ</span></p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
+                <i class="fas fa-hand-holding-usd mr-2 text-green-500"></i> Lợi nhuận
+            </h2>
+            <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ number_format($profit ?? 0) }} VNĐ</p>
         </div>
     </div>
 
