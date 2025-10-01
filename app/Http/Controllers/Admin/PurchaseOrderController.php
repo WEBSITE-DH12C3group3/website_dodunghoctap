@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PurchaseOrder;
+use App\Exports\PurchaseOrdersExport;
+use Maatwebsite\Excel\Facades\Excel; //
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\PurchaseOrderItem;
 use App\Models\Product;
 use App\Models\Supplier;
@@ -253,4 +256,30 @@ class PurchaseOrderController extends Controller
             return back()->with('error', 'Lỗi khi xóa phiếu nhập kho: ' . $e->getMessage());
         }
     }
+
+    public function export(Request $request)
+{
+    $format = $request->query('format');
+    $query = PurchaseOrder::query()
+        ->with(['user', 'supplier'])
+        ->when($request->search, fn($q) => $q->where('code', 'like', "%{$request->search}%")
+            ->orWhereHas('user', fn($q) => $q->where('full_name', 'like', "%{$request->search}%"))
+            ->orWhereHas('supplier', fn($q) => $q->where('supplier_name', 'like', "%{$request->search}%")))
+        ->when($request->date_from, fn($q) => $q->whereDate('order_date', '>=', $request->date_from))
+        ->when($request->date_to, fn($q) => $q->whereDate('order_date', '<=', $request->date_to))
+        ->when($request->amount_min, fn($q) => $q->where('total_amount', '>=', $request->amount_min))
+        ->when($request->amount_max, fn($q) => $q->where('total_amount', '<=', $request->amount_max))
+        ->when($request->user_id, fn($q) => $q->where('created_by', $request->user_id))
+        ->when($request->supplier_id, fn($q) => $q->where('supplier_id', $request->supplier_id));
+
+    if ($format === 'excel') {
+        return Excel::download(new PurchaseOrdersExport($query->get()), 'purchase_orders.xlsx');
+    } elseif ($format === 'pdf') {
+        $purchaseOrders = $query->get();
+        $pdf = Pdf::loadView('admin.purchase_orders.pdf', compact('purchaseOrders'));
+        return $pdf->download('purchase_orders.pdf');
+    }
+
+    return redirect()->back()->with('error', 'Invalid export format');
+}
 }

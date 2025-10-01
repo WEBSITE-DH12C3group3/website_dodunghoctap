@@ -169,6 +169,7 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage_orders')->name('admin.orders.update');
         Route::delete('/orders/{id}', [OrderController::class, 'destroy'])
             ->middleware('permission:manage_orders')->name('admin.orders.destroy');
+        Route::get('/admin/orders/export', [OrderController::class, 'export'])->name('admin.orders.export');
 
         Route::get('/purchase_orders', [PurchaseOrderController::class, 'index'])
             ->middleware('permission:manage_purchases')->name('admin.purchase_orders');
@@ -184,6 +185,7 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage_purchases')->name('admin.purchase_orders.update');
         Route::delete('/purchase_orders/{id}', [PurchaseOrderController::class, 'destroy'])
             ->middleware('permission:manage_purchases')->name('admin.purchase_orders.destroy');
+        Route::get('/admin/purchase-orders/export', [PurchaseOrderController::class, 'export'])->name('admin.purchase_orders.export');
 
         Route::get('/stats', [StatsController::class, 'index'])
             ->middleware('permission:view_statistics')->name('admin.stats');

@@ -4,6 +4,22 @@
 <div class="bg-white/80 dark:bg-slate-900/50 backdrop-blur p-6 rounded-2xl shadow ring-1 ring-slate-900/5 dark:ring-white/10">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Danh sách đơn hàng</h2>
+        <div class="relative">
+            <button id="exportButton" 
+                    class="inline-block rounded-xl px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm">
+                Xuất báo cáo
+            </button>
+            <div id="exportDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg z-10">
+                <a href="{{ route('admin.orders.export', array_merge(['format' => 'pdf'], request()->query())) }}" 
+                   class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+                    Xuất PDF
+                </a>
+                <a href="{{ route('admin.orders.export', array_merge(['format' => 'excel'], request()->query())) }}" 
+                   class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+                    Xuất Excel
+                </a>
+            </div>
+        </div>
     </div>
 
     {{-- Form lọc --}}
@@ -135,4 +151,21 @@
         @endif
     @endif
 </div>
+
+<script>
+    // JavaScript to toggle the export dropdown
+    document.getElementById('exportButton').addEventListener('click', function() {
+        const dropdown = document.getElementById('exportDropdown');
+        dropdown.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const button = document.getElementById('exportButton');
+        const dropdown = document.getElementById('exportDropdown');
+        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>
 @endsection
