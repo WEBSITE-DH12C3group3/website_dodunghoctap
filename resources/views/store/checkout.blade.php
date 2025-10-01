@@ -63,22 +63,126 @@
                     </svg>
                     Phương thức vận chuyển
                 </h2>
-                <label class="flex items-center justify-between border border-indigo-500 bg-indigo-50 rounded-xl px-4 py-4 cursor-pointer shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <input type="radio" name="shipping_method" value="free" class="hidden" checked>
-                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full ring-2 ring-indigo-600 bg-indigo-600 text-white">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </span>
-                        <span class="font-medium text-gray-800">Giao hàng tiêu chuẩn (Miễn phí)</span>
+
+
+                @php
+                // Giả lập dữ liệu và biến trạng thái được chọn mặc định ban đầu
+                $shippingMethods = [
+                ['value' => 'standard', 'label' => 'Giao hàng tiêu chuẩn', 'price' => '0đ', 'info' => 'Dự kiến giao hàng trong 3-5 ngày làm việc.', 'price_class' => 'text-green-600', 'checked' => true],
+                ['value' => 'express', 'label' => 'Giao hàng nhanh', 'price' => '50.000đ', 'info' => 'Dự kiến giao hàng trong 1-2 ngày làm việc.', 'price_class' => 'text-gray-800', 'checked' => false],
+                ];
+                @endphp
+
+                @foreach ($shippingMethods as $method)
+                @php
+                // Định nghĩa các class CSS
+                $defaultClass = 'border-gray-300 hover:border-indigo-400 bg-white';
+                $checkedClass = 'border-indigo-600 bg-indigo-50 shadow-md ring-2 ring-indigo-300';
+                $isChecked = $method['checked']; // Lấy trạng thái mặc định từ mảng PHP
+                @endphp
+
+                <label data-shipping-option
+                    class="flex flex-col border rounded-xl px-4 py-4 cursor-pointer transition duration-200 ease-in-out mt-3 
+                      {{ $isChecked ? $checkedClass : $defaultClass }}">
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            {{-- INPUT RADIO BUTTON (Dùng để gửi giá trị, nhưng bị ẩn) --}}
+                            <input type="radio" name="shipping_method" value="{{ $method['value'] }}" class="hidden"
+                                {{ $isChecked ? 'checked' : '' }}>
+
+                            {{-- CUSTOM RADIO UI (Phần tử sẽ bị JS thay đổi) --}}
+                            <span data-custom-radio class="inline-flex items-center justify-center w-5 h-5 rounded-full ring-2 transition duration-200 
+                                 {{ $isChecked ? 'ring-indigo-600 bg-indigo-600 text-white' : 'ring-gray-400 bg-white' }}">
+                                {{-- Icon Checkmark --}}
+                                <svg data-checkmark class="w-3 h-3 {{ $isChecked ? '' : 'hidden' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </span>
+
+                            <span class="font-medium text-gray-800">{{ $method['label'] }}</span>
+                        </div>
+
+                        <span class="font-semibold {{ $method['price_class'] }}">{{ $method['price'] }}</span>
                     </div>
-                    <span class="font-semibold text-green-600">0đ</span>
+
+                    <p class="text-sm text-gray-500 mt-2 ml-8">{{ $method['info'] }}</p>
+
                 </label>
-                <p class="text-sm text-gray-500 mt-2 ml-8">Dự kiến giao hàng trong 3-5 ngày làm việc.</p>
+                @endforeach
             </section>
 
+            <script>
+                // Định nghĩa các class CSS để JS sử dụng
+                const DEFAULT_CLASS = 'border-gray-300 hover:border-indigo-400 bg-white';
+                const CHECKED_CLASS = 'border-indigo-600 bg-indigo-50 shadow-md ring-2 ring-indigo-300';
 
+                // Custom Radio UI classes
+                const RADIO_DEFAULT_CLASS = 'ring-gray-400 bg-white';
+                const RADIO_CHECKED_CLASS = 'ring-indigo-600 bg-indigo-600 text-white';
+
+                // Lấy tất cả các label có thuộc tính data-shipping-option
+                const shippingOptions = document.querySelectorAll('[data-shipping-option]');
+
+                shippingOptions.forEach(optionLabel => {
+                    // Lắng nghe sự kiện click trên toàn bộ label
+                    optionLabel.addEventListener('click', function() {
+                        // 1. Loại bỏ trạng thái 'checked' khỏi tất cả các option khác
+                        shippingOptions.forEach(otherLabel => {
+                            // Chỉ xử lý nếu option đó không phải là option đang được click
+                            if (otherLabel !== this) {
+                                // Loại bỏ class được chọn trên Label
+                                otherLabel.className = otherLabel.className
+                                    .replace(CHECKED_CLASS, '') // Xóa class đã chọn
+                                    .trim() + ' ' + DEFAULT_CLASS; // Thêm lại class mặc định
+
+                                // Loại bỏ trạng thái 'checked' trên Custom Radio UI
+                                const otherRadio = otherLabel.querySelector('[data-custom-radio]');
+                                const otherCheckmark = otherLabel.querySelector('[data-checkmark]');
+
+                                if (otherRadio) {
+                                    otherRadio.className = otherRadio.className
+                                        .replace(RADIO_CHECKED_CLASS, '')
+                                        .trim() + ' ' + RADIO_DEFAULT_CLASS;
+                                }
+                                if (otherCheckmark) {
+                                    otherCheckmark.classList.add('hidden');
+                                }
+                            }
+                        });
+
+                        // 2. Thêm trạng thái 'checked' cho option hiện tại
+                        const currentRadio = this.querySelector('[data-custom-radio]');
+                        const currentCheckmark = this.querySelector('[data-checkmark]');
+
+                        // Thêm class được chọn trên Label hiện tại
+                        this.className = this.className
+                            .replace(DEFAULT_CLASS, '') // Xóa class mặc định
+                            .trim() + ' ' + CHECKED_CLASS; // Thêm class đã chọn
+
+                        // Thêm trạng thái 'checked' trên Custom Radio UI
+                        if (currentRadio) {
+                            currentRadio.className = currentRadio.className
+                                .replace(RADIO_DEFAULT_CLASS, '')
+                                .trim() + ' ' + RADIO_CHECKED_CLASS;
+                        }
+                        if (currentCheckmark) {
+                            currentCheckmark.classList.remove('hidden');
+                        }
+
+                        // 3. Đặt thuộc tính "checked" trên input radio ẩn
+                        const currentInput = this.querySelector('input[type="radio"]');
+                        if (currentInput) {
+                            // Bỏ checked trên tất cả input khác (để đảm bảo form submission đúng)
+                            document.querySelectorAll('input[name="shipping_method"]').forEach(input => {
+                                input.checked = false;
+                            });
+                            // Đặt checked cho input hiện tại
+                            currentInput.checked = true;
+                        }
+                    });
+                });
+            </script>
 
             {{-- 3. Phương thức thanh toán --}}
             <section class="mt-8">
@@ -88,58 +192,123 @@
                     </svg>
                     Phương thức thanh toán
                 </h2>
+                <input type="hidden" name="payment_channel" id="payment_channel" value="">
+
                 <div class="space-y-3">
                     @php
                     $paymentMethods = [
                     'cod' => ['label' => 'Thanh toán khi giao hàng (COD)', 'icon' => '💵'],
-                    'vietqr' => ['label' => 'Thanh toán qua cổng VietQR', 'icon' => '📱'],
+                    'bank_transfer' => ['label' => 'Thanh toán qua cổng VietQR', 'icon' => '📱', 'channel' => 'vietqr'],
                     'payos' => ['label' => 'Thanh toán qua cổng PayOS', 'icon' => '💳'],
                     ];
+                    // Sử dụng $selectedPayment để kiểm tra trạng thái ban đầu
                     $selectedPayment = old('payment_method', 'cod');
+
+                    // Định nghĩa các class CSS
+                    $defaultClass = 'border-gray-300 hover:border-indigo-400 bg-white';
+                    $checkedClass = 'border-indigo-600 bg-indigo-50 shadow-lg ring-2 ring-indigo-300'; // Đã sửa lỗi chính tả ring-indigo-30_0
                     @endphp
 
                     @foreach($paymentMethods as $value => $method)
-                    <label data-pay
-                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition duration-200 ease-in-out
-                                hover:shadow-md focus-within:ring-2 focus-within:ring-indigo-400
-                                border-gray-300 hover:border-indigo-400
-                                {{ $selectedPayment === $value ? 'border-indigo-600 bg-indigo-50 shadow-lg ring-2 ring-indigo-300' : '' }}">
-                        {{-- Input Radio Button: ĐÃ GIẢM KÍCH THƯỚC (size-4) --}}
-                        <input type="radio" name="payment_method" value="{{ $value }}" class="
-                                size-4 text-indigo-600 border-gray-300 rounded-full appearance-none transition duration-150 ease-in-out 
-                                checked:bg-indigo-600 checked:border-indigo-600 checked:ring-2 checked:ring-offset-2 checked:ring-indigo-600 
-                                focus:ring-2 focus:ring-offset-2 focus:ring-indigo-200 
-                                cursor-pointer"
-                            {{ $selectedPayment === $value ? 'checked' : '' }}>
+                    @php
+                    $isChecked = $selectedPayment === $value;
+                    @endphp
 
-                        {{-- Content: Icon and Label --}}
+                    <label
+                        data-method="{{ $value }}"
+                        @if(!empty($method['channel'])) data-channel="{{ $method['channel'] }}" @endif
+                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition duration-200 ease-in-out
+               hover:shadow-md focus-within:ring-2 focus-within:ring-indigo-400
+               {{ $isChecked ? $checkedClass : $defaultClass }}">
+
+                        {{-- 1. INPUT RADIO GỐC: ĐÃ ẨN --}}
+                        <input type="radio" name="payment_method" value="{{ $value }}" class="hidden"
+                            {{ $isChecked ? 'checked' : '' }}>
+
+                        {{-- 2. CUSTOM RADIO UI (Phần tử sẽ bị JS thay đổi) --}}
+                        <span data-custom-radio class="inline-flex items-center justify-center w-5 h-5 rounded-full ring-2 transition duration-200 
+                         {{ $isChecked ? 'ring-indigo-600 bg-indigo-600 text-white' : 'ring-gray-400 bg-white' }}">
+                            {{-- Icon Checkmark --}}
+                            <svg data-checkmark class="w-3 h-3 {{ $isChecked ? '' : 'hidden' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </span>
+
+                        {{-- 3. Icon + text --}}
                         <div class="flex items-center gap-2">
-                            <span class="text-xl text-gray-700">{{ $method['icon'] }}</span>
-                            <span class="text-gray-800 font-medium">{{ $method['label'] }}</span>
+                            <span class="text-xl text-gray-700">{{ $method['icon'] ?? '' }}</span>
+                            <span class="font-medium text-gray-800">{{ $method['label'] }}</span>
                         </div>
                     </label>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', () => {
-                            const ACTIVE = ['border-indigo-600', 'bg-indigo-50', 'shadow-lg', 'ring-2', 'ring-indigo-300'];
-                            const labels = Array.from(document.querySelectorAll('label[data-pay]'));
-                            const update = () => {
-                                labels.forEach(lb => lb.classList.remove(...ACTIVE));
-                                const checked = document.querySelector('input[name="payment_method"]:checked');
-                                if (!checked) return;
-                                checked.closest('label')?.classList.add(...ACTIVE);
-                            };
-                            document.querySelectorAll('input[name="payment_method"]').forEach(r => {
-                                r.addEventListener('change', update);
-                            });
-                            update(); // chạy lần đầu
-                        });
-                    </script>
-
                     @endforeach
                 </div>
             </section>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Class cho LABEL (Container)
+                    const ACTIVE_CONTAINER_CLASSES = ['border-indigo-600', 'bg-indigo-50', 'shadow-lg', 'ring-2', 'ring-indigo-300'];
+                    const DEFAULT_CONTAINER_CLASSES = ['border-gray-300', 'hover:border-indigo-400', 'bg-white'];
+
+                    // Class cho CUSTOM RADIO UI (Nút tròn w-5 h-5)
+                    const ACTIVE_RADIO_CLASSES = ['ring-indigo-600', 'bg-indigo-600', 'text-white'];
+                    const DEFAULT_RADIO_CLASSES = ['ring-gray-400', 'bg-white'];
+
+                    // Lấy tất cả các label
+                    const labels = Array.from(document.querySelectorAll('label[data-method]'));
+                    const channelInput = document.getElementById('payment_channel');
+
+                    function syncActive() {
+                        const checked = document.querySelector('input[name="payment_method"]:checked');
+
+                        labels.forEach(lb => {
+                            const isCurrent = checked && lb.contains(checked);
+                            const radio = lb.querySelector('[data-custom-radio]');
+                            const checkmark = lb.querySelector('[data-checkmark]');
+
+                            // Cập nhật trạng thái LABEL
+                            lb.classList.remove(...ACTIVE_CONTAINER_CLASSES);
+                            lb.classList.add(...DEFAULT_CONTAINER_CLASSES);
+
+                            // Cập nhật trạng thái CUSTOM RADIO UI
+                            radio?.classList.remove(...ACTIVE_RADIO_CLASSES);
+                            radio?.classList.add(...DEFAULT_RADIO_CLASSES);
+                            checkmark?.classList.add('hidden');
 
 
+                            if (isCurrent) {
+                                // Áp dụng trạng thái ACTIVE cho Label hiện tại
+                                lb.classList.add(...ACTIVE_CONTAINER_CLASSES);
+                                lb.classList.remove(...DEFAULT_CONTAINER_CLASSES); // Loại bỏ default để tránh xung đột
+
+                                // Áp dụng trạng thái ACTIVE cho Custom Radio UI
+                                radio?.classList.add(...ACTIVE_RADIO_CLASSES);
+                                radio?.classList.remove(...DEFAULT_RADIO_CLASSES); // Loại bỏ default
+                                checkmark?.classList.remove('hidden');
+                            }
+                        });
+                    }
+
+                    function syncChannel() {
+                        // ... (Logic đồng bộ Channel giữ nguyên)
+                        const checked = document.querySelector('input[name="payment_method"]:checked');
+                        if (!checked) return;
+                        const label = checked.closest('label');
+                        const channel = label?.getAttribute('data-channel') || '';
+                        channelInput.value = channel;
+                    }
+
+                    document.querySelectorAll('input[name="payment_method"]').forEach(r => {
+                        r.addEventListener('change', () => {
+                            syncActive();
+                            syncChannel();
+                        });
+                    });
+
+                    // chạy lần đầu
+                    syncActive();
+                    syncChannel();
+                });
+            </script>
 
             {{-- 4. Mã giảm giá --}}
             <section class="mt-8">

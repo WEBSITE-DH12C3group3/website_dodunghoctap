@@ -47,7 +47,8 @@ class CheckoutController extends Controller
             'address'         => 'required|string|max:255',
             'note'            => 'nullable|string|max:500',
             'coupon'          => 'nullable|string|max:100',
-            'payment_method'  => 'required|in:cod,payos,vietqr',
+            'payment_method'  => 'required|in:cod,bank_transfer,momo,vnpay,payos',
+            'payment_channel' => ['nullable', 'string', 'max:50'],
         ]);
 
         $cart = collect(session('cart', []));
@@ -67,7 +68,7 @@ class CheckoutController extends Controller
                 'status'         => match ($data['payment_method']) {
                     'cod'    => 'pending',
                     'payos'  => 'processing',
-                    'vietqr' => 'processing',
+                    'bank_transfer' => 'processing',
                     default  => 'pending',
                 },
                 'total_amount'   => $grandTotal,
@@ -107,29 +108,46 @@ class CheckoutController extends Controller
                 session()->forget('cart');
                 Cookie::queue(Cookie::forget('cart'));
                 return redirect()->route('store.orders.index')->with('success', 'Đặt hàng COD thành công.');
-            } else if ($data['payment_method'] === 'vietqr') {
-                $vietqrUrl = $this->buildVietQr(
-                    bankBin: '970422',                  // BIN MB Bank
-                    accountNo: '2009122004',
-                    accountName: 'CONG TY TNHH PEAKVL',
+            }
+            // ... bên trong store()
+            if (
+                $data['payment_method'] === 'bank_transfer'
+                && ($data['payment_channel'] ?? '') === 'vietqr'
+            ) {
+
+                $bankBin     = env('VIETQR_BANK_BIN', '970422');
+                $accountNo   = env('VIETQR_ACCOUNT_NO', '2009122004');
+                $accountName = env('VIETQR_ACCOUNT_NAME', 'CONG TY TNHH PEAKVL');
+
+                $addInfo = 'Thanh toan don hang #' . $order->order_id;
+
+                // TẠO ĐÚNG TÊN BIẾN: $qrUrl
+                $qrUrl = $this->buildVietQr(
+                    bankBin: $bankBin,
+                    accountNo: $accountNo,
+                    accountName: $accountName,
                     amount: (int) $grandTotal,
-                    addInfo: 'Thanh toan don hang #' . $order->order_id
+                    addInfo: $addInfo
                 );
+
+                // clear cart, commit...
+                if (!empty($coupon)) $coupon->increment('used_count');
                 session()->forget('cart');
                 Cookie::queue(Cookie::forget('cart'));
-
                 DB::commit();
 
-                // Hiển thị trang QR để KH quét
+                // TRUYỀN ĐÚNG TÊN SANG VIEW: 'qrUrl' => $qrUrl
                 return view('store.payment_qr', [
-                    'order'     => $order,
-                    'vietqrUrl' => $vietqrUrl,
-                    'grandTotal' => $grandTotal,
+                    'order'       => $order,
+                    'qrUrl'       => $qrUrl,          // <- quan trọng
+                    'amount'      => $grandTotal,
+                    'bankBin'     => $bankBin,
+                    'accountNo'   => $accountNo,
+                    'accName'     => $accountName,    // view có thể dùng accName
+                    'accountName' => $accountName,    // hoặc accountName — truyền cả 2 cho chắc
                 ]);
-                DB::commit();
-                return redirect()->route('store.orders.index') // nếu bạn có trang danh sách đơn
-                    ->with('success', 'Đặt hàng thành công (COD). Mã đơn #' . $order->order_id);
             }
+
 
             // ==== PAYOS qua REST ====
             $clientId    = env('PAYOS_CLIENT_ID');
