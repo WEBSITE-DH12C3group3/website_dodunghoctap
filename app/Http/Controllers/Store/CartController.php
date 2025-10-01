@@ -36,16 +36,16 @@ class CartController extends Controller
         $cart = $this->getCart();
         $total = collect($cart)->sum(fn($i) => $i['price'] * $i['qty']);
         $bestSellers = Product::query()
-            ->leftJoinSub(
-                DB::table('order_items')
-                    ->select('product_id', DB::raw('SUM(quantity) as sold'))
-                    ->groupBy('product_id'),
-                'oi',
-                'oi.product_id',
-                '=',
-                'products.product_id'
-            )
-            ->select('products.*', DB::raw('COALESCE(oi.sold, 0) as sold'))
+            // ->leftJoinSub(
+            //     DB::table('order_items')
+            //         ->select('product_id', DB::raw('SUM(quantity) as sold'))
+            //         ->groupBy('product_id'),
+            //     'oi',
+            //     'oi.product_id',
+            //     '=',
+            //     'products.product_id'
+            // )
+            // ->select('products.*', DB::raw('COALESCE(oi.sold, 0) as sold'))
             ->orderByDesc('sold')
             ->limit(16)
             ->get();

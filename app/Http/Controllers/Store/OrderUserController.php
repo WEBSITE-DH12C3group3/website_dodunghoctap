@@ -34,7 +34,7 @@ class OrderUserController extends Controller
         // Badge map
         $paymentBadge = [
             'pending' => ['Chưa thanh toán', 'bg-amber-100 text-amber-700'],
-            'processing' => ['Đã thanh toán', 'bg-emerald-100 text-emerald-700'],
+            'processing' => ['Đang xử lý', 'bg-emerald-100 text-emerald-700'],
             'confirmed' => ['Đã thanh toán', 'bg-emerald-100 text-emerald-700'],
             'completed' => ['Đã thanh toán', 'bg-emerald-100 text-emerald-700'],
             'cancelled' => ['Đã hủy', 'bg-gray-200 text-gray-700'],
@@ -53,29 +53,29 @@ class OrderUserController extends Controller
     }
 
     public function cancel($orderId)
-{
-    $userId = auth()->id();
-    $order = DB::table('orders')
-        ->where('order_id', $orderId)
-        ->where('user_id', $userId)
-        ->first();
+    {
+        $userId = auth()->id();
+        $order = DB::table('orders')
+            ->where('order_id', $orderId)
+            ->where('user_id', $userId)
+            ->first();
 
-    if (!$order) {
-        return redirect()->back()->with('error', 'Đơn hàng không tồn tại hoặc không thuộc về bạn.');
+        if (!$order) {
+            return redirect()->back()->with('error', 'Đơn hàng không tồn tại hoặc không thuộc về bạn.');
+        }
+
+        if (!in_array($order->status, ['pending', 'pending_confirmation'])) {
+            return redirect()->back()->with('error', 'Chỉ có thể hủy đơn hàng khi trạng thái là "Chưa thanh toán" hoặc "Chờ xác nhận".');
+        }
+
+        DB::table('orders')
+            ->where('order_id', $orderId)
+            ->update(['status' => 'cancelled']);
+
+        DB::table('delivery')
+            ->where('order_id', $orderId)
+            ->update(['delivery_status' => 'cancelled']);
+
+        return redirect()->route('store.orders.index')->with('ok', 'Đơn hàng đã được hủy thành công.');
     }
-
-    if (!in_array($order->status, ['pending', 'pending_confirmation'])) {
-        return redirect()->back()->with('error', 'Chỉ có thể hủy đơn hàng khi trạng thái là "Chưa thanh toán" hoặc "Chờ xác nhận".');
-    }
-
-    DB::table('orders')
-        ->where('order_id', $orderId)
-        ->update(['status' => 'cancelled']);
-
-    DB::table('delivery')
-        ->where('order_id', $orderId)
-        ->update(['delivery_status' => 'cancelled']);
-
-    return redirect()->route('store.orders.index')->with('ok', 'Đơn hàng đã được hủy thành công.');
-}
 }

@@ -220,42 +220,6 @@ CREATE TABLE `order_items` (
   `quantity` int(11) DEFAULT NULL,
   `price` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-DELIMITER $$
-CREATE TRIGGER `trg_oi_after_delete` AFTER DELETE ON `order_items` FOR EACH ROW BEGIN
-  DECLARE st VARCHAR(50);
-  SELECT status INTO st FROM orders WHERE order_id = OLD.order_id;
-  IF st = 'paid' THEN
-    UPDATE products SET sold = GREATEST(COALESCE(sold,0) - OLD.quantity, 0)
-    WHERE product_id = OLD.product_id;
-  END IF;
-END
-$$
-DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `trg_oi_after_insert` AFTER INSERT ON `order_items` FOR EACH ROW BEGIN
-  DECLARE st VARCHAR(50);
-  SELECT status INTO st FROM orders WHERE order_id = NEW.order_id;
-  IF st = 'paid' THEN
-    UPDATE products SET sold = COALESCE(sold,0) + NEW.quantity
-    WHERE product_id = NEW.product_id;
-  END IF;
-END
-$$
-DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `trg_oi_after_update` AFTER UPDATE ON `order_items` FOR EACH ROW BEGIN
-  DECLARE st_old VARCHAR(50); DECLARE st_new VARCHAR(50);
-  SELECT status INTO st_old FROM orders WHERE order_id = OLD.order_id;
-  SELECT status INTO st_new FROM orders WHERE order_id = NEW.order_id;
-
-  -- nếu cùng order và đều 'paid', hiệu chỉnh chênh lệch
-  IF OLD.order_id = NEW.order_id AND st_old='paid' AND st_new='paid' THEN
-    UPDATE products SET sold = GREATEST(COALESCE(sold,0) + (NEW.quantity - OLD.quantity), 0)
-    WHERE product_id = NEW.product_id;
-  END IF;
-END
-$$
-DELIMITER ;
 
 
 -- --------------------------------------------------------
