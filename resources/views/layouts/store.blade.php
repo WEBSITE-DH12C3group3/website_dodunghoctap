@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" class="h-full antialiased">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,9 +30,14 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui']
+                    },
                     colors: {
-                        brand: { 600: '#4f46e5', 700: '#4338ca' }
+                        brand: {
+                            600: '#4f46e5',
+                            700: '#4338ca'
+                        }
                     }
                 }
             }
@@ -48,13 +54,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="font-sans antialiased bg-gray-100 dark:bg-slate-900">
+
+<body class="font-sans antialiased bg-gray-100 ">
     <!-- Header -->
     <div class="sticky top-0 z-40">
         @include('store.partials.header', [
-            'categories' => $categories ?? [],
-            'cartCount' => $cartCount ?? 0,
-            'activeCategoryId' => $activeCategoryId ?? null,
+        'categories' => $categories ?? [],
+        'cartCount' => $cartCount ?? 0,
+        'activeCategoryId' => $activeCategoryId ?? null,
         ])
     </div>
 
@@ -72,7 +79,8 @@
         #chat-toggle {
             position: fixed;
             bottom: 20px;
-            right: 20px; /* Giữ vị trí gốc bên phải */
+            right: 20px;
+            /* Giữ vị trí gốc bên phải */
             background: #6635c0;
             color: white;
             border-radius: 50%;
@@ -81,7 +89,7 @@
             text-align: center;
             font-size: 28px;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             z-index: 10001;
             display: flex;
             justify-content: center;
@@ -92,13 +100,14 @@
         #chatbox {
             position: fixed;
             bottom: 90px;
-            right: 20px; /* Giữ vị trí gốc bên phải */
+            right: 20px;
+            /* Giữ vị trí gốc bên phải */
             width: 320px;
             height: 420px;
             border: 1px solid #ccc;
             background: white;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             display: none;
             flex-direction: column;
             z-index: 10000;
@@ -143,7 +152,8 @@
         .welcome-notification {
             position: absolute;
             bottom: calc(100% + 10px);
-            right: calc(50% + 60px); /* Dịch sang trái 50px từ tâm nút */
+            right: calc(50% + 60px);
+            /* Dịch sang trái 50px từ tâm nút */
             transform: translateX(50%);
             background-color: #333;
             color: white;
@@ -160,7 +170,8 @@
             content: '';
             position: absolute;
             top: 100%;
-            left: calc(50% + 55px); /* Dịch mũi tên sang phải 50px */
+            left: calc(50% + 55px);
+            /* Dịch mũi tên sang phải 50px */
             transform: translateX(-50%);
             border: 7px solid transparent;
             border-top-color: #333;
@@ -212,7 +223,7 @@
             const chatbox = document.getElementById('chatbox');
             const isOpen = chatbox.style.display === 'flex';
             chatbox.style.display = isOpen ? 'none' : 'flex';
-            
+
             // Dừng hoặc khởi động lại thông báo khi toggle
             if (isOpen) {
                 console.log('Chatbox closed, restarting notification interval');
@@ -248,7 +259,9 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({
+                        message
+                    })
                 });
 
                 if (!res.ok) {
@@ -299,4 +312,5 @@
         });
     </script>
 </body>
+
 </html>
