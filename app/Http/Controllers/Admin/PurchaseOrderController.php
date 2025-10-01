@@ -14,39 +14,67 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderController extends Controller
 {
-    public function index(Request $request)
-    {
-        Log::info('PurchaseOrderController@index called, fetching purchase orders');
+  public function index(Request $request)
+{
+    Log::info('PurchaseOrderController@index called, fetching purchase orders');
 
-        try {
-            $query = PurchaseOrder::with('user', 'supplier');
+    try {
+        $query = PurchaseOrder::with('user', 'supplier');
 
-            if ($request->filled('search')) {
-                $searchTerm = $request->input('search');
-                $query->where(function ($q) use ($searchTerm) {
-                    $q->where('code', 'LIKE', "%{$searchTerm}%")
-                      ->orWhereHas('supplier', function ($q) use ($searchTerm) {
-                          $q->where('supplier_name', 'LIKE', "%{$searchTerm}%");
-                      })
-                      ->orWhereHas('user', function ($q) use ($searchTerm) {
-                          $q->where('full_name', 'LIKE', "%{$searchTerm}%");
-                      });
-                });
-                Log::info('Purchase order search: ' . $searchTerm);
-            }
-
-            $purchaseOrders = $query->orderBy('order_date', 'desc')
-                                  ->paginate(10)
-                                  ->withQueryString();
-
-            Log::info('Purchase orders fetched (page): ' . $purchaseOrders->count() . ', total: ' . $purchaseOrders->total());
-
-            return view('admin.purchase_orders.index', compact('purchaseOrders'));
-        } catch (\Exception $e) {
-            Log::error('Error in PurchaseOrderController@index: ' . $e->getMessage());
-            return redirect()->route('admin.purchase_orders')->with('error', 'Lỗi khi tải danh sách phiếu nhập kho: ' . $e->getMessage());
+        // 🔍 Tìm kiếm
+        if ($request->filled('search')) {
+            $s = $request->input('search');
+            $query->where(function ($q) use ($s) {
+                $q->where('code', 'LIKE', "%{$s}%")
+                  ->orWhereHas('supplier', fn($qq) => $qq->where('supplier_name', 'LIKE', "%{$s}%"))
+                  ->orWhereHas('user', fn($qq) => $qq->where('full_name', 'LIKE', "%{$s}%"));
+            });
+            Log::info("Purchase order search: ".$s);
         }
+
+        // 📅 Lọc theo ngày nhập
+        if ($request->filled('date_from')) {
+            $query->whereDate('order_date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('order_date', '<=', $request->date_to);
+        }
+
+        // 💰 Lọc theo tổng tiền
+        if ($request->filled('amount_min')) {
+            $query->where('total_amount', '>=', (float) $request->amount_min);
+        }
+        if ($request->filled('amount_max')) {
+            $query->where('total_amount', '<=', (float) $request->amount_max);
+        }
+
+        // 👤 Lọc theo người nhập
+        if ($request->filled('user_id')) {
+            $query->where('created_by', $request->user_id);
+        }
+
+        // 🏢 Lọc theo nhà cung cấp
+        if ($request->filled('supplier_id')) {
+            $query->where('supplier_id', $request->supplier_id);
+        }
+
+        $purchaseOrders = $query->orderBy('order_date', 'desc')
+                                ->paginate(10)
+                                ->withQueryString();
+
+        // Lấy dữ liệu dropdown cho form lọc
+        $users = \App\Models\User::select('user_id','full_name')->get();
+        $suppliers = \App\Models\Supplier::select('supplier_id','supplier_name')->get();
+
+        Log::info('Purchase orders fetched (page): '.$purchaseOrders->count().', total: '.$purchaseOrders->total());
+
+        return view('admin.purchase_orders.index', compact('purchaseOrders','users','suppliers'));
+    } catch (\Exception $e) {
+        Log::error('Error in PurchaseOrderController@index: ' . $e->getMessage());
+        return redirect()->route('admin.purchase_orders')->with('error', 'Lỗi khi tải danh sách phiếu nhập kho: ' . $e->getMessage());
     }
+}
+
 
     public function create()
     {

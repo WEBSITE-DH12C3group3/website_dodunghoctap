@@ -11,36 +11,69 @@ use Illuminate\Support\Facades\Log;
 class OrderController extends Controller
 {
     public function index(Request $request)
-    {
-        Log::info('OrderController@index called, fetching orders');
+{
+    Log::info('OrderController@index called, fetching orders');
 
-        try {
-            $query = Order::with('user', 'delivery');
+    try {
+        $query = Order::with('user', 'delivery');
 
-            if ($request->filled('search')) {
-                $searchTerm = $request->input('search');
-                $query->where(function ($q) use ($searchTerm) {
-                    $q->where('order_id', 'LIKE', "%{$searchTerm}%")
-                      ->orWhereHas('user', function ($q) use ($searchTerm) {
-                          $q->where('full_name', 'LIKE', "%{$searchTerm}%");
-                      })
-                      ->orWhere('status', 'LIKE', "%{$searchTerm}%");
-                });
-                Log::info('Order search: ' . $searchTerm);
-            }
-
-            $orders = $query->orderBy('order_id', 'desc')
-                           ->paginate(10)
-                           ->withQueryString();
-
-            Log::info('Orders fetched (page): ' . $orders->count() . ', total: ' . $orders->total());
-
-            return view('admin.orders.index', compact('orders'));
-        } catch (\Exception $e) {
-            Log::error('Error in OrderController@index: ' . $e->getMessage());
-            return redirect()->route('admin.orders')->with('error', 'Lỗi khi tải danh sách đơn hàng: ' . $e->getMessage());
+        // 🔍 Tìm kiếm
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('order_id', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('user', function ($q) use ($searchTerm) {
+                      $q->where('full_name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
+                  })
+                  ->orWhere('status', 'LIKE', "%{$searchTerm}%");
+            });
+            Log::info('Order search: ' . $searchTerm);
         }
+
+        // 📅 Lọc theo ngày đặt
+        if ($request->filled('date_from')) {
+            $query->whereDate('order_date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('order_date', '<=', $request->date_to);
+        }
+
+        // 💰 Lọc theo tổng tiền
+        if ($request->filled('amount_min')) {
+            $query->where('total_amount', '>=', (float) $request->amount_min);
+        }
+        if ($request->filled('amount_max')) {
+            $query->where('total_amount', '<=', (float) $request->amount_max);
+        }
+
+        // 💳 Lọc theo phương thức thanh toán
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        // 📦 Lọc theo trạng thái
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // 📑 Lấy danh sách
+        $orders = $query->orderBy('order_id', 'desc')
+                        ->paginate(10)
+                        ->withQueryString();
+
+        Log::info('Orders fetched (page): ' . $orders->count() . ', total: ' . $orders->total());
+
+        return view('admin.orders.index', compact('orders'));
+
+    } catch (\Exception $e) {
+        Log::error('Error in OrderController@index: ' . $e->getMessage());
+        return redirect()->route('admin.orders')
+                         ->with('error', 'Lỗi khi tải danh sách đơn hàng: ' . $e->getMessage());
     }
+}
+
 
     public function show($id)
     {

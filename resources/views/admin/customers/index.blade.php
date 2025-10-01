@@ -19,33 +19,56 @@
     </div>
   @endif
 
-  {{-- Tìm kiếm --}}
-  <form method="GET" class="mb-4">
-    <div class="flex items-center gap-2">
-      <div class="relative flex-1">
-        <input
-          type="text" name="search" value="{{ request('search') }}"
-          placeholder="Tên, email, SĐT…"
-          class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800
-                 px-4 py-2 pl-10 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400
-                 focus:outline-none focus:ring-2 focus:ring-brand-400" />
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-        </svg>
-      </div>
-      <button
-        class="rounded-xl px-4 py-2 text-sm font-medium border border-slate-300 dark:border-slate-700
-               hover:bg-slate-50 dark:hover:bg-slate-800">
-        Lọc
-      </button>
-      @if(request()->filled('search'))
-        <a href="{{ route('admin.customers') }}"
-           class="rounded-xl px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:underline">
-          Xoá lọc
-        </a>
-      @endif
-    </div>
-  </form>
+ {{-- Tìm kiếm + lọc --}}
+<form method="GET" class="mb-4 grid grid-cols-1 md:grid-cols-5 gap-2">
+  <!-- Ô tìm kiếm -->
+  <input
+    type="text" name="search" value="{{ request('search') }}"
+    placeholder="Tên, email, SĐT…"
+    class="md:col-span-2 w-full rounded-xl border border-slate-300 dark:border-slate-700
+           bg-white dark:bg-slate-800 px-4 py-2 text-sm text-slate-800 dark:text-slate-100
+           placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400" />
+
+  <!-- Số đơn hàng từ / đến -->
+  <div class="flex gap-1">
+    <input type="number" name="orders_min" value="{{ request('orders_min') }}" placeholder="Đơn từ"
+      class="w-1/2 rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+    <input type="number" name="orders_max" value="{{ request('orders_max') }}" placeholder="Đơn đến"
+      class="w-1/2 rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+  </div>
+
+  <!-- Tổng chi từ / đến -->
+  <div class="flex gap-1">
+    <input type="number" name="spend_min" value="{{ request('spend_min') }}" placeholder="Chi từ"
+      class="w-1/2 rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+    <input type="number" name="spend_max" value="{{ request('spend_max') }}" placeholder="Chi đến"
+      class="w-1/2 rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+  </div>
+
+  <!-- Mốc nhanh cho tổng chi -->
+  <select name="spend_quick" onchange="if(this.value) { this.form.spend_min=this.value; this.form.submit(); }"
+    class="rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+    <option value="">-- Mốc tổng chi --</option>
+    <option value="1000000" {{ request('spend_min')==1000000 ? 'selected':'' }}>Trên 1 triệu</option>
+    <option value="5000000" {{ request('spend_min')==5000000 ? 'selected':'' }}>Trên 5 triệu</option>
+    <option value="10000000" {{ request('spend_min')==10000000 ? 'selected':'' }}>Trên 10 triệu</option>
+  </select>
+
+  <!-- Buttons -->
+  <div class="flex gap-2">
+    <button class="rounded-xl px-4 py-2 text-sm font-medium border border-slate-300 dark:border-slate-700
+                   hover:bg-slate-50 dark:hover:bg-slate-800">
+      Lọc
+    </button>
+    @if(request()->except('page'))
+      <a href="{{ route('admin.customers') }}"
+         class="rounded-xl px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:underline">
+        Xoá lọc
+      </a>
+    @endif
+  </div>
+</form>
+
 
   {{-- Bảng danh sách --}}
   <div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">

@@ -6,22 +6,61 @@
         <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Danh sách đơn hàng</h2>
     </div>
 
-    <div class="mb-4">
-        <form action="{{ route('admin.orders') }}" method="GET" class="flex items-center space-x-2">
-            <input type="text" name="search" placeholder="Tìm kiếm theo ID, tên khách hàng hoặc trạng thái..." 
-                   class="flex-1 rounded-xl px-4 py-2 text-sm text-slate-700 dark:text-slate-200 
-                          bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 
-                          focus:outline-none focus:ring-2 focus:ring-brand-500"
-                   value="{{ request('search') }}">
-            <button type="submit" class="rounded-xl px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 shadow-sm">
-                Tìm kiếm
-            </button>
-            @if(request('search'))
-                <a href="{{ route('admin.orders') }}" class="text-slate-500 hover:text-red-500">Xóa tìm kiếm</a>
-            @endif
-        </form>
-    </div>
+    {{-- Form lọc --}}
+    <form action="{{ route('admin.orders') }}" method="GET" class="mb-6 grid grid-cols-1 md:grid-cols-6 gap-2">
+        <!-- Tìm kiếm -->
+        <input type="text" name="search" placeholder="Tìm ID, tên KH, trạng thái..." 
+               class="md:col-span-2 rounded-xl px-4 py-2 text-sm text-slate-700 dark:text-slate-200 
+                      bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 
+                      focus:outline-none focus:ring-2 focus:ring-brand-500"
+               value="{{ request('search') }}">
 
+        <!-- Ngày đặt từ / đến -->
+        <div class="flex gap-1">
+            <input type="date" name="date_from" value="{{ request('date_from') }}"
+                   class="w-1/2 rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+            <input type="date" name="date_to" value="{{ request('date_to') }}"
+                   class="w-1/2 rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+        </div>
+
+        <!-- Tổng tiền từ / đến -->
+        <div class="flex gap-1">
+            <input type="number" name="amount_min" value="{{ request('amount_min') }}" placeholder="Tổng từ"
+                   class="w-1/2 rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+            <input type="number" name="amount_max" value="{{ request('amount_max') }}" placeholder="Tổng đến"
+                   class="w-1/2 rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+        </div>
+
+        <!-- Lọc theo phương thức thanh toán -->
+        <select name="payment_method" class="rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+            <option value="">-- Thanh toán --</option>
+            <option value="cod" {{ request('payment_method')=='cod' ? 'selected' : '' }}>Thanh toán khi nhận hàng</option>
+            <option value="bank_transfer" {{ request('payment_method')=='bank_transfer' ? 'selected' : '' }}>Chuyển khoản ngân hàng</option>
+            <option value="momo" {{ request('payment_method')=='momo' ? 'selected' : '' }}>Momo</option>
+        </select>
+
+        <!-- Lọc theo trạng thái -->
+        <select name="status" class="rounded-xl border px-2 py-2 text-sm bg-slate-100 dark:bg-slate-800">
+            <option value="">-- Trạng thái --</option>
+            <option value="pending" {{ request('status')=='pending' ? 'selected' : '' }}>Chờ xử lý</option>
+            <option value="confirmed" {{ request('status')=='confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
+            <option value="delivered" {{ request('status')=='delivered' ? 'selected' : '' }}>Đã giao</option>
+            <option value="cancelled" {{ request('status')=='cancelled' ? 'selected' : '' }}>Đã hủy</option>
+        </select>
+
+        <!-- Buttons -->
+        <div class="md:col-span-6 flex gap-2">
+            <button type="submit"
+                class="rounded-xl px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 shadow-sm">
+                Lọc
+            </button>
+            @if(request()->except('page'))
+                <a href="{{ route('admin.orders') }}" class="text-slate-500 hover:text-red-500 text-sm">Xóa lọc</a>
+            @endif
+        </div>
+    </form>
+
+    {{-- Flash message --}}
     @if (session('ok'))
         <div class="mb-4 rounded-xl border border-green-200/60 dark:border-green-400/30 bg-green-50/80 dark:bg-green-900/30 px-4 py-3 text-green-700 dark:text-green-200 shadow-sm">
             {{ session('ok') }}
@@ -33,10 +72,13 @@
         </div>
     @endif
 
-    @if ($orders->isEmpty() && request('search'))
-        <p class="text-slate-600 dark:text-slate-300">Không tìm thấy đơn hàng nào phù hợp với "{{ request('search') }}".</p>
-    @elseif ($orders->isEmpty())
-        <p class="text-slate-600 dark:text-slate-300">Chưa có đơn hàng nào.</p>
+    {{-- Table --}}
+    @if ($orders->isEmpty())
+        <p class="text-slate-600 dark:text-slate-300">
+            {{ request()->anyFilled(['search','date_from','date_to','amount_min','amount_max','payment_method','status'])
+                ? 'Không tìm thấy đơn hàng nào phù hợp.'
+                : 'Chưa có đơn hàng nào.' }}
+        </p>
     @else
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-700 dark:text-slate-200">
@@ -53,19 +95,16 @@
                 </thead>
                 <tbody>
                     @php
-                        // Ánh xạ trạng thái đơn hàng sang tiếng Việt
                         $statusMap = [
                             'pending' => 'Chờ xử lý',
                             'confirmed' => 'Đã xác nhận',
                             'cancelled' => 'Đã hủy',
                             'delivered' => 'Đã giao',
                         ];
-
-                        // Ánh xạ phương thức thanh toán (nếu cần)
                         $paymentMethodMap = [
                             'cod' => 'Thanh toán khi nhận hàng',
                             'bank_transfer' => 'Chuyển khoản ngân hàng',
-                            // Thêm nếu có thêm phương thức
+                            'momo' => 'Momo',
                         ];
                     @endphp
                     @foreach ($orders as $order)
@@ -77,11 +116,10 @@
                         <td class="px-4 py-3">{{ $paymentMethodMap[$order->payment_method] ?? ucfirst($order->payment_method) }}</td>
                         <td class="px-4 py-3">{{ $statusMap[$order->status] ?? ucfirst($order->status) }}</td>
                         <td class="px-4 py-3 flex gap-2">
-                            <a href="{{ route('admin.orders.show', $order->order_id) }}" class="text-blue-600 hover:underline">Xem chi tiết</a>
+                            <a href="{{ route('admin.orders.show', $order->order_id) }}" class="text-blue-600 hover:underline">Xem</a>
                             <a href="{{ route('admin.orders.edit', $order->order_id) }}" class="text-green-600 hover:underline">Cập nhật</a>
                             <form action="{{ route('admin.orders.destroy', $order->order_id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">
-                                @csrf
-                                @method('DELETE')
+                                @csrf @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:underline">Hủy</button>
                             </form>
                         </td>

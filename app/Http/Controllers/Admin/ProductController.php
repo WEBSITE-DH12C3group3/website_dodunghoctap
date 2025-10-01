@@ -13,39 +13,71 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
-    {
-        Log::info('ProductController@index called, fetching products');
+public function index(Request $request)
+{
+    Log::info('ProductController@index called, fetching products');
 
-        try {
-            $query = Product::with(['category', 'brand']);
+    try {
+        $query = Product::with(['category', 'brand']);
 
-            if ($request->filled('search')) {
-                $searchTerm = $request->input('search');
-                $query->where(function ($q) use ($searchTerm) {
-                    $q->where('product_name', 'LIKE', "%{$searchTerm}%")
-                      ->orWhereHas('category', function ($q) use ($searchTerm) {
-                          $q->where('category_name', 'LIKE', "%{$searchTerm}%");
-                      })
-                      ->orWhereHas('brand', function ($q) use ($searchTerm) {
-                          $q->where('brand_name', 'LIKE', "%{$searchTerm}%");
-                      });
-                });
-                Log::info('Product search: ' . $searchTerm);
-            }
-
-            $products = $query->orderBy('product_id', 'desc')
-                             ->paginate(10)
-                             ->withQueryString();
-
-            Log::info('Products fetched (page): ' . $products->count() . ', total: ' . $products->total());
-
-            return view('admin.products.index', compact('products'));
-        } catch (\Exception $e) {
-            Log::error('Error in ProductController@index: ' . $e->getMessage());
-            return redirect()->route('admin.products')->with('error', 'Lỗi khi tải danh sách sản phẩm: ' . $e->getMessage());
+        // Tìm kiếm theo tên / danh mục / thương hiệu
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('product_name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('category', function ($q) use ($searchTerm) {
+                      $q->where('category_name', 'LIKE', "%{$searchTerm}%");
+                  })
+                  ->orWhereHas('brand', function ($q) use ($searchTerm) {
+                      $q->where('brand_name', 'LIKE', "%{$searchTerm}%");
+                  });
+            });
+            Log::info('Product search: ' . $searchTerm);
         }
+
+        // Lọc theo danh mục
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Lọc theo thương hiệu
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        }
+
+        // Lọc theo số lượng tồn
+        if ($request->filled('stock_min')) {
+            $query->where('stock_quantity', '>=', (int) $request->stock_min);
+        }
+        if ($request->filled('stock_max')) {
+            $query->where('stock_quantity', '<=', (int) $request->stock_max);
+        }
+
+        // Lọc theo khoảng giá
+        if ($request->filled('price_min')) {
+            $query->where('price', '>=', (int) $request->price_min);
+        }
+        if ($request->filled('price_max')) {
+            $query->where('price', '<=', (int) $request->price_max);
+        }
+
+        $products = $query->orderBy('product_id', 'desc')
+                         ->paginate(10)
+                         ->withQueryString();
+
+        // Lấy data cho dropdown lọc (bắt buộc để view không lỗi)
+        $categories = Category::all();
+        $brands = Brand::all();
+
+        Log::info('Products fetched (page): ' . $products->count() . ', total: ' . $products->total());
+
+        return view('admin.products.index', compact('products', 'categories', 'brands'));
+    } catch (\Exception $e) {
+        Log::error('Error in ProductController@index: ' . $e->getMessage());
+        return redirect()->route('admin.products')->with('error', 'Lỗi khi tải danh sách sản phẩm: ' . $e->getMessage());
     }
+}
+
 
     public function create()
     {
