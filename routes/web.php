@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Store\HomeController;
@@ -49,6 +50,15 @@ Route::get('/featured', [ProductListController::class, 'featured'])->name('store
 
 // search.blade
 Route::get('/search', [SearchController::class, 'index'])->name('store.product.search');
+
+
+// === CHATBOT ROUTES ĐÃ CẬP NHẬT: Cho phép POST lên /chat ===
+// Route GET để hiển thị giao diện chat
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index'); 
+// Route POST để gửi tin nhắn. Sửa POST /chat/send thành POST /chat
+// -> Giải quyết lỗi 404/HTML trả về khi gọi POST /chat
+Route::post('/chat', [ChatController::class, 'chat'])->name('chat.send'); 
+
 
 // show.blade
 Route::get('/product/{id}', [ProductShowController::class, 'show'])
