@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'S3 — Stationery Shop' }}</title>
+    <title>{{ $title ?? 'PEAKVL' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -65,8 +65,8 @@
                 </div>
                 <!-- Logo and Title -->
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-semibold tracking-tight mb-6">
-                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 text-white shadow-sm">S3</span>
-                    <span>S3 — Stationery Shop</span>
+                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 text-white shadow-sm">PEAK</span>
+                    <span>PEAKVL</span>
                 </a>
                 <!-- Navigation -->
                 <nav class="space-y-2 flex-1">

@@ -40,7 +40,7 @@
                         {{-- Ảnh (KHÔNG overflow-hidden để không “cắt” cảm giác mép trên) --}}
                         <div class="p-4 pt-6"> {{-- pt-5 để có thêm không gian phía trên --}}
                             <div class="relative rounded-xl">
-                                <img src="{{ asset('storage/'.$p->image) }}"
+                                <img src="{{ $p->image_url ? asset('storage/' . $p->image_url) : asset('images/placeholder.webp') }}"
                                     alt="{{ $p->product_name }}"
                                     class="w-full h-40 object-contain bg-[#F7FAFF] rounded-[18px]
                     transition-transform duration-300 group-hover/card:scale-[1.02]" />

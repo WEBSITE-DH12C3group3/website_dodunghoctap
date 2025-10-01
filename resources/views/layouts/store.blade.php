@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'PEAK VL')</title>
+    <title>@yield('title', 'PEAKVL')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Favicon + Icons -->
     <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('icons/apple-icon-57x57.png') }}">
@@ -282,7 +282,7 @@
 
             const notificationDiv = document.createElement('div');
             notificationDiv.className = 'welcome-notification';
-            notificationDiv.textContent = 'Chào mừng bạn đến với PeakVN.';
+            notificationDiv.textContent = 'Chào mừng bạn đến với PeakVL.';
             chatToggle.appendChild(notificationDiv);
 
             setTimeout(() => {
