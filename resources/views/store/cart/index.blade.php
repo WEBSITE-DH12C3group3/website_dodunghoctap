@@ -118,174 +118,167 @@
         {{-- Cột phải: tóm tắt đơn hàng --}}
         <aside class="lg:sticky lg:top-24">
             <div class="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-4 sm:p-5">
-                <div class="flex items-center justify-between">
-                    <h2 class="font-semibold">Tổng tiền</h2>
-                    <div id="cart-total" class="text-xl font-bold text-[#2659f3]">
-                        {{ number_format($total,0,',','.') }}đ
+                <form action="{{ route('checkout.index') }}" method="GET" class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-semibold">Tổng tiền</h2>
+                        <div id="cart-total" class="text-xl font-bold text-[#2659f3]">
+                            {{ number_format($total,0,',','.') }}đ
+                        </div>
                     </div>
-                </div>
-                <script>
-                    (() => {
-                        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                        const routeUpdate = @json(route('cart.update'));
-                        const format = n => n.toLocaleString('vi-VN');
-                        const timers = new Map(); // debounce theo mỗi row
+                    <script>
+                        (() => {
+                            const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                            const routeUpdate = @json(route('cart.update'));
+                            const format = n => n.toLocaleString('vi-VN');
+                            const timers = new Map(); // debounce theo mỗi row
 
-                        // Chuẩn hoá chuỗi thành số lượng >= 1
-                        function normalizeQty(val) {
-                            const n = parseInt(String(val).replace(/[^\d]/g, ''), 10);
-                            return isNaN(n) || n < 1 ? 1 : n;
-                        }
+                            // Chuẩn hoá chuỗi thành số lượng >= 1
+                            function normalizeQty(val) {
+                                const n = parseInt(String(val).replace(/[^\d]/g, ''), 10);
+                                return isNaN(n) || n < 1 ? 1 : n;
+                            }
 
-                        async function postUpdate(rowEl, qty) {
-                            const id = rowEl.dataset.id;
-                            const price = parseInt(rowEl.dataset.price || '0', 10);
+                            async function postUpdate(rowEl, qty) {
+                                const id = rowEl.dataset.id;
+                                const price = parseInt(rowEl.dataset.price || '0', 10);
 
-                            const res = await fetch(routeUpdate, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': csrf,
-                                    'Accept': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    id,
-                                    qty
-                                })
+                                const res = await fetch(routeUpdate, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': csrf,
+                                        'Accept': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        id,
+                                        qty
+                                    })
+                                });
+
+                                if (!res.ok) throw new Error('Update failed');
+                                const data = await res.json();
+
+                                // Cập nhật UI
+                                const subtotalEl = rowEl.closest('.bg-white, .ring-1, [data-subtotal]') // tìm card chứa
+                                    .querySelector('[data-subtotal]');
+                                if (subtotalEl) {
+                                    const sub = (data.itemSubtotal != null) ? data.itemSubtotal : (price * qty);
+                                    subtotalEl.textContent = format(sub) + 'đ';
+                                }
+                                if (data.total != null) {
+                                    const totalEl = document.getElementById('cart-total');
+                                    if (totalEl) totalEl.textContent = format(data.total) + 'đ';
+                                }
+                            }
+
+                            // Click nút +/- vẫn hoạt động
+                            document.addEventListener('click', async (e) => {
+                                const btn = e.target.closest('.qty-btn');
+                                if (!btn) return;
+
+                                const row = btn.closest('[data-cart-row]');
+                                const input = row.querySelector('.qty-input');
+                                const curr = normalizeQty(input.value);
+                                const qty = Math.max(1, curr + (parseInt(btn.dataset.delta || '0', 10)));
+
+                                input.value = qty;
+
+                                try {
+                                    await postUpdate(row, qty);
+                                } catch {
+                                    location.reload();
+                                }
                             });
 
-                            if (!res.ok) throw new Error('Update failed');
-                            const data = await res.json();
+                            // Gõ số trong input → debounce update
+                            document.addEventListener('input', (e) => {
+                                const inp = e.target.closest('.qty-input');
+                                if (!inp) return;
 
-                            // Cập nhật UI
-                            const subtotalEl = rowEl.closest('.bg-white, .ring-1, [data-subtotal]') // tìm card chứa
-                                .querySelector('[data-subtotal]');
-                            if (subtotalEl) {
-                                const sub = (data.itemSubtotal != null) ? data.itemSubtotal : (price * qty);
-                                subtotalEl.textContent = format(sub) + 'đ';
-                            }
-                            if (data.total != null) {
-                                const totalEl = document.getElementById('cart-total');
-                                if (totalEl) totalEl.textContent = format(data.total) + 'đ';
-                            }
-                        }
+                                // Giữ chỉ chữ số, không cho ký tự khác
+                                const cleaned = String(inp.value).replace(/[^\d]/g, '');
+                                inp.value = cleaned;
 
-                        // Click nút +/- vẫn hoạt động
-                        document.addEventListener('click', async (e) => {
-                            const btn = e.target.closest('.qty-btn');
-                            if (!btn) return;
+                                const row = inp.closest('[data-cart-row]');
+                                // debounce 350ms
+                                clearTimeout(timers.get(row));
+                                const t = setTimeout(async () => {
+                                    const qty = normalizeQty(inp.value);
+                                    inp.value = qty;
+                                    try {
+                                        await postUpdate(row, qty);
+                                    } catch {
+                                        /* im lặng */
+                                    }
+                                }, 350);
+                                timers.set(row, t);
+                            });
 
-                            const row = btn.closest('[data-cart-row]');
-                            const input = row.querySelector('.qty-input');
-                            const curr = normalizeQty(input.value);
-                            const qty = Math.max(1, curr + (parseInt(btn.dataset.delta || '0', 10)));
-
-                            input.value = qty;
-
-                            try {
-                                await postUpdate(row, qty);
-                            } catch {
-                                location.reload();
-                            }
-                        });
-
-                        // Gõ số trong input → debounce update
-                        document.addEventListener('input', (e) => {
-                            const inp = e.target.closest('.qty-input');
-                            if (!inp) return;
-
-                            // Giữ chỉ chữ số, không cho ký tự khác
-                            const cleaned = String(inp.value).replace(/[^\d]/g, '');
-                            inp.value = cleaned;
-
-                            const row = inp.closest('[data-cart-row]');
-                            // debounce 350ms
-                            clearTimeout(timers.get(row));
-                            const t = setTimeout(async () => {
-                                const qty = normalizeQty(inp.value);
-                                inp.value = qty;
-                                try {
-                                    await postUpdate(row, qty);
-                                } catch {
-                                    /* im lặng */
+                            // Enter/blur → cập nhật ngay
+                            document.addEventListener('keydown', async (e) => {
+                                const inp = e.target.closest('.qty-input');
+                                if (!inp) return;
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const row = inp.closest('[data-cart-row]');
+                                    const qty = normalizeQty(inp.value);
+                                    inp.value = qty;
+                                    try {
+                                        await postUpdate(row, qty);
+                                    } catch {
+                                        location.reload();
+                                    }
+                                } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                                    // Hỗ trợ mũi tên ↑↓ tăng/giảm
+                                    e.preventDefault();
+                                    const row = inp.closest('[data-cart-row]');
+                                    const curr = normalizeQty(inp.value);
+                                    const qty = Math.max(1, curr + (e.key === 'ArrowUp' ? 1 : -1));
+                                    inp.value = qty;
+                                    try {
+                                        await postUpdate(row, qty);
+                                    } catch {
+                                        location.reload();
+                                    }
                                 }
-                            }, 350);
-                            timers.set(row, t);
-                        });
+                            });
 
-                        // Enter/blur → cập nhật ngay
-                        document.addEventListener('keydown', async (e) => {
-                            const inp = e.target.closest('.qty-input');
-                            if (!inp) return;
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
+                            document.addEventListener('blur', async (e) => {
+                                const inp = e.target.closest('.qty-input');
+                                if (!inp) return;
                                 const row = inp.closest('[data-cart-row]');
                                 const qty = normalizeQty(inp.value);
                                 inp.value = qty;
                                 try {
                                     await postUpdate(row, qty);
                                 } catch {
-                                    location.reload();
+                                    /* bỏ qua */
                                 }
-                            } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                                // Hỗ trợ mũi tên ↑↓ tăng/giảm
-                                e.preventDefault();
-                                const row = inp.closest('[data-cart-row]');
-                                const curr = normalizeQty(inp.value);
-                                const qty = Math.max(1, curr + (e.key === 'ArrowUp' ? 1 : -1));
-                                inp.value = qty;
-                                try {
-                                    await postUpdate(row, qty);
-                                } catch {
-                                    location.reload();
-                                }
-                            }
-                        });
+                            }, true);
+                        })();
+                    </script>
 
-                        document.addEventListener('blur', async (e) => {
-                            const inp = e.target.closest('.qty-input');
-                            if (!inp) return;
-                            const row = inp.closest('[data-cart-row]');
-                            const qty = normalizeQty(inp.value);
-                            inp.value = qty;
-                            try {
-                                await postUpdate(row, qty);
-                            } catch {
-                                /* bỏ qua */
-                            }
-                        }, true);
-                    })();
-                </script>
 
-                <!-- <div class="mt-3">
-                    <label class="flex items-center gap-3 text-sm">
-                        <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600">
-                        <span>Xuất hoá đơn công ty</span>
-                    </label>
-                    <p class="mt-2 text-xs text-rose-600 font-medium">
-                        *Lưu ý: Nhập rõ ràng và đầy đủ thông tin hoá đơn (không viết tắt phường/xã, quận/huyện, tỉnh/thành phố, tên công ty).
+                    <div class="mt-4">
+                        <label for="note" class="text-sm font-medium">Ghi chú đơn hàng</label>
+                        <textarea id="note" name="note" rows="3"
+                            class="mt-2 w-full rounded-xl border border-gray-200
+                                px-3 py-2 leading-relaxed 
+                                placeholder:text-gray-400
+                                focus:outline-none focus:ring-0 focus:border-gray-200
+                                resize-y"
+                            placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao..."></textarea>
+                    </div>
+
+                    <button type="submit"
+                        class="block w-full h-12 rounded-full bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 text-center leading-[48px]">
+                        Tiến hành đặt hàng
+                    </button>
+
+                    <p class="mt-3 text-[13px] text-gray-500 text-center">
+                        Bằng việc tiếp tục, bạn đồng ý với <a href="#" class="text-blue-600 hover:underline">Điều khoản mua hàng</a>.
                     </p>
-                </div> -->
-                <div class="mt-4">
-                    <label for="note" class="text-sm font-medium">Ghi chú đơn hàng</label>
-                    <textarea id="note" name="note" rows="3"
-                        class="mt-2 w-full rounded-xl border border-gray-200
-           px-3 py-2             {{-- đệm trong: cách chữ với khung một tẹo --}}
-           leading-relaxed       {{-- dòng thoáng hơn chút --}}
-           placeholder:text-gray-400
-           focus:outline-none focus:ring-0 focus:border-gray-200
-           resize-y"
-                        placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao..."></textarea>
-                </div>
-
-                <a href="{{ route('checkout.index') }}"
-                    class="block w-full h-12 rounded-full bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 text-center leading-[48px]">
-                    Tiến hành đặt hàng
-                </a>
-
-                <p class="mt-3 text-[13px] text-gray-500 text-center">
-                    Bằng việc tiếp tục, bạn đồng ý với <a href="#" class="text-blue-600 hover:underline">Điều khoản mua hàng</a>.
-                </p>
+                </form>
             </div>
         </aside>
     </div>

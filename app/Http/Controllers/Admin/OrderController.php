@@ -27,12 +27,12 @@ class OrderController extends Controller
                 $searchTerm = $request->input('search');
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('order_id', 'LIKE', "%{$searchTerm}%")
-                      ->orWhereHas('user', function ($q) use ($searchTerm) {
-                          $q->where('full_name', 'LIKE', "%{$searchTerm}%")
-                            ->orWhere('email', 'LIKE', "%{$searchTerm}%")
-                            ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
-                      })
-                      ->orWhere('status', 'LIKE', "%{$searchTerm}%");
+                        ->orWhereHas('user', function ($q) use ($searchTerm) {
+                            $q->where('full_name', 'LIKE', "%{$searchTerm}%")
+                                ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                                ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
+                        })
+                        ->orWhere('status', 'LIKE', "%{$searchTerm}%");
                 });
                 Log::info('Order search: ' . $searchTerm);
             }
@@ -65,17 +65,16 @@ class OrderController extends Controller
 
             // 📑 Lấy danh sách
             $orders = $query->orderBy('order_id', 'desc')
-                            ->paginate(10)
-                            ->withQueryString();
+                ->paginate(10)
+                ->withQueryString();
 
             Log::info('Orders fetched (page): ' . $orders->count() . ', total: ' . $orders->total());
 
             return view('admin.orders.index', compact('orders'));
-
         } catch (\Exception $e) {
             Log::error('Error in OrderController@index: ' . $e->getMessage());
             return redirect()->route('admin.orders')
-                             ->with('error', 'Lỗi khi tải danh sách đơn hàng: ' . $e->getMessage());
+                ->with('error', 'Lỗi khi tải danh sách đơn hàng: ' . $e->getMessage());
         }
     }
 
@@ -103,9 +102,15 @@ class OrderController extends Controller
             'expected_delivery_date' => 'nullable|date',
         ]);
 
+        $previousStatus = $order->status;
+
         $order->update([
             'status' => $validated['status'],
         ]);
+
+        if ($previousStatus !== $order->status) {
+            $order->syncProductSoldForStatusChange($previousStatus, $order->status);
+        }
 
         if ($order->delivery) {
             $order->delivery->update([
@@ -150,12 +155,12 @@ class OrderController extends Controller
                 ->when($request->search, function ($q) use ($request) {
                     $searchTerm = $request->input('search');
                     $q->where('order_id', 'LIKE', "%{$searchTerm}%")
-                      ->orWhereHas('user', function ($q) use ($searchTerm) {
-                          $q->where('full_name', 'LIKE', "%{$searchTerm}%")
-                            ->orWhere('email', 'LIKE', "%{$searchTerm}%")
-                            ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
-                      })
-                      ->orWhere('status', 'LIKE', "%{$searchTerm}%");
+                        ->orWhereHas('user', function ($q) use ($searchTerm) {
+                            $q->where('full_name', 'LIKE', "%{$searchTerm}%")
+                                ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                                ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
+                        })
+                        ->orWhere('status', 'LIKE', "%{$searchTerm}%");
                 })
                 ->when($request->date_from, fn($q) => $q->whereDate('order_date', '>=', $request->date_from))
                 ->when($request->date_to, fn($q) => $q->whereDate('order_date', '<=', $request->date_to))
@@ -169,7 +174,7 @@ class OrderController extends Controller
             // Chuẩn bị dữ liệu cho báo cáo
             $data = [
                 'orders' => $orders,
-                'periodText' => $request->date_from && $request->date_to 
+                'periodText' => $request->date_from && $request->date_to
                     ? Carbon::parse($request->date_from)->format('d/m/Y') . ' - ' . Carbon::parse($request->date_to)->format('d/m/Y')
                     : 'Tất cả',
                 'userName' => auth()->user()->full_name,

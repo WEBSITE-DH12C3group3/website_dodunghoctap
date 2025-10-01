@@ -55,8 +55,7 @@ class OrderUserController extends Controller
     public function cancel($orderId)
     {
         $userId = auth()->id();
-        $order = DB::table('orders')
-            ->where('order_id', $orderId)
+        $order = Order::where('order_id', $orderId)
             ->where('user_id', $userId)
             ->first();
 

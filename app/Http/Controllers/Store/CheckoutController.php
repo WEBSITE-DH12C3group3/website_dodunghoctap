@@ -47,7 +47,7 @@ class CheckoutController extends Controller
             'address'         => 'required|string|max:255',
             'note'            => 'nullable|string|max:500',
             'coupon'          => 'nullable|string|max:100',
-            'payment_method'  => 'required|in:cod,payos',
+            'payment_method'  => 'required|in:cod,payos,vietqr',
         ]);
 
         $cart = collect(session('cart', []));
@@ -64,7 +64,12 @@ class CheckoutController extends Controller
         try {
             $order = Order::create([
                 'user_id'        => Auth::id(),
-                'status'         => $data['payment_method'] === 'cod' ? 'processing' : 'confirmed',
+                'status'         => match ($data['payment_method']) {
+                    'cod'    => 'pending',
+                    'payos'  => 'processing',
+                    'vietqr' => 'processing',
+                    default  => 'pending',
+                },
                 'total_amount'   => $grandTotal,
                 'payment_method' => $data['payment_method'], // DB có cột này
             ]);
@@ -74,6 +79,7 @@ class CheckoutController extends Controller
                 'order_id'      => $order->order_id,
                 'receiver_name' => $data['fullname'],
                 'phone'         => $data['phone'],
+                'email'        => Auth::user()->email,
                 'address'       => $data['address'],
                 'note'          => $data['note'] ?? null,
                 'delivery_status' => 'pending',
@@ -93,6 +99,9 @@ class CheckoutController extends Controller
             if ($coupon) {
                 $coupon->increment('used_count');
             }
+
+            $order->syncProductSoldForStatusChange(null, $order->status);
+
             if ($data['payment_method'] === 'cod') {
                 DB::commit();
                 session()->forget('cart');
@@ -188,51 +197,43 @@ class CheckoutController extends Controller
 
     public function payosReturn(Request $request)
     {
-        $status    = $request->query('status');     // PAID|PENDING|...
-        $orderCode = $request->query('orderCode');  // có thể có
-        $cancel    = filter_var($request->query('cancel'), FILTER_VALIDATE_BOOL);
+        $status    = $request->query('status');     // PAID | PENDING | CANCELLED ...
+        $orderCode = $request->query('orderCode');  // dạng đã gửi đi
 
-        if ($cancel || strtoupper((string)$status) === 'CANCELLED') {
+        // ---- Cancel từ return url ----
+        if ($request->boolean('cancel') || strtoupper((string)$status) === 'CANCELLED') {
             if ($orderCode) {
-                Order::where('order_code', $orderCode)
-                    ->where('status', 'pending')
+                $orderId = intdiv((int)$orderCode, 1000);
+                Order::where('order_id', $orderId)
+                    ->whereIn('status', ['pending', 'processing'])
                     ->update(['status' => 'cancelled']);
             }
             return redirect()->route('checkout.index')->with('error', 'Bạn đã hủy thanh toán.');
         }
 
-        $clientId = env('PAYOS_CLIENT_ID');
-        $apiKey   = env('PAYOS_API_KEY');
-
-        // Dùng orderCode nếu có; nếu không, có thể đọc từ paymentLinkId (id path cho phép cả hai)
-        $id = $orderCode ?: $request->query('id'); // id = paymentLinkId nếu PayOS trả
-
+        // ---- Xác minh trạng thái từ PayOS (GET /v2/payment-requests/{id}) ----
         try {
-            $http = new Client([
-                'base_uri' => 'https://api-merchant.payos.vn',
-                'timeout'  => 15,
-            ]);
+            $clientId = env('PAYOS_CLIENT_ID');
+            $apiKey   = env('PAYOS_API_KEY');
 
-            $res = $http->get('/v2/payment-requests/' . urlencode($id), [
-                'headers' => [
-                    'x-client-id' => $clientId,
-                    'x-api-key'   => $apiKey,
-                    'Accept'      => 'application/json',
-                ],
-            ]);
+            $id   = $orderCode ?: $request->query('id'); // có thể dùng lại orderCode
+            $http = new \GuzzleHttp\Client(['base_uri' => 'https://api-merchant.payos.vn', 'timeout' => 15]);
 
-            $json = json_decode((string) $res->getBody(), true);
-            $data = $json['data'] ?? [];
+            $res  = $http->get('/v2/payment-requests/' . urlencode((string)$id), [
+                'headers' => ['x-client-id' => $clientId, 'x-api-key' => $apiKey, 'Accept' => 'application/json'],
+            ]);
+            $data = json_decode((string)$res->getBody(), true)['data'] ?? [];
 
             if (strtoupper($data['status'] ?? '') === 'PAID') {
-                $order = Order::where('order_code', $data['orderCode'] ?? $orderCode)
-                    ->orWhere('payment_link_id', $data['paymentLinkId'] ?? null)
-                    ->first();
+                // Lấy lại order_id từ orderCode PayOS trả về
+                $oc      = (int)($data['orderCode'] ?? $orderCode);
+                $orderId = intdiv($oc, 1000);
 
+                $order = Order::where('order_id', $orderId)->first();
                 if ($order && $order->status !== 'confirmed') {
                     DB::transaction(function () use ($order) {
                         $order->update(['status' => 'confirmed']);
-                        // TODO: trừ kho theo order_items nếu bạn muốn trừ lúc đã thanh toán
+                        // nếu có logic trừ kho/sold thì gọi ở đây (sau khi đã confirmed)
                         if (!empty($order->coupon_code)) {
                             Coupon::where('code', $order->coupon_code)->increment('used_count');
                         }
@@ -244,7 +245,8 @@ class CheckoutController extends Controller
                 return redirect()->route('store.orders.index')->with('success', 'Thanh toán thành công.');
             }
 
-            return redirect()->route('store.orders.index')->with('warning', 'Thanh toán chưa hoàn tất. Trạng thái: ' . ($data['status'] ?? $status ?? 'N/A'));
+            return redirect()->route('store.orders.index')
+                ->with('warning', 'Thanh toán chưa hoàn tất. Trạng thái: ' . ($data['status'] ?? $status ?? 'N/A'));
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('checkout.index')->with('error', 'Lỗi xác minh thanh toán: ' . $e->getMessage());
@@ -255,12 +257,15 @@ class CheckoutController extends Controller
     {
         $orderCode = $request->query('orderCode');
         if ($orderCode) {
-            Order::where('order_code', $orderCode)
-                ->where('status', 'pending')
+            $orderId = intdiv((int)$orderCode, 1000);  // lấy lại order_id
+            Order::where('order_id', $orderId)
+                ->whereIn('status', ['pending', 'processing'])
                 ->update(['status' => 'cancelled']);
         }
         return redirect()->route('checkout.index')->with('error', 'Bạn đã hủy thanh toán.');
     }
+
+
 
     private function calcDiscount(?string $code, float $subTotal): array
     {

@@ -21,6 +21,16 @@
                     <input name="address" value="{{ old('address', auth()->user()->address ?? '') }}"
                         class="w-full border rounded-lg px-3 h-11" placeholder="Địa chỉ" required>
                 </div>
+                <textarea id="note" name="note" rows="3"
+                    class="mt-2 w-full rounded-xl border border-gray-200
+                                px-3 py-2 leading-relaxed 
+                                placeholder:text-gray-400
+                                focus:outline-none focus:ring-0 focus:border-gray-200
+                                resize-y
+                                sm:col-span-2"
+                    placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao...">{{ old('note', request('note')) }}</textarea>
+                @error('note') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+
             </div>
         </div>
 
