@@ -4,7 +4,7 @@
 <div class="bg-white/80 dark:bg-slate-900/50 backdrop-blur p-6 rounded-2xl shadow ring-1 ring-slate-900/5 dark:ring-white/10">
     <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-6">Chỉnh sửa sản phẩm</h2>
 
-    <form action="{{ route('admin.products.update', $product->product_id) }}" method="POST">
+    <form action="{{ route('admin.products.update', $product->product_id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 

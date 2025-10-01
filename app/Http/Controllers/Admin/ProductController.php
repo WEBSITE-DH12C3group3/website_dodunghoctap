@@ -141,9 +141,10 @@ class ProductController extends Controller
 
             if ($request->hasFile('image_url')) {
                 // Xóa ảnh cũ nếu tồn tại
-                if ($product->image_url && Storage::exists($product->image_url)) {
-                    Storage::delete($product->image_url);
+               if ($product->image_url && Storage::disk('public')->exists($product->image_url)) {
+                Storage::disk('public')->delete($product->image_url);
                 }
+
                 $imageName = time() . '_' . $request->file('image_url')->getClientOriginalName();
                 $imagePath = $request->file('image_url')->storeAs('products', $imageName, 'public');
                 if (!$imagePath) {
