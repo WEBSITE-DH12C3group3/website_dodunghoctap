@@ -24,9 +24,22 @@ class CheckoutController extends Controller
 
         $subTotal   = $cart->sum(fn($i) => $i['price'] * $i['qty']);
         $shipping   = 0;
-        $couponCode = $request->get('coupon');
 
-        [$discount, $coupon] = $this->calcDiscount($couponCode, $subTotal);
+        // Ưu tiên coupon đã "apply" và lưu trong session
+        $couponCodeFromSession = session('applied_coupon_code');
+        $couponCodeFromQuery   = $request->get('coupon');
+
+        $couponCode = $couponCodeFromSession ?: $couponCodeFromQuery;
+
+        // Nếu có session sẵn discount thì dùng lại (đồng bộ với applyCoupon)
+        $discount = (int) (session('applied_discount', 0));
+
+        // Phòng hờ: nếu chưa có session discount mà có couponCode → tính lại
+        if ($discount <= 0 && $couponCode) {
+            [$discountTmp, $coupon] = $this->calcDiscount($couponCode, $subTotal);
+            $discount = (int) $discountTmp;
+        }
+
         $grandTotal = max(0, $subTotal - $discount + $shipping);
 
         return view('store.checkout', compact(
@@ -38,6 +51,7 @@ class CheckoutController extends Controller
             'couponCode'
         ));
     }
+
 
     public function store(Request $request)
     {
@@ -58,7 +72,13 @@ class CheckoutController extends Controller
 
         $subTotal = $cart->sum(fn($i) => $i['price'] * $i['qty']);
         $shipping = 0;
-        [$discount, $coupon] = $this->calcDiscount($data['coupon'] ?? null, $subTotal);
+        $sessionCode = session('applied_coupon_code');
+        $sessionDiscount = (float) session('applied_discount', 0);
+        [$discount, $coupon] = $this->calcDiscount($sessionCode ?? ($data['coupon'] ?? null), (float)$subTotal);
+        if ($sessionDiscount > 0 && !$discount) {
+            $coupon = Coupon::where('code', $sessionCode)->lockForUpdate()->first();
+            // $coupon->increment('used_count');
+        }
         $grandTotal = (int) max(0, $subTotal - $discount + $shipping);
 
         DB::beginTransaction();
@@ -131,7 +151,7 @@ class CheckoutController extends Controller
                 );
 
                 // clear cart, commit...
-                if (!empty($coupon)) $coupon->increment('used_count');
+                // if (!empty($coupon)) $coupon->increment('used_count');
                 session()->forget('cart');
                 Cookie::queue(Cookie::forget('cart'));
                 DB::commit();
@@ -257,7 +277,6 @@ class CheckoutController extends Controller
                         }
                     });
                 }
-
                 session()->forget('cart');
                 Cookie::queue(Cookie::forget('cart'));
                 return redirect()->route('store.orders.index')->with('success', 'Thanh toán thành công.');
@@ -283,7 +302,30 @@ class CheckoutController extends Controller
         return redirect()->route('checkout.index')->with('error', 'Bạn đã hủy thanh toán.');
     }
 
+    // CheckoutController.php
+    public function applyCoupon(Request $request)
+    {
+        $cart = collect(session('cart', []));
+        if ($cart->isEmpty()) {
+            return redirect()->route('checkout.index')->with('coupon_error', 'Giỏ hàng trống.');
+        }
 
+        $code = trim((string)$request->input('coupon', ''));
+        if ($code === '') {
+            session()->forget(['applied_coupon_code', 'applied_discount']);
+            return redirect()->route('checkout.index')->with('coupon_error', 'Vui lòng nhập mã.');
+        }
+
+        $subTotal = $cart->sum(fn($i) => $i['price'] * $i['qty']);
+        [$discount, $coupon] = $this->calcDiscount($code, $subTotal); // <- chỉ tính, KHÔNG increment
+        if ($discount > 0) {
+            session(['applied_coupon_code' => $code, 'applied_discount' => (int)$discount]);
+            return redirect()->route('checkout.index')->with('coupon_ok', "Đã áp dụng mã {$code}.");
+        }
+
+        session()->forget(['applied_coupon_code', 'applied_discount']);
+        return redirect()->route('checkout.index')->with('coupon_error', "Mã {$code} không hợp lệ.");
+    }
 
     private function calcDiscount(?string $code, float $subTotal): array
     {

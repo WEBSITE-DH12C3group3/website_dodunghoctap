@@ -54,10 +54,10 @@ Route::get('/search', [SearchController::class, 'index'])->name('store.product.s
 
 // === CHATBOT ROUTES ĐÃ CẬP NHẬT: Cho phép POST lên /chat ===
 // Route GET để hiển thị giao diện chat
-Route::get('/chat', [ChatController::class, 'index'])->name('chat.index'); 
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 // Route POST để gửi tin nhắn. Sửa POST /chat/send thành POST /chat
 // -> Giải quyết lỗi 404/HTML trả về khi gọi POST /chat
-Route::post('/chat', [ChatController::class, 'chat'])->name('chat.send'); 
+Route::post('/chat', [ChatController::class, 'chat'])->name('chat.send');
 
 
 // show.blade
@@ -94,12 +94,22 @@ Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebook
 //     ->name('password.update');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
     Route::post('/product/{id}/review', [ProductReviewController::class, 'store'])->name('store.product.review.store');
+
     Route::post('/favourites/toggle', [FavouriteController::class, 'toggle'])->name('favourites.toggle');
+
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+    Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])
+        ->name('checkout.apply.coupon');
+
     Route::get('/orders', [OrderUserController::class, 'index'])->name('store.orders.index');
+
     Route::post('/orders/{orderId}/cancel', [OrderUserController::class, 'cancel'])->name('store.orders.cancel');
 
     Route::get('/profile/password', [PasswordOtpController::class, 'requestForm'])
@@ -125,6 +135,7 @@ Route::get('/checkout/return', [CheckoutController::class, 'payosReturn'])
 
 Route::get('/checkout/cancel', [CheckoutController::class, 'payosCancel'])
     ->name('payos.cancel');
+
 // admin
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
