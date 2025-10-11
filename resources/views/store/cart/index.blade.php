@@ -109,9 +109,9 @@
             @endforeach
 
             {{-- Banner freeship --}}
-            <div class="flex items-center gap-3 text-[#0D2E69] bg-blue-50 rounded-2xl px-4 py-3 ring-1 ring-blue-100">
+            <div class="flex items-center gap-3 text-rose-600 bg-blue-50 rounded-2xl px-4 py-3 ring-1 ring-blue-100">
                 <img src="https://cdn-icons-png.flaticon.com/512/1670/1670915.png " alt="Freeship" class="w-6 h-6">
-                <p class="text-sm">Miễn phí vận chuyển cho đơn hàng từ <span class="font-semibold">100,000đ</span></p>
+                <p class="text-badse">Chương trình ưu đãi đặc biệt miễn phí vận chuyển với tất cả các đơn hàng!</p>
             </div>
         </div>
 

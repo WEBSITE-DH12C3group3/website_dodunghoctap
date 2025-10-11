@@ -18,10 +18,19 @@ class Product extends Model
         'description',
         'price',
         'stock_quantity',
+        'image_url',
         'sold',
-        'image_url'
+        'is_featured'
+    ];
+    protected $casts = [
+        'is_featured' => 'boolean',
     ];
 
+    /** Chỉ lấy record gắn cờ nổi bật rõ ràng */
+    public function scopeFeatured($q)
+    {
+        return $q->where('is_featured', 1);
+    }
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id', 'category_id');
@@ -43,7 +52,7 @@ class Product extends Model
 
     public function favourites()
     {
-        return $this->hasMany(\App\Models\Favourite::class, 'product_id', 'product_id');
+        return $this->hasMany(Favourite::class, 'product_id', 'product_id');
     }
 
     public function getFavouritesCountAttribute()

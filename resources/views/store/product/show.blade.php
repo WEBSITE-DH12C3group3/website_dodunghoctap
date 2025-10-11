@@ -535,14 +535,14 @@
                         class="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                     <div class="text-xs text-gray-500 text-right" id="rvm-count">0/500 ký tự</div>
 
-                    {{-- Ảnh đánh giá (UI mô phỏng, có thể lưu hoặc bỏ qua phía server) --}}
+                    <!-- {{-- Ảnh đánh giá (UI mô phỏng, có thể lưu hoặc bỏ qua phía server) --}}
                     <div class="mt-3">
                         <div class="text-sm text-gray-700 mb-1">Hình ảnh đánh giá <span class="text-xs text-gray-500">(jpg, jpeg, png)</span></div>
                         <label class="inline-flex items-center justify-center w-16 h-16 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
                             <span class="text-2xl">+</span>
                             <input type="file" name="images[]" accept=".jpg,.jpeg,.png" class="hidden" multiple>
                         </label>
-                    </div>
+                    </div> -->
 
                     <div class="mt-5 flex items-center justify-end gap-3">
                         <button type="button" id="rv-cancel" class="px-4 py-2 rounded-lg border">Hủy</button>
