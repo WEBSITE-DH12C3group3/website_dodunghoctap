@@ -63,6 +63,7 @@ class CheckoutController extends Controller
             'coupon'          => 'nullable|string|max:100',
             'payment_method'  => 'required|in:cod,bank_transfer,momo,vnpay,payos',
             'payment_channel' => ['nullable', 'string', 'max:50'],
+            'shipping_method' => 'required|string|in:standard,express',
         ]);
 
         $cart = collect(session('cart', []));
@@ -71,7 +72,7 @@ class CheckoutController extends Controller
         }
 
         $subTotal = $cart->sum(fn($i) => $i['price'] * $i['qty']);
-        $shipping = 0;
+        $shipping = ($data['shipping_method'] === 'express') ? 50000 : 0;
         $sessionCode = session('applied_coupon_code');
         $sessionDiscount = (float) session('applied_discount', 0);
         [$discount, $coupon] = $this->calcDiscount($sessionCode ?? ($data['coupon'] ?? null), (float)$subTotal);
@@ -104,7 +105,7 @@ class CheckoutController extends Controller
                 'address'       => $data['address'],
                 'note'          => $data['note'] ?? null,
                 'delivery_status' => 'pending',
-                'shipping_type'   => 'standard',
+                'shipping_type'   => $data['shipping_method'] ?? 'standard',
                 'shipping_provider' => 'GHTK',
             ]);
 
@@ -229,7 +230,7 @@ class CheckoutController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
-            return back()->with('error', 'Không thể tạo phiên PayOS: ' . $e->getMessage());
+            return back()->with('error', 'Đã có lỗi xảy ra khi tạo đơn hàng: ' . $e->getMessage());
         }
     }
 
@@ -345,6 +346,56 @@ class CheckoutController extends Controller
             $discount = round($subTotal * ((int)$coupon->discount_percent) / 100);
         }
         return [min($discount, $subTotal), $coupon];
+    }
+
+    // app/Http/Controllers/CheckoutController.php
+
+    public function recalc(Request $request)
+    {
+        $cart = collect(session('cart', []));
+        if ($cart->isEmpty()) {
+            return response()->json(['error' => 'Cart empty'], 400);
+        }
+
+        $shippingMethod = $request->string('shipping')->lower()->value() ?: 'standard';
+        $couponCode     = $request->string('coupon')->trim()->value() ?: null;
+
+        // Tính tạm
+        $subTotal = $cart->sum(fn($i) => (int)$i['qty'] * (float)$i['price']);
+
+        // Tùy bảng phí của bạn
+        $shippingFeeMap = [
+            'standard' => 0,
+            'express'  => 50000,   // đổi con số cho đúng dự án
+        ];
+        $shipping = $shippingFeeMap[$shippingMethod] ?? 0;
+
+        // Dùng lại hàm calcDiscount hiện có
+        [$discount, $coupon] = $this->calcDiscount($couponCode, $subTotal);
+
+        $grandTotal = max(0, $subTotal - $discount + $shipping);
+
+        // Trả JSON + định dạng sẵn để set vào UI
+        $fmt = fn($n) => number_format($n, 0, ',', '.') . 'đ';
+
+        return response()->json([
+            'ok'         => true,
+            'subTotal'   => $subTotal,
+            'discount'   => $discount,
+            'shipping'   => $shipping,
+            'grandTotal' => $grandTotal,
+            'display'    => [
+                'subTotal'   => $fmt($subTotal),
+                'discount'   => '-' . $fmt($discount),
+                'shipping'   => $fmt($shipping),
+                'grandTotal' => $fmt($grandTotal),
+            ],
+            // gợi ý cập nhật ẩn
+            'normalized' => [
+                'shipping'   => $shippingMethod,
+                'coupon'     => $couponCode,
+            ],
+        ]);
     }
 
     /**
