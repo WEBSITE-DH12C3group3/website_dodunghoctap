@@ -60,9 +60,19 @@ class CartController extends Controller
         ]);
 
         $product = Product::findOrFail($request->product_id);
-        $qty = max((int)$request->input('qty', 1), 1);
+        $qtyReq = max((int)$request->input('qty', 1), 1);
 
         $cart = $this->getCart();
+
+        $already   = isset($cart[$product->product_id]) ? (int)$cart[$product->product_id]['qty'] : 0;
+        $stock     = max(0, (int)($product->stock_quantity ?? 0));
+        $available = max(0, $stock - $already);
+
+        if ($available <= 0) {
+            return back()->with('error', 'Sản phẩm đã hết hàng hoặc bạn đã đạt giới hạn tồn có thể mua.');
+        }
+
+        $qty = min($qtyReq, $available);
 
         if (isset($cart[$product->product_id])) {
             $cart[$product->product_id]['qty'] += $qty;
@@ -81,7 +91,7 @@ class CartController extends Controller
         if ($request->boolean('buy_now')) {
             return redirect()->route('cart.index')->with('success', 'Đã thêm vào giỏ. Tiến hành thanh toán.');
         }
-        return back()->with('success', 'Đã thêm vào giỏ hàng.');
+        return back()->with('success', 'Đã thêm vào giỏ hàng (giới hạn theo tồn kho).');
     }
 
     public function update(Request $request)
@@ -92,10 +102,18 @@ class CartController extends Controller
         ]);
 
         $cart = $this->getCart();
-        if (isset($cart[$request->id])) {
-            $cart[$request->id]['qty'] = (int)$request->qty;
-            $this->persistCart($cart);
+        if (!isset($cart[$request->id])) {
+            return back();
         }
+
+        $product = Product::findOrFail($request->id);
+        $stock   = max(0, (int)($product->stock_quantity ?? 0));
+
+        $qtyReq = (int)$request->qty;
+        $qty    = min(max(1, $qtyReq), max(1, $stock));
+
+        $cart[$request->id]['qty'] = $qty;
+        $this->persistCart($cart);
         return back();
     }
 
