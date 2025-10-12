@@ -69,8 +69,8 @@
                 </div>
                 <!-- Logo and Title -->
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-semibold tracking-tight mb-6">
-                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 text-white shadow-sm">PEAK</span>
-                    <span>PEAKVL</span>
+                    <img src="{{ asset('icons/android-icon-192x192.png') }}" alt="Logo" class="h-10 w-10">
+                    <span class="text-2xl">PEAKVL</span>
                 </a>
                 <!-- Navigation -->
                 <nav class="space-y-2 flex-1">

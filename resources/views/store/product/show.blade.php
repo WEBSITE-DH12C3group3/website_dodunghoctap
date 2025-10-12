@@ -48,7 +48,7 @@
                             </span>
                             <span>Tình trạng:
                                 @if($product->stock_quantity > 0)
-                                <span class="text-blue-700 font-medium">Còn hàng</span>
+                                <span class="text-blue-700 font-medium">Còn hàng ({{ $product->stock_quantity }})</span>
                                 @else
                                 <span class="text-rose-600 font-medium">Hết hàng</span>
                                 @endif
@@ -151,18 +151,62 @@
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->product_id }}">
 
+                        @php $maxQty = max(0, (int)($product->stock_quantity ?? 0)); @endphp
                         <div class="flex items-center gap-3">
                             <label class="text-sm text-gray-600">Số lượng</label>
                             <div class="flex items-center rounded-full border border-gray-300 overflow-hidden">
                                 <button type="button"
-                                    class="w-10 h-10 grid place-items-center text-gray-600"
-                                    onclick="const i=this.nextElementSibling;i.value=Math.max(1,(+i.value||1)-1)">−</button>
-                                <input name="qty" value="1" class="w-12 text-center outline-none" />
+                                    class="w-10 h-10 grid place-items-center text-gray-600 dec-btn"
+                                    aria-label="Giảm số lượng">−</button>
+
+                                <input
+                                    name="qty"
+                                    type="number"
+                                    value="{{ $maxQty > 0 ? 1 : 0 }}"
+                                    min="1"
+                                    max="{{ $maxQty }}"
+                                    class="w-14 text-center outline-none qty-input"
+                                    data-max="{{ $maxQty }}"
+                                    {{ $maxQty === 0 ? 'readonly' : '' }} />
+
                                 <button type="button"
-                                    class="w-10 h-10 grid place-items-center text-gray-600"
-                                    onclick="const i=this.previousElementSibling;i.value=(+i.value||1)+1">+</button>
+                                    class="w-10 h-10 grid place-items-center text-gray-600 inc-btn"
+                                    aria-label="Tăng số lượng">+</button>
                             </div>
                         </div>
+
+                        <script>
+                            (function() {
+                                const form = document.currentScript.closest('form') || document;
+                                const qty = form.querySelector('.qty-input');
+                                const inc = form.querySelector('.inc-btn');
+                                const dec = form.querySelector('.dec-btn');
+                                if (!qty || !inc || !dec) return;
+
+                                const clamp = () => {
+                                    const max = parseInt(qty.dataset.max || qty.max || '1', 10);
+                                    let v = parseInt(qty.value || '1', 10);
+                                    if (isNaN(v)) v = 1;
+                                    v = Math.min(Math.max(v, 1), Math.max(1, max));
+                                    qty.value = v;
+                                    dec.disabled = v <= 1;
+                                    inc.disabled = v >= max;
+                                };
+
+                                inc.addEventListener('click', () => {
+                                    qty.value = (parseInt(qty.value || '1', 10) + 1);
+                                    clamp();
+                                });
+                                dec.addEventListener('click', () => {
+                                    qty.value = (parseInt(qty.value || '1', 10) - 1);
+                                    clamp();
+                                });
+                                qty.addEventListener('input', clamp);
+                                qty.addEventListener('blur', clamp);
+
+                                clamp();
+                            })();
+                        </script>
 
                         <div class="grid grid-cols-2 gap-3">
                             <button type="submit"
@@ -175,10 +219,10 @@
                                 THÊM VÀO GIỎ
                             </button>
 
-                            <button type="submit" name="buy_now" value="1"
-                                class="rounded-full h-12 px-6 bg-indigo-700 text-white font-semibold hover:bg-indigo-800 transition shadow-lg">
-                                MUA NGAY
-                            </button>
+                            @if($maxQty===0) <button type="submit" name="buy_now" value="1" class="rounded-full h-12 px-6 bg-indigo-700 text-white font-semibold hover:bg-indigo-800 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled> @else <button type="submit" name="buy_now" value="1"
+                                    class="rounded-full h-12 px-6 bg-indigo-700 text-white font-semibold hover:bg-indigo-800 transition shadow-lg"> @endif
+                                    MUA NGAY
+                                </button>
                         </div>
 
                         {{-- Cam kết --}}
@@ -491,14 +535,14 @@
                         class="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                     <div class="text-xs text-gray-500 text-right" id="rvm-count">0/500 ký tự</div>
 
-                    {{-- Ảnh đánh giá (UI mô phỏng, có thể lưu hoặc bỏ qua phía server) --}}
+                    <!-- {{-- Ảnh đánh giá (UI mô phỏng, có thể lưu hoặc bỏ qua phía server) --}}
                     <div class="mt-3">
                         <div class="text-sm text-gray-700 mb-1">Hình ảnh đánh giá <span class="text-xs text-gray-500">(jpg, jpeg, png)</span></div>
                         <label class="inline-flex items-center justify-center w-16 h-16 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
                             <span class="text-2xl">+</span>
                             <input type="file" name="images[]" accept=".jpg,.jpeg,.png" class="hidden" multiple>
                         </label>
-                    </div>
+                    </div> -->
 
                     <div class="mt-5 flex items-center justify-end gap-3">
                         <button type="button" id="rv-cancel" class="px-4 py-2 rounded-lg border">Hủy</button>

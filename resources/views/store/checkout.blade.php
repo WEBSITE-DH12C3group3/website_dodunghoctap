@@ -3,6 +3,10 @@
 @section('title', 'Tiến hành đặt hàng')
 
 @section('content')
+<form id="coupon-form" action="{{ route('checkout.apply.coupon') }}" method="POST" class="hidden">
+    @csrf
+</form>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="max-w-7xl mx-auto p-4 md:p-8">
 
     <div class="grid lg:grid-cols-12 gap-8">
@@ -63,7 +67,6 @@
                     </svg>
                     Phương thức vận chuyển
                 </h2>
-
 
                 @php
                 // Giả lập dữ liệu và biến trạng thái được chọn mặc định ban đầu
@@ -309,30 +312,7 @@
                     syncChannel();
                 });
             </script>
-
-            {{-- 4. Mã giảm giá --}}
-            <section class="mt-8">
-                <h2 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-5 flex items-center gap-2">
-                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2-3 .895-3 2 1.343 2 3 2m-3 0h6m-9 0h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                    </svg>
-                    Mã giảm giá
-                </h2>
-                <div class="grid sm:grid-cols-3 gap-3">
-                    <div class="sm:col-span-2">
-                        <input name="coupon" value="{{ old('coupon', $couponCode) }}"
-                            class="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 h-12 transition duration-150"
-                            placeholder="Nhập mã giảm giá (nếu có)">
-                    </div>
-                    <button type="submit" name="action" value="apply_coupon"
-                        class="h-12 rounded-xl bg-gray-900 text-white font-semibold hover:bg-black transition duration-150 shadow-md">
-                        Áp dụng / Cập nhật
-                    </button>
-                </div>
-            </section>
-
-
-
+            <br>
             {{-- Nút hoàn tất --}}
             <button type="submit" name="action" value="complete_order"
                 class="w-full h-14 rounded-full bg-indigo-600 text-white font-extrabold text-lg shadow-xl hover:bg-indigo-700 transition duration-300 transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-indigo-500/50 mt-4">
@@ -367,30 +347,144 @@
                         @endforeach
                     </ul>
                 </div>
+                <div class="mt-4 pt-4 border-t">
+                    <label for="coupon-input" class="text-xl font-bold text-gray-800 border-b pb-3 mb-5 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                        </svg>
+                        Mã giảm giá
+                    </label>
+                    <div class="flex gap-2">
+                        <input
+                            id="coupon-input"
+                            type="text"
+                            name="coupon"
+                            value="{{ old('coupon', session('applied_coupon_code', $couponCode ?? '')) }}"
+                            placeholder="Nhập mã giảm giá"
+                            class="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 h-12 transition duration-150" placeholder="Nhập mã giảm giá (nếu có)"
+                            form="coupon-form" {{-- Gắn input vào form riêng --}}>
+                        <button
+                            type="submit"
+                            class="h-12 w-32 rounded-xl text-white font-semibold  transition duration-150 shadow-md flex items-center justify-center bg-indigo-600 text-white hover:bg-indigo-700"
+                            form="coupon-form" {{-- Nút này submit form coupon --}}>
+                            Áp dụng
+                        </button>
+                    </div>
 
+                    {{-- Thông báo sau redirect (PRG) --}}
+                    <div id="messenger" class="text-sm mt-2">
+                        @if(session('coupon_ok'))
+                        <div class="rounded-lg bg-green-50 text-green-700 px-3 py-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square-fill inline-block mr-1" viewBox="0 0 16 16">
+                                <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z" />
+                            </svg> {{ session('coupon_ok') }}
+                        </div>
+                        @endif
+                        @if(session('coupon_error'))
+                        <div class="rounded-lg bg-red-50 text-red-700 px-3 py-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square-fill inline-block mr-1" viewBox="0 0 16 16">
+                                <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm3.354 4.646L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708" />
+                            </svg> {{ session('coupon_error') }}
+                        </div>
+                        @endif
+                    </div>
+                </div>
                 {{-- Chi tiết tính toán --}}
                 <dl class="mt-4 space-y-3 text-base text-gray-600 border-t pt-4">
                     <div class="flex justify-between">
                         <dt>Tạm tính</dt>
-                        <dd class="font-medium text-gray-800">{{ number_format($subTotal,0,',','.') }}đ</dd>
+                        <dd id="subtotal-value" class="font-medium text-gray-800">{{ number_format($subTotal,0,',','.') }}đ</dd>
                     </div>
                     <div class="flex justify-between">
                         <dt>Phí vận chuyển</dt>
-                        <dd class="font-medium text-green-600">{{ number_format($shipping,0,',','.') }}đ</dd>
+                        <dd id="shipping-value" class="font-medium text-green-600">{{ number_format($shipping,0,',','.') }}đ</dd>
                     </div>
                     <div class="flex justify-between">
                         <dt>Giảm giá Coupon</dt>
-                        <dd class="font-medium text-red-500">-{{ number_format($discount,0,',','.') }}đ</dd>
+                        <dd id="discount-value" class="font-medium text-red-500">-{{ number_format($discount,0,',','.') }}đ</dd>
                     </div>
                 </dl>
 
                 {{-- Tổng cộng --}}
                 <div class="mt-5 pt-4 border-t-2 border-dashed border-gray-200 flex justify-between items-center text-xl font-bold">
                     <span>Tổng cộng</span>
-                    <span class="text-indigo-600">{{ number_format($grandTotal,0,',','.') }}đ</span>
+                    <span id="grandtotal" class="text-indigo-600">{{ number_format($grandTotal,0,',','.') }}đ</span>
                 </div>
             </div>
         </aside>
     </div>
 </div>
+@push('scripts')
+<script>
+    (function() {
+        const btn = document.getElementById('apply_coupon_btn');
+        const codeInp = document.getElementById('coupon_code');
+        const alertBox = document.getElementById('coupon_message');
+
+        const subEl = document.getElementById('subtotal-value'); // đã có trong HTML
+        const discEl = document.getElementById('discount-value'); // đã có trong HTML
+        const totalEl = document.getElementById('grandtotal'); // HTML đang là grandtotal (không có dấu gạch)
+
+        if (!btn || !codeInp || !alertBox) return;
+
+        // URL AJAX cố định theo route bạn đã khai báo trong web.php
+        const url = "{{ route('checkout.apply.coupon') }}";
+
+        function showAlert(msg, ok = true) {
+            alertBox.className = 'text-sm font-medium mt-2 ' + (ok ?
+                'text-green-700' :
+                'text-red-700');
+            alertBox.innerHTML = msg;
+        }
+
+        function vnd(n) {
+            const num = Number(n) || 0;
+            return num.toLocaleString('vi-VN') + ' đ';
+        }
+
+        btn.addEventListener('click', async function() {
+            const code = (codeInp.value || '').trim();
+            if (!code) {
+                showAlert('⚠️ Vui lòng nhập mã giảm giá.', false);
+                return;
+            }
+
+            showAlert('Đang kiểm tra mã…');
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    // Gửi cả code lẫn coupon để tương thích mọi trường hợp controller đọc field nào
+                    body: JSON.stringify({
+                        code: code,
+                        coupon: code
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    showAlert(data.message || '❌ Mã không hợp lệ hoặc đã hết hạn.', false);
+                    return;
+                }
+
+                // Cập nhật lại hiển thị: discount & tổng cộng
+                if (discEl) discEl.textContent = '-' + vnd(data.discount);
+                if (totalEl) totalEl.textContent = vnd(data.grand_total);
+
+                showAlert(`✅ Đã áp dụng mã <b>${data.coupon_code}</b>. Giảm ${vnd(data.discount)}.`);
+            } catch (e) {
+                console.error(e);
+                showAlert('❌ Lỗi kết nối, vui lòng thử lại.', false);
+            }
+        });
+    })();
+</script>
+
+@endpush
 @endsection

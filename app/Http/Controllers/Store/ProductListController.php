@@ -31,6 +31,7 @@ class ProductListController extends Controller
                 'p.sold',
                 'p.category_id',
                 'p.brand_id',
+                'p.is_featured',
                 DB::raw('ROUND(COALESCE(r.avg_rating,0),1) AS avg_rating'),
                 DB::raw('COALESCE(r.reviews_count,0) AS reviews_count')
             );
