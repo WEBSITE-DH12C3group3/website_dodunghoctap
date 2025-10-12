@@ -3,6 +3,11 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Base URL cho các API chat admin -->
+    <meta name="admin-chat-base" content="{{ url('/admin/chat') }}">
+
+    <meta name="auth-user-id" content="{{ auth()->check() ? auth()->user()->user_id : '' }}"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'PEAKVL' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +29,6 @@
     <link rel="manifest" href="{{ asset('icons/manifest.json') }}">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="{{ asset('icons/ms-icon-144x144.png') }}">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -173,6 +177,12 @@
                         <span>Quản lý thương hiệu</span>
                     </a>
                     @endif
+                    @if(auth()->user()->hasPermission('manage_livechat'))
+                        <a href="{{ route('admin.chat.index') }}"
+                        class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition">
+                        <i class="fa-solid fa-comments mr-3"></i> Quản lý Live Chat
+                        </a>
+                    @endif
                 </nav>
                 <!-- User Info and Actions -->
                 <div class="mt-auto border-t border-slate-200 dark:border-slate-700 pt-4">
@@ -259,6 +269,11 @@
             sidebar.classList.toggle('-translate-x-full');
         });
     </script>
+    <script>
+        const _authMeta = document.querySelector('meta[name="auth-user-id"]');
+        window.AuthUserId = _authMeta?.content ? Number(_authMeta.content) : null;
+    </script>
+    @stack('scripts')
 </body>
 
 </html>

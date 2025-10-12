@@ -304,7 +304,7 @@
             </p>
             {{-- Đăng nhập mạng xã hội --}}
             <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <a href="#"
+                <a href="{{ route('google.redirect') }}"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#C6262C] px-4 py-3 text-white font-medium
                   hover:brightness-110 transition">
                     {{-- Google icon --}}

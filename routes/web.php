@@ -29,6 +29,8 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Store\PasswordOtpController;
+use App\Http\Controllers\Store\ChatController as StoreChatController;
+use App\Http\Controllers\Admin\ChatAdminController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -77,6 +79,12 @@ Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogle
 Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook']);
 Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
 
+Route::middleware('auth')->group(function () {
+    Route::post('/chat/open',        [StoreChatController::class, 'open'])->name('chat.open');
+    Route::get('/chat/{sessionId}/history', [StoreChatController::class, 'history'])->name('chat.history');
+    Route::post('/chat/send',        [StoreChatController::class, 'send'])->name('chat.send');
+    Route::post('/chat/mark-read',   [StoreChatController::class, 'markRead'])->name('chat.markRead');
+});
 // // forget password
 // Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
 //     ->name('password.request');
@@ -231,7 +239,20 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:view_statistics')->name('admin.stats');
         Route::post('/stats/export', [StatsController::class, 'exportReport'])->name('admin.stats.export');
     });
+
 });
+Route::middleware(['auth', 'permission:manage_livechat'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('/chatlive',                   [ChatAdminController::class, 'index'])->name('admin.chat.index');
+        Route::post('/chat/{sessionId}/assign',   [ChatAdminController::class, 'assign'])->name('admin.chat.assign');
+        Route::post('/chat/{sessionId}/unassign', [ChatAdminController::class, 'unassign'])->name('admin.chat.unassign');
+        Route::get('/chat/{sessionId}',       [ChatAdminController::class, 'view'])->name('admin.chat.view');
+        Route::post('/chat/{sessionId}/send', [ChatAdminController::class, 'send'])->name('admin.chat.send');
+
+        // Optional JSON endpoint
+        Route::get('/chat/{sessionId}/messages', [ChatAdminController::class, 'messages'])->name('admin.chat.messages');
+    });
 
 Route::middleware('permission:manage_users')->group(function () {
 

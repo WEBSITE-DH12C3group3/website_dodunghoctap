@@ -24,6 +24,10 @@ use Illuminate\Support\Collection;
  * - Bảng không dùng timestamps mặc định của Laravel.
  * - Mật khẩu sẽ tự hash qua setPasswordAttribute().
  */
+/**
+ * @method bool hasPermission(string $permissionName)
+ */
+
 class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
@@ -33,6 +37,8 @@ class User extends Authenticatable
 
     /** @var string  */
     protected $primaryKey = 'user_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     /** @var bool  */
     public $timestamps = false;
