@@ -386,7 +386,7 @@ CREATE TABLE `orders` (
   `user_id` int(11) DEFAULT NULL,
   `status` varchar(50) DEFAULT 'pending',
   `total_amount` decimal(15,2) DEFAULT NULL,
-  `payment_method` enum('cod','bank_transfer','momo','vnpay') NOT NULL DEFAULT 'cod',
+  `payment_method` enum('cod','bank_transfer', 'payos') NOT NULL DEFAULT 'cod',
   `order_date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
