@@ -27,7 +27,7 @@ class ProductShowController extends Controller
             ->where('category_id', $product->category_id)
             ->where('product_id', '!=', $product->product_id)
             ->latest('created_at')
-            ->take(10)->get();
+            ->paginate(10, ['*'], 'related_page');
 
         // Lấy đánh giá
         $comments = Comment::with('user')
