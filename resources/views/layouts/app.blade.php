@@ -57,8 +57,9 @@
 <body class="h-full bg-gradient-to-br from-sky-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-72 bg-white dark:bg-slate-900/90 backdrop-blur-sm border-r-2 border-slate-300 dark:border-slate-600 shadow-2xl z-10 md:sticky md:top-0 md:h-screen transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-            <div class="p-6 flex flex-col h-full">
+        <aside id="sidebar"   class="w-72 bg-white dark:bg-slate-900/90 backdrop-blur-sm border-r-2 border-slate-300 dark:border-slate-600 shadow-2xl z-10
+         md:sticky md:top-0 md:h-screen transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="p-6 flex flex-col h-full min-h-0">
                 <!-- Mobile menu toggle (top of sidebar for mobile) -->
                 <div class="flex items-center justify-between mb-6 md:hidden">
                     <button id="sidebarToggle" class="p-2 rounded-xl hover:bg-slate-200/60 dark:hover:bg-slate-800/60">
@@ -69,11 +70,11 @@
                 </div>
                 <!-- Logo and Title -->
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-semibold tracking-tight mb-6">
-                    <img src="{{ asset('icons/android-icon-192x192.png') }}" alt="Logo" class="h-10 w-10">
-                    <span class="text-2xl">PEAKVL</span>
+                <img src="{{ asset('icons/android-icon-192x192.png') }}" alt="Logo" class="h-10 w-10">
+                <span class="text-2xl">PEAKVL</span>
                 </a>
                 <!-- Navigation -->
-                <nav class="space-y-2 flex-1">
+                <nav class="space-y-2 flex-1 overflow-y-auto pr-1" style="-webkit-overflow-scrolling: touch;">
                     @if(auth()->check() && auth()->user()->hasPermission('manage_products'))
                     <a href="{{ route('admin.products') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.products*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
@@ -179,8 +180,12 @@
                     @endif
                     @if(auth()->user()->hasPermission('manage_livechat'))
                         <a href="{{ route('admin.chat.index') }}"
-                        class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition">
-                        <i class="fa-solid fa-comments mr-3"></i> Quản lý Live Chat
+                        class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.chat*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <!-- icon chat bubble -->
+                                <path d="M4 4h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8l-4 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                            </svg>
+                            <span>Quản lý Live Chat</span>
                         </a>
                     @endif
                     @if(auth()->check() && auth()->user()->hasPermission('manage_discounts'))
