@@ -10,7 +10,7 @@
         {{-- User Info Card --}}
         <div class="lg:col-span-1 rounded-2xl bg-white/80 dark:bg-slate-900/50 backdrop-blur p-6 shadow ring-1 ring-slate-900/5 dark:ring-white/10">
             <h2 class="text-xl font-semibold mb-2 text-slate-800 dark:text-slate-100">Xin chào, {{ auth()->user()->full_name }} 👋</h2>
-            <p class="text-sm text-slate-600 dark:text-slate-300 mb-1">Email: **{{ auth()->user()->email }}**</p>
+            <p class="text-sm text-slate-600 dark:text-slate-300 mb-1">Email: {{ auth()->user()->email }}</p>
             <p class="text-sm text-slate-600 dark:text-slate-300">Vai trò:
                 <span class="ml-2 rounded-lg px-2 py-0.5 text-xs font-semibold bg-brand-600 text-white dark:bg-brand-700/80">
                     {{ optional(auth()->user()->role)->role_name }}
@@ -20,17 +20,7 @@
         </div>
         
         {{-- Total Users/Customers Card (Placeholder - Requires data from controller) --}}
-        {{-- Uncomment and replace 'X' with actual data passed from the backend if available --}}
-        {{-- <div class="rounded-2xl bg-white/80 dark:bg-slate-900/50 backdrop-blur p-6 shadow ring-1 ring-slate-900/5 dark:ring-white/10 flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-slate-600 dark:text-slate-300">Tổng số Khách hàng</p>
-                <p class="text-3xl font-bold text-slate-800 dark:text-slate-100 mt-1">12,345</p>
-            </div>
-            <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white grid place-items-center shadow">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 11a4 4 0 110-8 4 4 0 010 8zm10 0a4 4 0 110-8 4 4 0 010 8zM2 20a5 5 0 015-5h2a5 5 0 015 5v1H2v-1zm13 0a6.97 6.97 0 00-2.05-4.95A4.98 4.98 0 0120 20v1h-5v-1z" /></svg>
-            </div>
-        </div> --}}
-
+        {{-- Uncomment and replace 'X' with actual data passed from the backend if available --}}      
         {{-- Other Dashboard Summary Cards (Placeholders) --}}
         <div class="rounded-2xl bg-white/80 dark:bg-slate-900/50 backdrop-blur p-6 shadow ring-1 ring-slate-900/5 dark:ring-white/10 flex items-center justify-between">
             <div>
