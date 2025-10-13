@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 01, 2025 at 08:17 PM
+-- Generation Time: Oct 13, 2025 at 04:55 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,6 +33,22 @@ CREATE TABLE `attributes` (
   `description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `attributes`
+--
+
+INSERT INTO `attributes` (`id`, `name`, `description`, `created_at`) VALUES
+(1, 'Màu sắc', 'Ví dụ: Đỏ, Xanh, Đen, Trắng...', '2025-10-13 11:55:20'),
+(2, 'Kích thước', 'Ví dụ: A4, A5, B5, 0.5mm...', '2025-10-13 11:55:20'),
+(3, 'Chất liệu', 'Nhựa, Kim loại, Vải...', '2025-10-13 11:55:20'),
+(4, 'Số trang', 'Áp dụng cho vở/sổ', '2025-10-13 11:55:20'),
+(5, 'Độ cứng ngòi', 'HB, 2B, 4B... cho bút chì', '2025-10-13 11:55:20'),
+(6, 'Đường kính nét', '0.3mm, 0.5mm, 0.7mm...', '2025-10-13 11:55:20'),
+(7, 'Loại mực', 'Gel, Bi, Lông dầu, Lông bảng', '2025-10-13 11:55:20'),
+(8, 'Khổ giấy', 'A3, A4, A5, B5...', '2025-10-13 11:55:20'),
+(9, 'Dung tích', 'Áp dụng cho bình nước/hộp mực', '2025-10-13 11:55:20'),
+(10, 'Bảo hành', 'Thời gian bảo hành (nếu có)', '2025-10-13 11:55:20');
 
 -- --------------------------------------------------------
 
@@ -92,7 +108,19 @@ INSERT INTO `categories` (`category_id`, `category_name`, `description`) VALUES
 (12, 'Sticker - Note dán', NULL),
 (13, 'Bao tập - Bao sách', NULL),
 (14, 'Bình nước - Hộp cơm', NULL),
-(16, 'Bao tập - Bao sách22', NULL);
+(16, 'Bao tập - Bao sách22', NULL),
+(17, 'Balo - Túi', 'Balo, túi đeo chéo, túi đựng bút vở'),
+(18, 'Máy tính - Calculator', 'Máy tính bỏ túi cho học sinh, sinh viên'),
+(19, 'USB - Ổ lưu trữ', 'USB, thẻ nhớ, ổ cứng di động mini'),
+(20, 'Bút lông - Bút dạ', 'Bút board, bút lông dầu, bút lông bảng'),
+(21, 'Màu nước - Màu sáp', 'Dụng cụ tô màu cho mỹ thuật'),
+(22, 'Keo - Băng dính', 'Keo dán, băng dính trong/đục'),
+(23, 'Kéo - Dao rọc giấy', 'Kéo học sinh, dao rọc giấy'),
+(24, 'Bảng trắng - Bảng mini', 'Bảng mini, bảng trắng cầm tay'),
+(25, 'Hộp đựng tài liệu', 'File hộp, cặp tài liệu'),
+(26, 'Giấy note - Index', 'Giấy note, phân trang'),
+(27, 'Thước cuộn - Eke', 'Thước cuộn, eke nhựa'),
+(28, 'Sổ tay - Planner', 'Sổ tay, planner, bullet journal');
 
 -- --------------------------------------------------------
 
@@ -108,6 +136,16 @@ CREATE TABLE `chat_sessions` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `chat_sessions`
+--
+
+INSERT INTO `chat_sessions` (`session_id`, `user_id`, `assigned_admin_id`, `last_message_at`, `created_at`, `updated_at`) VALUES
+(1, 15, 1, '2025-10-11 16:46:47', '2025-10-10 10:54:59', '2025-10-11 16:46:47'),
+(2, 8, 1, '2025-10-13 14:21:55', '2025-10-11 16:13:51', '2025-10-13 14:21:55'),
+(3, 2, 1, '2025-10-12 10:54:23', '2025-10-12 09:48:56', '2025-10-12 10:54:23'),
+(4, 1, NULL, '2025-10-13 14:25:46', '2025-10-13 14:25:46', '2025-10-13 14:25:46');
 
 -- --------------------------------------------------------
 
@@ -198,7 +236,10 @@ INSERT INTO `delivery` (`delivery_id`, `order_id`, `receiver_name`, `phone`, `em
 (6, 2, 'Unknown', 'Unknown', 'unknown@example.com', 'Unknown', NULL, 'delivered', '2025-09-28', 'standard', 'GHTK'),
 (7, 9, 'Unknown', 'Unknown', 'unknown@example.com', 'Unknown', NULL, 'shipping', '2025-09-28', 'express', 'GHTK'),
 (8, 3, 'Unknown', 'Unknown', 'unknown@example.com', 'Unknown', NULL, 'delivered', '2025-09-25', 'express', 'Viettel Post'),
-(9, 18, 'phùng thị trang', '+84349459165', NULL, 'fffffff', NULL, 'pending', NULL, 'standard', 'GHTK');
+(9, 18, 'phùng thị trang', '+84349459165', NULL, 'fffffff', NULL, 'pending', NULL, 'standard', 'GHTK'),
+(10, 19, '1', '1', '1@1', '1', NULL, 'pending', NULL, 'standard', 'GHTK'),
+(11, 20, '1', '1', '1@1', '1', NULL, 'pending', NULL, 'standard', 'GHTK'),
+(12, 21, 'mynameistrang', '+84349459165', 'phungtrang19012004@gmail.com', 'fffffff', NULL, 'pending', NULL, 'standard', 'GHTK');
 
 -- --------------------------------------------------------
 
@@ -218,7 +259,8 @@ CREATE TABLE `favourite` (
 --
 
 INSERT INTO `favourite` (`favourite_id`, `user_id`, `product_id`, `added_date`) VALUES
-(1, 4, 16, '2025-09-25 04:24:01');
+(1, 4, 16, '2025-09-25 04:24:01'),
+(2, 1, 18, '2025-10-13 13:53:11');
 
 -- --------------------------------------------------------
 
@@ -235,6 +277,76 @@ CREATE TABLE `messages` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`message_id`, `session_id`, `sender_id`, `content`, `is_read`, `created_at`, `updated_at`) VALUES
+(1, 1, 15, 'hello', 1, '2025-10-10 10:55:39', '2025-10-10 11:15:26'),
+(2, 1, 15, 'xin chào', 1, '2025-10-10 11:21:48', '2025-10-10 11:22:00'),
+(3, 1, 1, 'chào bạn', 1, '2025-10-10 11:22:16', '2025-10-10 11:22:39'),
+(4, 1, 1, 'chào bạn', 1, '2025-10-10 11:49:14', '2025-10-10 12:47:48'),
+(5, 1, 1, 'chào bạn', 1, '2025-10-10 11:49:28', '2025-10-10 12:47:48'),
+(6, 1, 15, 'chào', 1, '2025-10-10 12:47:54', '2025-10-10 12:48:23'),
+(7, 1, 15, 'ê', 1, '2025-10-10 12:48:03', '2025-10-10 12:48:23'),
+(8, 1, 15, 'ê', 1, '2025-10-10 12:48:07', '2025-10-10 12:48:23'),
+(9, 1, 15, 'ê', 1, '2025-10-10 12:49:20', '2025-10-10 12:49:31'),
+(10, 1, 1, 'hello', 1, '2025-10-10 13:00:56', '2025-10-10 13:10:14'),
+(11, 1, 1, 'hello', 1, '2025-10-10 13:01:12', '2025-10-10 13:10:14'),
+(12, 1, 1, 'rafe', 1, '2025-10-10 13:09:52', '2025-10-10 13:10:14'),
+(13, 1, 1, 'cai cho j', 1, '2025-10-10 13:10:02', '2025-10-10 13:10:14'),
+(14, 1, 15, 'helo', 1, '2025-10-10 13:10:26', '2025-10-10 13:10:37'),
+(15, 1, 15, 'hello', 1, '2025-10-11 14:57:54', '2025-10-11 16:38:59'),
+(16, 2, 8, 'chào', 1, '2025-10-11 16:14:05', '2025-10-11 16:36:00'),
+(17, 2, 1, 'chào bạn ạ', 1, '2025-10-11 16:36:16', '2025-10-11 16:42:17'),
+(18, 2, 1, 'chào bạn ạ', 1, '2025-10-11 16:36:16', '2025-10-11 16:42:17'),
+(19, 2, 1, 'chào nạn nhé', 1, '2025-10-11 16:36:40', '2025-10-11 16:42:17'),
+(20, 2, 1, 'chào nạn nhé', 1, '2025-10-11 16:36:40', '2025-10-11 16:42:17'),
+(21, 1, 1, 'hello', 0, '2025-10-11 16:39:03', '2025-10-11 16:39:03'),
+(22, 1, 1, 'hello', 0, '2025-10-11 16:39:03', '2025-10-11 16:39:03'),
+(23, 1, 1, 'chà', 0, '2025-10-11 16:46:45', '2025-10-11 16:46:45'),
+(24, 1, 1, 'chà', 0, '2025-10-11 16:46:45', '2025-10-11 16:46:45'),
+(25, 1, 1, 'chà', 0, '2025-10-11 16:46:45', '2025-10-11 16:46:45'),
+(26, 1, 1, 'chà', 0, '2025-10-11 16:46:45', '2025-10-11 16:46:45'),
+(27, 1, 1, 'uhfuhfui', 0, '2025-10-11 16:46:47', '2025-10-11 16:46:47'),
+(28, 1, 1, 'uhfuhfui', 0, '2025-10-11 16:46:47', '2025-10-11 16:46:47'),
+(29, 1, 1, 'uhfuhfui', 0, '2025-10-11 16:46:47', '2025-10-11 16:46:47'),
+(30, 1, 1, 'uhfuhfui', 0, '2025-10-11 16:46:47', '2025-10-11 16:46:47'),
+(31, 2, 8, 'drferf', 1, '2025-10-11 16:47:26', '2025-10-11 16:47:31'),
+(32, 2, 1, 'ờ', 1, '2025-10-11 16:47:34', '2025-10-11 16:47:39'),
+(33, 2, 1, 'ờ', 1, '2025-10-11 16:47:34', '2025-10-11 16:47:39'),
+(34, 2, 1, 'ờ', 1, '2025-10-11 16:47:34', '2025-10-11 16:47:39'),
+(35, 2, 1, 'ờ', 1, '2025-10-11 16:47:34', '2025-10-11 16:47:39'),
+(36, 2, 1, 'hrfuef', 1, '2025-10-11 16:47:52', '2025-10-11 16:47:56'),
+(37, 2, 1, 'hrfuef', 1, '2025-10-11 16:47:52', '2025-10-11 16:47:56'),
+(38, 2, 1, 'hrfuef', 1, '2025-10-11 16:47:52', '2025-10-11 16:47:56'),
+(39, 2, 1, 'hrfuef', 1, '2025-10-11 16:47:52', '2025-10-11 16:47:56'),
+(40, 2, 1, 'jksf', 1, '2025-10-11 16:50:54', '2025-10-13 14:21:44'),
+(41, 2, 1, 'jksf', 1, '2025-10-11 16:50:54', '2025-10-13 14:21:44'),
+(42, 2, 1, 'jksf', 1, '2025-10-11 16:50:54', '2025-10-13 14:21:44'),
+(43, 2, 1, 'jksf', 1, '2025-10-11 16:50:54', '2025-10-13 14:21:44'),
+(44, 2, 1, 'sd', 1, '2025-10-11 16:50:56', '2025-10-13 14:21:44'),
+(45, 2, 1, 'sd', 1, '2025-10-11 16:50:56', '2025-10-13 14:21:44'),
+(46, 2, 1, 'sd', 1, '2025-10-11 16:50:56', '2025-10-13 14:21:44'),
+(47, 2, 1, 'sd', 1, '2025-10-11 16:50:56', '2025-10-13 14:21:44'),
+(48, 2, 1, 'dksdgjfh', 1, '2025-10-11 16:52:12', '2025-10-13 14:21:44'),
+(49, 3, 2, 'hello', 1, '2025-10-12 10:10:53', '2025-10-12 10:12:18'),
+(50, 3, 1, 'chào bạn', 1, '2025-10-12 10:12:37', '2025-10-12 10:12:44'),
+(51, 3, 1, 'hello ạ', 1, '2025-10-12 10:12:58', '2025-10-12 10:13:05'),
+(52, 3, 2, 'chào', 1, '2025-10-12 10:13:27', '2025-10-12 10:14:39'),
+(53, 3, 2, 'hehe', 1, '2025-10-12 10:21:55', '2025-10-12 10:21:57'),
+(54, 3, 1, 'cai j vay', 1, '2025-10-12 10:22:10', '2025-10-12 10:22:14'),
+(55, 3, 2, '..', 1, '2025-10-12 10:40:44', '2025-10-12 10:40:51'),
+(56, 3, 1, 'jdsfgh', 1, '2025-10-12 10:40:56', '2025-10-12 10:41:01'),
+(57, 3, 1, 'ade', 1, '2025-10-12 10:41:05', '2025-10-12 10:41:13'),
+(58, 3, 2, 'etger', 1, '2025-10-12 10:41:08', '2025-10-12 10:41:28'),
+(59, 3, 2, 'ưewqrf', 1, '2025-10-12 10:41:20', '2025-10-12 10:41:28'),
+(60, 3, 1, 'ưerwef', 1, '2025-10-12 10:41:25', '2025-10-12 10:53:45'),
+(61, 3, 1, 'dfer', 1, '2025-10-12 10:44:58', '2025-10-12 10:53:45'),
+(62, 3, 1, 'ẻger', 1, '2025-10-12 10:54:09', '2025-10-12 10:54:14'),
+(63, 3, 2, 'ăef', 1, '2025-10-12 10:54:23', '2025-10-12 10:54:26'),
+(64, 2, 8, 'hello', 0, '2025-10-13 14:21:55', '2025-10-13 14:21:55');
 
 -- --------------------------------------------------------
 
@@ -274,7 +386,7 @@ CREATE TABLE `orders` (
   `user_id` int(11) DEFAULT NULL,
   `status` varchar(50) DEFAULT 'pending',
   `total_amount` decimal(15,2) DEFAULT NULL,
-  `payment_method` enum('cod','bank_transfer', 'payos') NOT NULL DEFAULT 'cod',
+  `payment_method` enum('cod','bank_transfer','momo','vnpay') NOT NULL DEFAULT 'cod',
   `order_date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -297,7 +409,10 @@ INSERT INTO `orders` (`order_id`, `user_id`, `status`, `total_amount`, `payment_
 (14, 4, 'pending', 1300000.00, 'cod', '2025-09-25 03:57:14'),
 (15, 4, 'pending', 1300000.00, 'cod', '2025-09-25 04:02:26'),
 (17, 1, 'processing', 12000.00, 'cod', '2025-09-25 08:39:12'),
-(18, 15, 'processing', 1312000.00, 'cod', '2025-10-01 08:42:35');
+(18, 15, 'processing', 1312000.00, 'cod', '2025-10-01 08:42:35'),
+(19, 1, 'processing', 24000.00, 'bank_transfer', '2025-10-02 05:53:02'),
+(20, 1, 'pending', 5000.00, 'cod', '2025-10-13 14:27:17'),
+(21, 7, 'processing', 5000.00, 'bank_transfer', '2025-10-13 14:32:12');
 
 -- --------------------------------------------------------
 
@@ -312,8 +427,6 @@ CREATE TABLE `order_items` (
   `quantity` int(11) DEFAULT NULL,
   `price` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-<<<<<<< Updated upstream
-=======
 
 --
 -- Dumping data for table `order_items`
@@ -335,48 +448,14 @@ INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_id`, `quantity`
 (14, 15, 13, 1, 1300000.00),
 (16, 17, 14, 1, 12000.00),
 (17, 18, 14, 1, 12000.00),
-(18, 18, 11, 1, 1300000.00);
+(18, 18, 11, 1, 1300000.00),
+(19, 19, 15, 2, 12000.00),
+(20, 20, 18, 1, 5000.00),
+(21, 21, 18, 1, 5000.00);
 
 --
 -- Triggers `order_items`
 --
-DELIMITER $$
-CREATE TRIGGER `trg_oi_after_delete` AFTER DELETE ON `order_items` FOR EACH ROW BEGIN
-  DECLARE st VARCHAR(50);
-  SELECT status INTO st FROM orders WHERE order_id = OLD.order_id;
-  IF st = 'paid' THEN
-    UPDATE products SET sold = GREATEST(COALESCE(sold,0) - OLD.quantity, 0)
-    WHERE product_id = OLD.product_id;
-  END IF;
-END
-$$
-DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `trg_oi_after_insert` AFTER INSERT ON `order_items` FOR EACH ROW BEGIN
-  DECLARE st VARCHAR(50);
-  SELECT status INTO st FROM orders WHERE order_id = NEW.order_id;
-  IF st = 'paid' THEN
-    UPDATE products SET sold = COALESCE(sold,0) + NEW.quantity
-    WHERE product_id = NEW.product_id;
-  END IF;
-END
-$$
-DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `trg_oi_after_update` AFTER UPDATE ON `order_items` FOR EACH ROW BEGIN
-  DECLARE st_old VARCHAR(50); DECLARE st_new VARCHAR(50);
-  SELECT status INTO st_old FROM orders WHERE order_id = OLD.order_id;
-  SELECT status INTO st_new FROM orders WHERE order_id = NEW.order_id;
-
-  -- nếu cùng order và đều 'paid', hiệu chỉnh chênh lệch
-  IF OLD.order_id = NEW.order_id AND st_old='paid' AND st_new='paid' THEN
-    UPDATE products SET sold = GREATEST(COALESCE(sold,0) + (NEW.quantity - OLD.quantity), 0)
-    WHERE product_id = NEW.product_id;
-  END IF;
-END
-$$
-DELIMITER ;
->>>>>>> Stashed changes
 
 -- --------------------------------------------------------
 
@@ -428,7 +507,7 @@ INSERT INTO `permissions` (`permission_id`, `permission_name`, `description`, `c
 (4, 'manage_orders', 'Quản lý đơn hàng', '2025-08-22 06:56:54'),
 (5, 'manage_categories', 'Quản lý danh mục', '2025-09-15 14:08:54'),
 (6, 'manage_purchases', 'Quản lý phiếu nhập kho', '2025-09-17 14:02:03'),
-(7, 'manage_discounts', 'Quản lý giảm giá', '2025-09-18 05:56:28'),
+(7, 'manage_discounts', 'Quản lý giảm giá', '2025-09-18 06:29:35'),
 (8, 'manage_brands', 'Quản lý thương hiệu', '2025-09-18 06:29:35'),
 (9, 'manage_livechat', 'Quản lý chat', '2025-09-30 15:32:42');
 
@@ -457,13 +536,74 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`product_id`, `product_name`, `category_id`, `brand_id`, `description`, `price`, `stock_quantity`, `image_url`, `sold`, `is_featured`, `created_at`) VALUES
-(11, 'Mùa hè', 3, NULL, 'cưcs', 1300000.00, 3457, '1755592645088-488150833.jpg', 2, 0, '2025-08-19 08:37:25'),
-(12, 'Hoa Hồng Đỏ', 7, NULL, '2222', 1300000.00, 11112, NULL, 1, 0, '2025-08-19 16:49:40'),
-(13, 'Hoa Hồng Đỏ', 13, NULL, '11', 1300000.00, 1112, '1755849769419-355125970.jpg', 2, 0, '2025-08-22 08:02:49'),
-(14, 'gậy bóng đá', 11, 1, 'đập nhau fen', 12000.00, 120, 'products/U30gU2Pe4uW284yUMUocaCc16EwaPfzvnMcchPaF.png', 0, 0, '2025-09-18 07:19:46'),
-(15, 'sừo', 9, 16, '1111', 12000.00, 126, 'products/XMwCIY8gwpvXn4pCRJYVwGBsX65DLOD8FkGgGNnl.jpg', 2, 0, '2025-09-19 05:27:04'),
-(16, 'bút chì wibu', 3, 11, 'ôi', 30000.00, 100, 'products/1758740094_z6991041784098_f2b66ee3bf17a3cd018aba68e9f0bb9c.jpg', 0, 0, '2025-09-24 18:54:54'),
-(17, 'hộp bút vàng 9999', 7, 13, 'bò biết bay', 40000.00, 100, 'products/1758740213_492013561_655045020664689_5854916036349762659_n.jpg', 0, 0, '2025-09-24 18:56:53');
+(14, 'gậy bóng đá', 11, 1, 'đập nhau fen', 12000.00, 120, 'products/1760363550_images.jpg', 0, 0, '2025-09-18 07:19:46'),
+(17, 'hộp bút vàng 9999', 7, 13, 'bò biết bay', 40000.00, 100, 'products/1759381410_images.jpg', 0, 0, '2025-09-24 18:56:53'),
+(18, 'Bút bi Thiên Long TL-027', 3, 1, 'Bút bi trơn, nét 0.5mm', 5000.00, 1200, 'products/1760363487_images (15).jpg', 0, 1, '2025-10-13 11:55:20'),
+(19, 'Bút gel Deli 0.5mm', 3, 2, 'Mực gel êm, khô nhanh', 9000.00, 800, 'products/1760363471_images (8).jpg', 0, 0, '2025-10-13 11:55:20'),
+(20, 'Bút mực Pilot G2 0.7', 3, 3, 'Nét 0.7mm, viết êm', 28000.00, 300, 'products/1760363442_images (12).jpg', 0, 0, '2025-10-13 11:55:20'),
+(21, 'Bút chì gỗ HB Staedtler', 3, 4, 'Bút chì HB, dễ gọt', 6000.00, 1000, 'products/1760363427_images (11).jpg', 0, 0, '2025-10-13 11:55:20'),
+(22, 'Bút chì kim 0.5mm Pentel', 3, 12, 'Thân chắc chắn, dễ dùng', 45000.00, 200, 'products/1760363399_download.jpg', 0, 0, '2025-10-13 11:55:20'),
+(23, 'Bút highlight Stabilo Boss', 3, 15, 'Màu nổi, không lem', 32000.00, 350, 'products/1760363378_download (1).jpg', 0, 1, '2025-10-13 11:55:20'),
+(24, 'Bút gel Uni-ball Signo', 3, 16, 'Mực gel chống lem', 36000.00, 280, 'products/1760363273_images (21).jpg', 0, 0, '2025-10-13 11:55:20'),
+(25, 'Bút máy Thiên Long Student', 3, 1, 'Bút máy học sinh, kèm ống mực', 42000.00, 180, 'products/1760363259_images (20).jpg', 0, 0, '2025-10-13 11:55:20'),
+(26, 'Thước thẳng 20cm Deli', 4, 2, 'Thước nhựa trong 20cm', 7000.00, 700, 'products/1760363242_images (16).jpg', 0, 0, '2025-10-13 11:55:20'),
+(27, 'Bộ eke 30-60-90 Maped', 4, 13, 'Bộ 2 eke, thước đo góc', 42000.00, 250, 'products/1760363226_download.jpg', 0, 0, '2025-10-13 11:55:20'),
+(28, 'Thước cuộn 3m Maped', 4, 13, 'Thước cuộn nhỏ gọn 3m', 55000.00, 140, 'products/1760363206_images (11).jpg', 0, 0, '2025-10-13 11:55:20'),
+(29, 'Tẩy Pentel Hi-Polymer', 5, 12, 'Tẩy êm, ít bụi', 12000.00, 900, 'products/1760363187_images (2).jpg', 0, 0, '2025-10-13 11:55:20'),
+(30, 'Gọt bút chì Maped 1 lỗ', 5, 13, 'Gọt nhựa nhỏ gọn', 9000.00, 600, 'products/1760363165_images (5).jpg', 0, 0, '2025-10-13 11:55:20'),
+(31, 'Compa Staedtler School', 6, 4, 'Compa học sinh, kim chắc', 55000.00, 220, 'products/1760363150_images (13).jpg', 0, 0, '2025-10-13 11:55:20'),
+(32, 'Thước đo góc 180° Deli', 6, 2, 'Thước đo góc bán nguyệt', 8000.00, 500, 'products/1760363127_images (3).jpg', 0, 0, '2025-10-13 11:55:20'),
+(33, 'Hộp bút vải Deli 2 ngăn', 7, 2, 'Chống bám bẩn, 2 ngăn tiện lợi', 65000.00, 180, 'products/1760363096_images (6).jpg', 0, 0, '2025-10-13 11:55:20'),
+(34, 'Hộp bút Maped PVC', 7, 13, 'PVC bền, khoá kéo mượt', 59000.00, 120, 'products/1760363075_images (10).jpg', 0, 0, '2025-10-13 11:55:20'),
+(35, 'Vở Campus B5 80 trang', 8, 11, 'Giấy dày, mịn', 18000.00, 900, 'products/1760363049_download (2).jpg', 0, 0, '2025-10-13 11:55:20'),
+(36, 'Vở kẻ ngang Thiên Long 200 trang', 8, 1, 'Bìa cứng, giấy trắng mịn', 26000.00, 600, 'products/1760363013_images (18).jpg', 0, 0, '2025-10-13 11:55:20'),
+(37, 'Giấy A4 70gsm PaperOne 500 tờ', 8, NULL, 'Giấy in 70gsm', 78000.00, 300, 'products/1760362990_images (4).jpg', 0, 0, '2025-10-13 11:55:20'),
+(38, 'Bìa còng A4 Deli', 9, 2, 'Khổ A4, gáy 5cm', 42000.00, 260, 'products/1760362974_images (14).jpg', 0, 0, '2025-10-13 11:55:20'),
+(39, 'File lá A4 100 cái', 9, NULL, 'File lá mỏng trong suốt', 45000.00, 400, 'products/1760362952_images (6).jpg', 0, 0, '2025-10-13 11:55:20'),
+(40, 'Bút màu sáp Crayola 24 màu', 10, 14, 'Sáp màu cho bé', 65000.00, 320, 'products/1760362921_images (11).jpg', 0, 1, '2025-10-13 11:55:21'),
+(41, 'Màu nước Faber-Castell 12 màu', 10, 11, 'Màu tươi, dễ pha', 82000.00, 180, 'products/1760362898_images (20).jpg', 0, 0, '2025-10-13 11:55:21'),
+(42, 'Cọ vẽ Pentel size 4', 10, 12, 'Lông mềm, thấm tốt', 29000.00, 150, 'products/1760362880_download (2).jpg', 0, 0, '2025-10-13 11:55:21'),
+(43, 'Tập vẽ A4 120gsm', 10, NULL, 'Giấy vẽ 120gsm, 20 tờ', 38000.00, 210, 'products/1760362865_images (18).jpg', 0, 0, '2025-10-13 11:55:21'),
+(44, 'Kẹp bướm 32mm (hộp 12)', 11, NULL, 'Kẹp giấy 32mm', 25000.00, 220, 'products/1760362818_images (13).jpg', 0, 0, '2025-10-13 11:55:21'),
+(45, 'Dập ghim Deli số 10', 11, 2, 'Dập ghim mini số 10', 52000.00, 140, 'products/1760362803_images (5).jpg', 0, 0, '2025-10-13 11:55:21'),
+(46, 'Kim ghim số 10 (1000 viên)', 11, 2, 'Kim thay cho dập ghim số 10', 12000.00, 600, 'products/1760362786_images (8).jpg', 0, 0, '2025-10-13 11:55:21'),
+(47, 'Giấy note 3x3 vàng', 12, NULL, 'Ghi chú 3x3 inch', 9000.00, 500, 'products/1760362770_images.jpg', 0, 0, '2025-10-13 11:55:21'),
+(48, 'Index phân trang 5 màu', 12, 13, 'Bộ 5 màu, 100 lá', 18000.00, 380, 'products/1760362748_images (1).jpg', 0, 0, '2025-10-13 11:55:21'),
+(49, 'Bình nước 500ml nhựa Tritan', 14, NULL, 'An toàn BPA free', 69000.00, 160, 'products/1760362731_images (10).jpg', 0, 0, '2025-10-13 11:55:21'),
+(50, 'Hộp cơm 2 ngăn', 14, NULL, 'Microwave safe', 89000.00, 110, 'products/1760362716_images (9).jpg', 0, 0, '2025-10-13 11:55:21'),
+(51, 'Balo học sinh Deli chữ U', 17, 2, 'Balo học sinh nhiều ngăn', 195000.00, 90, 'products/1760362703_images (23).jpg', 0, 0, '2025-10-13 11:55:21'),
+(52, 'Balo thời trang Maped', 17, 13, 'Balo nhẹ, đệm lưng êm', 245000.00, 70, 'products/1760362688_images (7).jpg', 0, 0, '2025-10-13 11:55:21'),
+(53, 'Sổ tay A5 bìa da', 28, NULL, 'Sổ tay bìa da A5 200 trang', 69000.00, 130, 'products/1760362676_download (1).jpg', 0, 1, '2025-10-13 11:55:21'),
+(54, 'Planner 2025 weekly', 28, NULL, 'Planner theo tuần 2025', 99000.00, 80, 'products/1760362649_download (1).jpg', 0, 0, '2025-10-13 11:55:21'),
+(55, 'Máy tính Casio fx-580VN X', 18, NULL, 'Máy tính khoa học cho HS-SV', 790000.00, 60, 'products/1760362635_images (11).jpg', 0, 0, '2025-10-13 11:55:21'),
+(56, 'Máy tính mini bỏ túi Deli', 18, 2, 'Màn hình 12 số', 159000.00, 90, 'products/1760362618_images (22).jpg', 0, 0, '2025-10-13 11:55:21'),
+(57, 'USB 32GB 3.0', 19, NULL, 'Tốc độ USB 3.0', 129000.00, 120, 'products/1760362600_images (17).jpg', 0, 0, '2025-10-13 11:55:21'),
+(58, 'USB 64GB 3.2', 19, NULL, 'Tốc độ USB 3.2', 189000.00, 80, 'products/1760362585_images (7).jpg', 0, 0, '2025-10-13 11:55:21'),
+(59, 'Bảng trắng mini A4', 24, NULL, 'Kèm bút lông & khăn lau', 39000.00, 140, 'products/1760362566_images (4).jpg', 0, 0, '2025-10-13 11:55:21'),
+(60, 'Kéo học sinh 13cm', 23, NULL, 'Đầu tù an toàn', 15000.00, 400, 'products/1760357450_download (2).jpg', 0, 0, '2025-10-13 11:55:21'),
+(61, 'Dao rọc giấy Deli 18mm', 23, 2, 'Khóa lưỡi chắc chắn', 22000.00, 200, 'products/1760362537_images (21).jpg', 0, 0, '2025-10-13 11:55:21'),
+(62, 'Keo khô Deli 15g', 22, 2, 'Dán giấy nhanh khô', 9000.00, 500, 'products/1760362508_images (2).jpg', 0, 0, '2025-10-13 11:55:21'),
+(63, 'Băng dính trong 1.8cm x 30y', 22, NULL, 'Độ dính tốt', 12000.00, 450, 'products/1760362484_images (10).jpg', 0, 0, '2025-10-13 11:55:21'),
+(64, 'Note 3x5 kẻ ngang', 26, NULL, 'Ghi chú khổ lớn', 14000.00, 260, 'products/1760362469_images (18).jpg', 0, 0, '2025-10-13 11:55:21'),
+(65, 'Hộp đựng tài liệu A4 5 ngăn', 25, NULL, 'Nhựa PP bền', 59000.00, 120, 'products/1760362450_images (23).jpg', 0, 0, '2025-10-13 11:55:21'),
+(66, 'Bút bi M&G 0.5mm', 3, 5, 'Bi 0.5mm, trơn', 7000.00, 900, 'products/1760362424_images (15).jpg', 0, 0, '2025-10-13 11:55:21'),
+(67, 'Bút lông dầu Thiên Long', 3, 1, 'Viết CD/DVD/kim loại', 15000.00, 350, 'products/1760362406_images (16).jpg', 0, 0, '2025-10-13 11:55:21'),
+(68, 'Bút lông bảng Deli', 3, 2, 'Xoá khô dễ dàng', 12000.00, 400, 'products/1760362393_download (2).jpg', 0, 0, '2025-10-13 11:55:21'),
+(69, 'Bút chì 2B Faber-Castell', 3, 11, 'Hộp 12 cây', 52000.00, 220, 'products/1760362380_download.jpg', 0, 0, '2025-10-13 11:55:21'),
+(70, 'Sổ chấm công A5', 11, NULL, 'Sổ văn phòng A5', 23000.00, 160, 'products/1760362353_images (18).jpg', 0, 0, '2025-10-13 11:55:21'),
+(71, 'Túi zipper A5', 9, NULL, 'Đựng giấy tờ chống nước', 9000.00, 380, 'products/1760362336_download (1).jpg', 0, 0, '2025-10-13 11:55:21'),
+(72, 'Vở ô ly A4 120 trang', 8, NULL, 'Giấy trắng, kẻ ô ly', 26000.00, 260, 'products/1760357450_download (2).jpg', 0, 0, '2025-10-13 11:55:21'),
+(73, 'Giấy A5 80gsm (500 tờ)', 8, NULL, 'Giấy in A5', 72000.00, 140, 'products/1760357562_images (14).jpg', 0, 0, '2025-10-13 11:55:21'),
+(74, 'Set cọ vẽ 5 cây', 10, 12, 'Nhiều cỡ cho vẽ màu', 59000.00, 90, 'products/1760357533_download (1).jpg', 0, 0, '2025-10-13 11:55:21'),
+(75, 'Bút dạ quang 6 màu Stabilo', 3, 15, 'Bộ 6 màu nổi bật', 149000.00, 110, 'products/1760357513_images (16).jpg', 0, 0, '2025-10-13 11:55:21'),
+(76, 'Bút gel Pentel Energel 0.5', 3, 12, 'Mực gel khô nhanh', 35000.00, 180, 'products/1760357480_images (10).jpg', 0, 0, '2025-10-13 11:55:21'),
+(77, 'Bút bi Uni-ball Jetstream', 3, 16, 'Bi trơn, chống lem', 39000.00, 150, 'products/1760357469_images (20).jpg', 0, 0, '2025-10-13 11:55:21'),
+(78, 'Thước kẻ kim loại 30cm', 4, NULL, 'Thép không gỉ', 29000.00, 130, 'products/1760357450_download (2).jpg', 0, 0, '2025-10-13 11:55:21'),
+(79, 'Kéo văn phòng 21cm', 11, NULL, 'Lưỡi sắc, tay cầm êm', 39000.00, 100, 'products/1760357430_images (13).jpg', 0, 0, '2025-10-13 11:55:21'),
+(80, 'Dập ghim số 10 Thiên Long', 11, 1, 'Dập ghim bền', 59000.00, 95, 'products/1760357415_images (6).jpg', 0, 0, '2025-10-13 11:55:21'),
+(81, 'Kim bấm số 10 Thiên Long', 11, 1, '1000 viên', 13000.00, 400, 'products/1760357394_images (4).jpg', 0, 0, '2025-10-13 11:55:21'),
+(82, 'Giấy note phủ keo 4 màu', 12, NULL, 'Ghi chú nhiều màu', 19000.00, 240, 'products/1760357355_images (1).jpg', 0, 0, '2025-10-13 11:55:21'),
+(83, 'Bút brush màu nước Pentel', 10, 12, 'Đầu cọ mềm, đậm nhạt tốt', 69000.00, 85, 'products/1760357333_download.jpg', 0, 0, '2025-10-13 11:55:21');
 
 -- --------------------------------------------------------
 
@@ -478,6 +618,18 @@ CREATE TABLE `product_attributes` (
   `value` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `product_attributes`
+--
+
+INSERT INTO `product_attributes` (`id`, `product_id`, `attribute_id`, `value`, `created_at`) VALUES
+(1, 19, 1, 'Đen', '2025-10-13 11:55:21'),
+(2, 19, 6, '0.5mm', '2025-10-13 11:55:21'),
+(3, 23, 1, 'Vàng', '2025-10-13 11:55:21'),
+(4, 35, 8, 'B5', '2025-10-13 11:55:21'),
+(5, 35, 4, '80', '2025-10-13 11:55:21'),
+(6, 55, 10, '12 tháng', '2025-10-13 11:55:21');
 
 -- --------------------------------------------------------
 
@@ -581,8 +733,8 @@ INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (1, 6),
 (1, 7),
 (1, 8),
-(1, 9);
-(7, 1),
+(1, 9),
+(7, 1);
 
 -- --------------------------------------------------------
 
@@ -602,7 +754,22 @@ CREATE TABLE `suppliers` (
 --
 
 INSERT INTO `suppliers` (`supplier_id`, `supplier_name`, `contact_info`, `description`) VALUES
-(1, 'ncca', '0961208936', NULL);
+(1, 'ncca', '0961208936', NULL),
+(3, 'Công ty VPP Minh Long', '024-3711-2233 | sales@minhlong.vn', 'Nhà phân phối văn phòng phẩm miền Bắc'),
+(4, 'Công ty Hồng Hà Trading', '028-3899-1122 | cskh@hongha.vn', 'Phân phối vở và giấy in'),
+(5, 'An Phát Stationery', '0938 111 222 | anphat@stationery.vn', 'Phân phối đa ngành VPP'),
+(6, 'Thiên Phú Supplies', '0988 333 444 | thienphu@sup.vn', 'Nhà cung cấp dụng cụ học tập'),
+(7, 'Nova Edu Mall', 'support@novaedu.vn', 'Trung tâm phân phối thiết bị trường học'),
+(8, 'Pencil House', '0909 123 789 | hello@pencilhouse.vn', 'Chuyên bút viết & phụ kiện'),
+(9, 'Paper World Co.', 'paperworld@co.vn', 'Chuyên giấy & sổ tay'),
+(10, 'Color Art VN', 'colorart@vn.com', 'Chuyên dụng cụ mỹ thuật'),
+(11, 'Maped VN Distributor', 'maped-vn@dist.com', 'Nhà pp chính hãng Maped'),
+(12, 'Deli Việt Nam', 'care@deli.vn', 'Đại lý Deli'),
+(13, 'Uni Việt Nam', 'contact@univn.com', 'Đại lý Uni-ball'),
+(14, 'Faber-Castell VN', 'fc@vietnam.com', 'Đại lý Faber-Castell'),
+(15, 'Pentel VN', 'pentel@vn.com', 'Đại lý Pentel'),
+(16, 'Crayola Partner VN', 'hello@crayola.vn', 'Đại lý Crayola'),
+(17, 'VietOffice Hub', 'hotline 1900-6868', 'Hub tổng hợp văn phòng phẩm');
 
 -- --------------------------------------------------------
 
@@ -630,21 +797,21 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `full_name`, `email`, `phone`, `address`, `password`, `google_id`, `facebook_id`, `role_id`, `created_at`, `is_active`, `last_activity`) VALUES
-(1, '1', '1@1', '1', '1', '$2y$10$3CqGdOLVg/zAhjPwv83MjOQeNVTC1CG7KlARiC5MMzem/UcJPUr8i', NULL, NULL, 1, '2025-09-18 16:39:42', 1, '2025-09-30 20:02:00'),
-(2, '1', '1@2', '0349459165', '1', '$2y$10$pZJHCIkN7HElvBnOOP0GPe4r1aPizcwcdgwSn3nkJMg5Klb8SsbDy', NULL, NULL, 7, '2025-09-18 16:40:02', 1, '2025-09-30 16:13:13'),
+(1, '1', '1@1', '1', '1', '$2y$10$3CqGdOLVg/zAhjPwv83MjOQeNVTC1CG7KlARiC5MMzem/UcJPUr8i', NULL, NULL, 1, '2025-09-18 16:39:42', 1, '2025-10-13 14:47:28'),
+(2, '1', '1@2', '0349459165', '1', '$2y$10$pZJHCIkN7HElvBnOOP0GPe4r1aPizcwcdgwSn3nkJMg5Klb8SsbDy', NULL, NULL, 7, '2025-09-18 16:40:02', 1, '2025-10-12 10:54:23'),
 (3, 'full', 'full@gmail.com', NULL, NULL, '$2y$10$dr.czSZf4m/W47jiq3V.uOAYu47EdFX2k1SXEtvDQ12.O6RGmnWkm', NULL, NULL, 1, '2025-09-15 10:16:33', 1, '2025-09-25 02:42:49'),
 (4, 'Lê Trường Giang', '22111061403@hunre.edu.vn', NULL, NULL, '$2y$10$s2hx4ODaRbTUJ8cSdmgnh.7iM3LIP6EBNPQQPcGdCEqbD7j1TA6P6', '114118200846899184853', NULL, 3, '2025-09-19 07:15:47', 1, '2025-09-25 04:30:34'),
 (5, 'Lê Trường Giang', 'letruonggiang2004hhbg@gmail.com', NULL, NULL, '$2y$10$aUfPCVmeh81MQ0x4ctWRMef3q4dyJzIWGCgS59p1N8NPHT8xXcOKW', NULL, '796737086574204', 3, '2025-09-22 15:12:15', 1, '2025-09-24 19:06:18'),
 (6, 'Giang Lê', 'gianglehhbg2004@gmail.com', NULL, NULL, '$2y$10$0Tw0t2FED86jZ1WKCChPvewpOMixb0oIz6qwAc9GH0tRTTbiBE6xW', '116654594578248973228', NULL, 3, '2025-09-25 01:48:02', 1, '2025-09-25 01:48:49'),
-(7, 'phùng thị trang', 'phungtrang19012004@gmail.com', '+84349459165', 'fffffff', '$2y$10$ysgsZOy.ndgomdjJEwdAyuJ8fmbu5okBfUTSfrS3sUv/FTE71GHVe', NULL, NULL, 3, '2025-09-25 07:37:59', 1, '2025-09-25 08:58:24'),
-(8, 'giaicuuthienthan', 'mynameistrang19012004@gmail.com', '+84349459165', 'fffffff', '$2y$10$BRgsqlqOoFwZqOmvD465ne5sH3k4jRhmv8JqxXYOBsAKC6VTte14q', NULL, NULL, 3, '2025-09-25 07:40:19', 1, '2025-09-25 08:13:48'),
+(7, 'mynameistrang', 'phungtrang19012004@gmail.com', '+84349459165', 'fffffff', '$2y$10$2f4RUvFhO6h1FQ7T4nXdwOG0GODksyoW.mvXSvk0OjF6HAuBEHjMK', '110649348640287605072', NULL, 3, '2025-09-25 07:37:59', 1, '2025-10-13 14:47:41'),
+(8, 'Trang Phùng', 'mynameistrang19012004@gmail.com', '+84349459165', 'fffffff', '$2y$10$ki53nt3shPBfnW9ITYO0t.Cj3kHHycFA0MuJc9cCZeJJV9WeIoMSW', '101984925702797977265', NULL, 3, '2025-09-25 07:40:19', 1, '2025-10-13 14:23:46'),
 (9, 'KHÁ BẢNH', 'banh@gmail.com', '+84368498289', 'ss', '$2y$10$PullQW1zoEdwcQeRAshjfOQvsezjv0B84Neg8Od7jgNerlKss9kOy', NULL, NULL, 3, '2025-09-25 07:41:45', 1, '2025-09-25 07:49:05'),
 (10, 'Nguyễn Văn A@#123', 'hoahoavuive2004@gmail.com', '+84349459165', 'nam dinh', '$2y$10$u/T2CoeeGcYwwukFPLhwEuBqMbvMqYHYmCGOA7vISMWmqpXqD5fSK', NULL, NULL, 3, '2025-09-25 07:49:22', 1, '2025-09-25 07:50:17'),
 (11, 'Nguyễn Văn A@#123', 'vuive2004@gmail.com', '+84349459165', 'nam dinh', '$2y$10$Em0OVdJU7Zb5MbMpKOkHA.Be0eRbd9akuIqyOkOf9xU2vRJbLTNae', NULL, NULL, 3, '2025-09-25 07:50:37', 1, '2025-09-25 07:51:14'),
 (12, 'KHÁ BẢNH', 'anh@gmail.com', '+84368498289', 'ss', '$2y$10$I6bvmy0ThBI.oe6S.S.WIOH5tZqdUE2EKojOkP3/o9pNNob5IZpp6', NULL, NULL, 3, '2025-09-25 07:51:34', 1, '2025-09-25 07:53:23'),
 (13, 'phùng thị trang', 'trang19012004@gmail.com', '+84349459165', 'fffffff', '$2y$10$Ihp4kKQLpmBIQGtLFUdWc.fNIgvdHZRE1QWbIqmgfUnks0XGi9xpC', NULL, NULL, 3, '2025-09-25 07:53:38', 1, '2025-09-25 07:55:25'),
 (14, 'phùng thị trang', 'trag@gmail.com', '+84349459165', 'fffffff', '$2y$10$BXZj8UmWgS9tbepaC289rO.eaStSCAr.xxabv9A4qSBpnuP.JA5v6', NULL, NULL, 3, '2025-09-25 07:56:48', 1, '2025-09-25 07:59:02'),
-(15, 'phùng thị trang', 'nam@gmail.com', '+84349459165', 'fffffff', '$2y$10$PXw7faGiSOMrIVbRDhYZne9OzUt962YlPHyim2tcoMAysVrtzqqo6', NULL, NULL, 3, '2025-09-25 08:02:08', 1, '2025-10-01 18:17:49');
+(15, 'phùng thị trang', 'nam@gmail.com', '+84349459165', 'fffffff', '$2y$10$PXw7faGiSOMrIVbRDhYZne9OzUt962YlPHyim2tcoMAysVrtzqqo6', NULL, NULL, 3, '2025-09-25 08:02:08', 1, '2025-10-11 15:00:28');
 
 -- --------------------------------------------------------
 
@@ -854,7 +1021,7 @@ ALTER TABLE `vnpay`
 -- AUTO_INCREMENT for table `attributes`
 --
 ALTER TABLE `attributes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `brands`
@@ -866,13 +1033,13 @@ ALTER TABLE `brands`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `chat_sessions`
 --
 ALTER TABLE `chat_sessions`
-  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `comments`
@@ -896,19 +1063,19 @@ ALTER TABLE `coupons`
 -- AUTO_INCREMENT for table `delivery`
 --
 ALTER TABLE `delivery`
-  MODIFY `delivery_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `delivery_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `favourite`
 --
 ALTER TABLE `favourite`
-  MODIFY `favourite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `favourite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -926,13 +1093,13 @@ ALTER TABLE `momo`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `password_otps`
@@ -950,13 +1117,13 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT for table `product_attributes`
 --
 ALTER TABLE `product_attributes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `purchase_orders`
@@ -980,7 +1147,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `supplier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `supplier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users`
