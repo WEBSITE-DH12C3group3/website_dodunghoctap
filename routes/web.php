@@ -1,10 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+use Illuminate\Http\Request;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\PassworddController;
 use App\Http\Controllers\Store\HomeController;
 use App\Http\Controllers\Store\ProfileController;
 use App\Http\Controllers\Store\ProductShowController;
@@ -33,8 +32,6 @@ use App\Http\Controllers\Store\PasswordOtpController;
 use App\Http\Controllers\Store\ChatController as StoreChatController;
 use App\Http\Controllers\Admin\ChatAdminController;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 require __DIR__ . '/auth.php';
 
@@ -79,6 +76,16 @@ Route::get('/auth/google/callback', [GoogleLoginController::class, 'handleGoogle
 
 Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook']);
 Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
+// Route::middleware('guest')->group(function () {
+//     Route::get('/forgotpassword', [PassworddController::class, 'requestForm'])->name('profile.password.request');
+//     Route::post('/forgotpassword/otp/send', [PassworddController::class, 'sendOtp'])->name('profile.password.otp.send');
+
+//     Route::get('/forgotpassword/otp/verify', [PassworddController::class, 'verifyForm'])->name('profile.password.verify.form');
+//     Route::post('/forgotpassword/otp/verify', [PassworddController::class, 'verifySubmit'])->name('profile.password.verify.submit');
+
+//     Route::get('/forgotpassword/reset', [PassworddController::class, 'resetForm'])->name('profile.password.reset.form');
+//     Route::post('/forgotpassword/reset', [PassworddController::class, 'resetSubmit'])->name('profile.password.reset.submit');
+// });
 
 Route::middleware('auth')->group(function () {
     Route::post('/chat/open',        [StoreChatController::class, 'open'])->name('chat.open');
@@ -86,21 +93,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/send',        [StoreChatController::class, 'send'])->name('chat.send');
     Route::post('/chat/mark-read',   [StoreChatController::class, 'markRead'])->name('chat.markRead');
 });
-// // forget password
-// Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
-//     ->name('password.request');
-
-// // Gửi email có link reset
-// Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
-//     ->name('password.email');
-
-// // Form đặt mật khẩu mới (từ link email)
-// Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
-//     ->name('password.reset');
-
-// // Submit đặt mật khẩu mới
-// Route::post('/reset-password', [NewPasswordController::class, 'store'])
-//     ->name('password.update');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 
@@ -225,18 +217,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy'])
             ->middleware('permission:manage_suppliers')->name('admin.suppliers.destroy');
 
-            Route::get('/discounts', [CouponController::class, 'index'])
-        ->middleware('permission:manage_discounts')->name('admin.discounts');
-    Route::get('/discounts/create', [CouponController::class, 'create'])
-        ->middleware('permission:manage_discounts')->name('admin.discounts.create');
-    Route::post('/discounts', [CouponController::class, 'store'])
-        ->middleware('permission:manage_discounts')->name('admin.discounts.store');
-    Route::get('/discounts/{id}/edit', [CouponController::class, 'edit'])
-        ->middleware('permission:manage_discounts')->name('admin.discounts.edit');
-    Route::put('/discounts/{id}', [CouponController::class, 'update'])
-        ->middleware('permission:manage_discounts')->name('admin.discounts.update');
-    Route::delete('/discounts/{id}', [CouponController::class, 'destroy'])
-        ->middleware('permission:manage_discounts')->name('admin.discounts.destroy');
+        Route::get('/discounts', [CouponController::class, 'index'])
+            ->middleware('permission:manage_discounts')->name('admin.discounts');
+        Route::get('/discounts/create', [CouponController::class, 'create'])
+            ->middleware('permission:manage_discounts')->name('admin.discounts.create');
+        Route::post('/discounts', [CouponController::class, 'store'])
+            ->middleware('permission:manage_discounts')->name('admin.discounts.store');
+        Route::get('/discounts/{id}/edit', [CouponController::class, 'edit'])
+            ->middleware('permission:manage_discounts')->name('admin.discounts.edit');
+        Route::put('/discounts/{id}', [CouponController::class, 'update'])
+            ->middleware('permission:manage_discounts')->name('admin.discounts.update');
+        Route::delete('/discounts/{id}', [CouponController::class, 'destroy'])
+            ->middleware('permission:manage_discounts')->name('admin.discounts.destroy');
 
         Route::get('/brands', [BrandController::class, 'index'])
             ->middleware('permission:manage_brands')->name('admin.brands');
@@ -264,7 +256,6 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:view_statistics')->name('admin.stats');
         Route::post('/stats/export', [StatsController::class, 'exportReport'])->name('admin.stats.export');
     });
-
 });
 Route::middleware(['auth', 'permission:manage_livechat'])
     ->prefix('admin')

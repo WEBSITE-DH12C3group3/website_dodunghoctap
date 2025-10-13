@@ -212,7 +212,7 @@
                 {{-- Quên mật khẩu --}}
                 <div class="text-center text-white/90">
                     Quên mật khẩu? Nhấn vào
-                    <a href="{{ route('password.request') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 ">
+                    <a href="{{ route('profile.password.request') }}" class="font-semibold text-yellow-300 hover:text-yellow-200 ">
                         đây
                     </a>
                 </div>
