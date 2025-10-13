@@ -183,6 +183,14 @@
                         <i class="fa-solid fa-comments mr-3"></i> Quản lý Live Chat
                         </a>
                     @endif
+                    @if(auth()->check() && auth()->user()->hasPermission('manage_discounts'))
+                    <a href="{{ route('admin.discounts') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.discounts*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21 6H7a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2zM9 10h2v2H9v-2zm6 4h2v2h-2v-2zM7 4h10v2H7V4z" />
+                        </svg>
+                        <span>Mã giảm giá</span>
+                    </a>
+                    @endif
                 </nav>
                 <!-- User Info and Actions -->
                 <div class="mt-auto border-t border-slate-200 dark:border-slate-700 pt-4">

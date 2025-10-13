@@ -18,6 +18,7 @@ use App\Http\Controllers\Store\FavouriteController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\UserController;
@@ -223,6 +224,19 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage_suppliers')->name('admin.suppliers.update');
         Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy'])
             ->middleware('permission:manage_suppliers')->name('admin.suppliers.destroy');
+
+            Route::get('/discounts', [CouponController::class, 'index'])
+        ->middleware('permission:manage_discounts')->name('admin.discounts');
+    Route::get('/discounts/create', [CouponController::class, 'create'])
+        ->middleware('permission:manage_discounts')->name('admin.discounts.create');
+    Route::post('/discounts', [CouponController::class, 'store'])
+        ->middleware('permission:manage_discounts')->name('admin.discounts.store');
+    Route::get('/discounts/{id}/edit', [CouponController::class, 'edit'])
+        ->middleware('permission:manage_discounts')->name('admin.discounts.edit');
+    Route::put('/discounts/{id}', [CouponController::class, 'update'])
+        ->middleware('permission:manage_discounts')->name('admin.discounts.update');
+    Route::delete('/discounts/{id}', [CouponController::class, 'destroy'])
+        ->middleware('permission:manage_discounts')->name('admin.discounts.destroy');
 
         Route::get('/brands', [BrandController::class, 'index'])
             ->middleware('permission:manage_brands')->name('admin.brands');
