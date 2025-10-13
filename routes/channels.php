@@ -18,18 +18,18 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
  *   -> nếu muốn siết chặt hơn, bật thêm điều kiện assigned ở dưới
  */
 Broadcast::channel('chat.session.{sessionId}', function ($user, $sessionId) {
-    $isOwner = ChatSession::where('session_id', $sessionId)
-        ->where('user_id', $user->user_id)
-        ->exists();
+    $session = ChatSession::select('user_id','assigned_admin_id')->find($sessionId);
+    if (!$session) return false;
 
-    $canManage = method_exists($user, 'hasPermission')
-        && $user->hasPermission('manage_livechat');
+    if ((int)$session->user_id === (int)$user->user_id) return true; // chủ phiên
 
-    // Nếu muốn chỉ agent đã được assign mới nghe được, dùng thêm:
-    // $assigned = ChatSession::where('session_id', $sessionId)
-    //     ->where('assigned_admin_id', $user->user_id)
-    //     ->exists();
-    // return $isOwner || ($canManage && $assigned);
+    $canManage = method_exists($user,'hasPermission') && $user->hasPermission('manage_livechat');
+    if (!$canManage) return false;
 
-    return $isOwner || $canManage;
+    // chưa ai nhận -> tất cả admin có quyền được nghe
+    if (is_null($session->assigned_admin_id)) return true;
+
+    // đã nhận -> chỉ admin được assign nghe
+    return (int)$session->assigned_admin_id === (int)$user->user_id;
 });
+

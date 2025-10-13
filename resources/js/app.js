@@ -6,6 +6,7 @@ import './bootstrap';
 import './chat';
 // import './admin-chat';
 import './admin-messenger';
+import './echo';
 
 window.Alpine = Alpine;
 
