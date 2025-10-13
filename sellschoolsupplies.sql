@@ -428,6 +428,7 @@ INSERT INTO `permissions` (`permission_id`, `permission_name`, `description`, `c
 (4, 'manage_orders', 'Quản lý đơn hàng', '2025-08-22 06:56:54'),
 (5, 'manage_categories', 'Quản lý danh mục', '2025-09-15 14:08:54'),
 (6, 'manage_purchases', 'Quản lý phiếu nhập kho', '2025-09-17 14:02:03'),
+(7, 'manage_discounts', 'Quản lý giảm giá', '2025-09-18 05:56:28'),
 (8, 'manage_brands', 'Quản lý thương hiệu', '2025-09-18 06:29:35'),
 (9, 'manage_livechat', 'Quản lý chat', '2025-09-30 15:32:42');
 
@@ -571,17 +572,17 @@ CREATE TABLE `role_permissions` (
 --
 
 INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
+(1, 0),
 (1, 1),
 (1, 2),
 (1, 3),
 (1, 4),
-(1, 2),
 (1, 5),
 (1, 6),
-(1, 0),
+(1, 7),
 (1, 8),
-(7, 1),
 (1, 9);
+(7, 1),
 
 -- --------------------------------------------------------
 
