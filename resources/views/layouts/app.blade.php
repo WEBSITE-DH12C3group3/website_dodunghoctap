@@ -178,16 +178,15 @@
                         <span>Quản lý thương hiệu</span>
                     </a>
                     @endif
-                    @if(auth()->user()->hasPermission('manage_livechat'))
-                        <a href="{{ route('admin.chat.index') }}"
-                        class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.chat*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
-                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <!-- icon chat bubble -->
-                                <path d="M4 4h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8l-4 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-                            </svg>
-                            <span>Quản lý Live Chat</span>
-                        </a>
-                    @endif
+                   @if(auth()->user()->hasPermission('manage_livechat'))
+ <a href="{{ route('admin.chat.index') }}"
+ class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.chat*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
+ <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+ <path d="M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4.5l3.5 4 3.5-4H21a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+ </svg>
+ <span>Live Chat</span>
+ </a>
+ @endif
                     @if(auth()->check() && auth()->user()->hasPermission('manage_discounts'))
                     <a href="{{ route('admin.discounts') }}" class="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-700 transition-colors duration-200 {{ Route::is('admin.discounts*') ? 'bg-brand-600 text-white dark:bg-brand-700' : '' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
