@@ -14,7 +14,7 @@ $detailUrl = isset($product->slug)
     <div class="bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-md transition">
         <div class="aspect-[4/3] bg-gray-50 overflow-hidden">
             @if($img)
-            <img src="{{ $img }}" alt="{{ $name }}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy">
+            <img src="{{ $p->image_url ? asset('storage/' . $p->image_url) : asset('images/placeholder.webp') }}" alt="{{ $name }}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy">
             @else
             <div class="w-full h-full flex items-center justify-center text-gray-400">No image</div>
             @endif

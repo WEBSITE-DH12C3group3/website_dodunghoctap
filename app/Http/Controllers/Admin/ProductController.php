@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -92,21 +94,22 @@ public function index(Request $request)
         Log::info('ProductController@store called with data:', $request->all());
         
         $validated = $request->validate([
-            'product_name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,category_id',
-            'brand_id' => 'nullable|exists:brands,brand_id',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
-            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'product_name'   => ['required','string','max:255','unique:products,product_name'],
+            'category_id'    => ['required','exists:categories,category_id'],
+            'brand_id'       => ['nullable','exists:brands,brand_id'],
+            'description'    => ['nullable','string'],
+            'price'          => ['required','numeric','min:0'],
+            'stock_quantity' => ['required','integer','min:0'],
+            'image_url'      => ['nullable','image','mimes:jpeg,png,jpg,gif','max:2048'],
         ], [
             'product_name.required' => 'Vui lòng nhập tên sản phẩm.',
-            'category_id.required' => 'Vui lòng chọn danh mục.',
-            'brand_id.exists' => 'Thương hiệu không tồn tại.',
-            'price.required' => 'Vui lòng nhập giá.',
-            'stock_quantity.required' => 'Vui lòng nhập số lượng tồn kho.',
-            'image_url.image' => 'File phải là hình ảnh.',
-            'image_url.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
+            'product_name.unique'   => 'Tên sản phẩm đã tồn tại.',
+            'category_id.required'  => 'Vui lòng chọn danh mục.',
+            'brand_id.exists'       => 'Thương hiệu không tồn tại.',
+            'price.required'        => 'Vui lòng nhập giá.',
+            'stock_quantity.required'=> 'Vui lòng nhập số lượng tồn kho.',
+            'image_url.image'       => 'File phải là hình ảnh.',
+            'image_url.max'         => 'Kích thước hình ảnh không được vượt quá 2MB.',
         ]);
 
         DB::beginTransaction();
@@ -150,21 +153,25 @@ public function index(Request $request)
         $product = Product::findOrFail($id);
 
         $validated = $request->validate([
-            'product_name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,category_id',
-            'brand_id' => 'nullable|exists:brands,brand_id',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
-            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'product_name'   => [
+                'required','string','max:255',
+                Rule::unique('products','product_name')->ignore($id, 'product_id')
+            ],
+            'category_id'    => ['required','exists:categories,category_id'],
+            'brand_id'       => ['nullable','exists:brands,brand_id'],
+            'description'    => ['nullable','string'],
+            'price'          => ['required','numeric','min:0'],
+            'stock_quantity' => ['required','integer','min:0'],
+            'image_url'      => ['nullable','image','mimes:jpeg,png,jpg,gif','max:2048'],
         ], [
             'product_name.required' => 'Vui lòng nhập tên sản phẩm.',
-            'category_id.required' => 'Vui lòng chọn danh mục.',
-            'brand_id.exists' => 'Thương hiệu không tồn tại.',
-            'price.required' => 'Vui lòng nhập giá.',
-            'stock_quantity.required' => 'Vui lòng nhập số lượng tồn kho.',
-            'image_url.image' => 'File phải là hình ảnh.',
-            'image_url.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
+            'product_name.unique'   => 'Tên sản phẩm đã tồn tại.',
+            'category_id.required'  => 'Vui lòng chọn danh mục.',
+            'brand_id.exists'       => 'Thương hiệu không tồn tại.',
+            'price.required'        => 'Vui lòng nhập giá.',
+            'stock_quantity.required'=> 'Vui lòng nhập số lượng tồn kho.',
+            'image_url.image'       => 'File phải là hình ảnh.',
+            'image_url.max'         => 'Kích thước hình ảnh không được vượt quá 2MB.',
         ]);
 
         DB::beginTransaction();

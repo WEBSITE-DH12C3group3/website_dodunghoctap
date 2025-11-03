@@ -45,7 +45,7 @@ class ChatController extends Controller
         }
 
         // 2. Sản phẩm bán chạy nhất (order_items)
-        $bestSellerKeywords = ['san pham ban chay', 'ban tot nhat', 'top ban', 'san pham hot'];
+        $bestSellerKeywords = ['san pham ban chay', 'ban tot nhat', 'top ban', 'san pham hot', 'top'];
         if (Str::contains($message, $bestSellerKeywords)) {
             try {
                 $topProducts = DB::table('products')
